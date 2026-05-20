@@ -1,0 +1,27 @@
+# ── Core UI ────────────────────────────────────────────────
+streamlit>=1.35.0
+
+# ── PDF Parsing ────────────────────────────────────────────
+pdfplumber>=0.10.3
+PyPDF2>=3.0.1
+
+# ── NLP & ML ──────────────────────────────────────────────
+scikit-learn>=1.4.0
+numpy>=1.26.0
+pandas>=2.2.0
+nltk>=3.8.1
+
+# ── Visualisation ─────────────────────────────────────────
+plotly>=5.20.0
+
+# ── API layer (optional — only needed if running api/main.py)
+fastapi>=0.111.0
+uvicorn[standard]>=0.29.0
+python-multipart>=0.0.9
+pydantic>=2.7.0
+
+# ── OpenAI integration (optional) ─────────────────────────
+openai>=1.30.0
+
+# ── Utilities ─────────────────────────────────────────────
+python-dotenv>=1.0.1

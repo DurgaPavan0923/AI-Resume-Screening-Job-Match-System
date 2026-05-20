@@ -1,0 +1,161 @@
+# skills.txt — one skill per line (case-insensitive matching)
+# Optional weight syntax:  skill_name:weight
+# Lines starting with # are comments.
+
+# ── Programming Languages ───────────────────────────────────
+python
+java
+javascript
+typescript
+c++
+c#
+golang
+rust
+kotlin
+swift
+scala
+r
+matlab
+julia
+
+# ── Web & Frontend ──────────────────────────────────────────
+react
+react native
+vue
+angular
+next.js
+nuxt.js
+html
+css
+sass
+tailwind css
+bootstrap
+webpack
+vite
+graphql
+
+# ── Backend & APIs ──────────────────────────────────────────
+node.js
+django
+flask
+fastapi
+spring boot
+express.js
+rest api
+grpc
+microservices
+websockets
+
+# ── Databases ───────────────────────────────────────────────
+sql
+mysql
+postgresql
+sqlite
+mongodb
+redis
+elasticsearch
+cassandra
+dynamodb
+firebase
+supabase
+
+# ── Data Science & ML ────────────────────────────────────────
+machine learning
+deep learning
+natural language processing
+computer vision
+reinforcement learning
+scikit-learn
+pandas
+numpy
+matplotlib
+seaborn
+xgboost
+lightgbm
+catboost
+hugging face
+transformers
+bert
+gpt
+llm
+rag
+vector database
+feature engineering
+model deployment
+
+# ── AI Frameworks ────────────────────────────────────────────
+tensorflow
+pytorch
+keras
+jax
+onnx
+mlflow
+weights and biases
+
+# ── MLOps & Data Engineering ─────────────────────────────────
+airflow
+dbt
+spark
+hadoop
+kafka
+dask
+prefect
+great expectations
+feast
+
+# ── Cloud & DevOps ───────────────────────────────────────────
+aws
+gcp
+azure
+docker
+kubernetes
+terraform
+ansible
+ci/cd
+github actions
+jenkins
+linux
+bash
+nginx
+prometheus
+grafana
+
+# ── Data Visualisation ───────────────────────────────────────
+tableau
+power bi
+looker
+plotly
+dash
+streamlit
+
+# ── Version Control & Collaboration ──────────────────────────
+git
+github
+gitlab
+bitbucket
+jira
+confluence
+notion
+
+# ── Security ─────────────────────────────────────────────────
+oauth
+jwt
+ssl/tls
+penetration testing
+owasp
+
+# ── Mobile ───────────────────────────────────────────────────
+flutter
+android
+ios
+react native
+expo
+
+# ── Soft Skills (weighted lower) ─────────────────────────────
+agile:1
+scrum:1
+kanban:1
+communication:1
+leadership:1
+problem solving:1
+teamwork:1
