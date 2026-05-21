@@ -1,0 +1,8 @@
+venv/
+__pycache__/
+datasets/
+models/
+*.pkl
+*.joblib
+*.csv
+*.pdf
