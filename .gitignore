@@ -4,3 +4,5 @@ model/
 .env
 
 .vercel
+node_modules/
+*.log
