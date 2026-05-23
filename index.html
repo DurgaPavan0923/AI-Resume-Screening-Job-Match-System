@@ -232,12 +232,18 @@
 
     .parallax-bg {
       background-image: var(--bg-gradient);
-      background-attachment: fixed;
+      background-size: cover;
+      background-repeat: no-repeat;
+      min-height: 100vh;
     }
     .glass-card {
       background: var(--glass-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
+      transform: translateZ(0);
+      -webkit-transform: translateZ(0);
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
     }
     .ambient-shadow {
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
