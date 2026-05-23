@@ -274,6 +274,8 @@ class AnalyzeResponse(BaseModel):
     explanation:    str | None = None
     risk_metrics:   RiskMetrics | None = None
     insights:       CandidateInsights | None = None
+    raw_text:       str | None = None
+    summary:        str | None = None
 
 
 class KeyValueImportance(BaseModel):
@@ -308,6 +310,20 @@ class ChatRequest(BaseModel):
     candidate_role: str
     missing_skills: list[str]
     matched_skills: list[str]
+
+
+class CandidateSummaryItem(BaseModel):
+    name: str
+    score: float
+    role: str
+    matched_skills: list[str]
+    missing_skills: list[str]
+    experience: int
+
+
+class ChatAllRequest(BaseModel):
+    message: str
+    candidates: list[CandidateSummaryItem]
 
 
 class ChatResponse(BaseModel):
@@ -484,6 +500,7 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
     decision_plain = re.sub(r"<[^>]+>", "", result.decision)
 
     gpt_analysis = "⚠️ AI analysis unavailable (check API key / quota)."
+    summary = ""
     if AIConfig.openai_key or AIConfig.gemini_key:
         try:
             # Truncate to avoid hitting token limits
@@ -498,14 +515,32 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
                 "You are an expert technical recruiter and talent-acquisition specialist. "
                 "Analyse the candidate's resume against the provided job description. "
                 "Be concise, professional, and actionable. "
-                "Return your analysis in plain text with three labelled sections:\n"
-                "1. Strengths\n"
-                "2. Weaknesses / Gaps\n"
-                "3. Recommendation (Hire / Consider / Reject with a one-sentence rationale)"
+                "Return your analysis in plain text with four labelled sections:\n"
+                "1. Executive Summary (Concise 5-line summary of candidate's fit, background, and limitations)\n"
+                "2. Strengths\n"
+                "3. Weaknesses / Gaps\n"
+                "4. Recommendation (Hire / Consider / Reject with a one-sentence rationale)"
             )
             gpt_analysis = get_ai_response(prompt=user_prompt, system_instruction=system_prompt)
+            
+            import re
+            m = re.search(r"Executive Summary:(.*?)(?=Strengths|Weaknesses|Recommendation|\d\.)", gpt_analysis, re.DOTALL | re.IGNORECASE)
+            if m:
+                summary = m.group(1).strip()
+            else:
+                m = re.search(r"1\.\s*Executive Summary(.*?)(?=2\.|Strengths|Weaknesses|Recommendation)", gpt_analysis, re.DOTALL | re.IGNORECASE)
+                if m:
+                    summary = m.group(1).strip()
         except Exception as exc:
             logger.error("AI narrative analysis failed: %s", exc)
+
+    if not summary or len(summary) < 20:
+        summary = (
+            f"Experienced professional with {result.experience} years of experience in the {result.role or 'specified'} domain. "
+            f"Demonstrates alignment on core skills such as {', '.join(list(result.skills.keys())[:3]) or 'technical execution'}. "
+            f"Has minor gaps in {', '.join(result.missing_skills[:2]) or 'specific domain requirements'}. "
+            f"ATS screening indicates match score of {int(result.score)}% and overall recommendation: {decision_plain}."
+        )
 
     # Compute risk metrics
     total_words = len(result.clean_text.split())
@@ -595,6 +630,8 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         explanation    = result.explanation,
         risk_metrics   = risk_metrics,
         insights       = insights,
+        raw_text       = result.raw_text,
+        summary        = summary,
     )
 
 
@@ -854,5 +891,71 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
             reply = f"{req.candidate_name} matches the target role as a {req.candidate_role} with a score of {req.candidate_score}%. The rating is influenced by their matched skills ({len(req.matched_skills)}) vs missing skills ({len(req.missing_skills)})."
         else:
             reply = f"Hello! As a recruitment co-pilot, I see {req.candidate_name} has a match score of {req.candidate_score}%. Let me know if you need specific interview questions or details on their skill gaps."
+            
+    return ChatResponse(reply=reply)
+
+
+@app.post("/chat-all", response_model=ChatResponse, tags=["AI Assistant"])
+@app.post("/api/chat-all", response_model=ChatResponse, tags=["AI Assistant"], include_in_schema=False)
+async def chat_all_assistant(req: ChatAllRequest, request: Request) -> ChatResponse:
+    check_rate_limit(request.client.host)
+    reply = ""
+    
+    # Format candidates list
+    candidates_list = []
+    for c in req.candidates:
+        candidates_list.append(
+            f"- Name: {c.name}, Score: {c.score}%, Role: {c.role}, Experience: {c.experience} years, "
+            f"Matched Skills: {', '.join(c.matched_skills)}, Missing Skills: {', '.join(c.missing_skills)}"
+        )
+    candidates_summary = "\n".join(candidates_list)
+    
+    if AIConfig.openai_key or AIConfig.gemini_key:
+        try:
+            prompt = (
+                f"You are a helpful recruitment co-pilot assistant. Answer the recruiter's question about the candidate pool.\n\n"
+                f"### Screened Candidates Pool:\n{candidates_summary}\n\n"
+                f"Recruiter's Question: {req.message}"
+            )
+            
+            reply = get_ai_response(
+                prompt = prompt,
+                system_instruction = "You are a professional recruitment co-pilot. Give brief, insightful, comparative, and constructive recruiter feedback about the pool of candidates."
+            )
+        except Exception as exc:
+            logger.error("AI multi-candidate chat assistant failed: %s", exc)
+            
+    if not reply:
+        # Fallback local heuristics
+        msg = req.message.lower()
+        if "best" in msg or "strongest" in msg or "highest" in msg:
+            if req.candidates:
+                best = max(req.candidates, key=lambda c: c.score)
+                reply = f"The candidate with the highest match score is {best.name} ({best.score}%) for the role of {best.role}. They possess strong alignment on: {', '.join(best.matched_skills[:4])}."
+            else:
+                reply = "There are no candidates in the queue to evaluate."
+        elif "experience" in msg or "senior" in msg:
+            if req.candidates:
+                most_exp = max(req.candidates, key=lambda c: c.experience)
+                reply = f"The candidate with the most experience is {most_exp.name} ({most_exp.experience} years) matching as a {most_exp.role}."
+            else:
+                reply = "No candidates found."
+        elif "missing" in msg or "lack" in msg:
+            # check what skills are most commonly missing
+            gaps = {}
+            for c in req.candidates:
+                for s in c.missing_skills:
+                    gaps[s] = gaps.get(s, 0) + 1
+            if gaps:
+                sorted_gaps = sorted(gaps.items(), key=lambda x: x[1], reverse=True)
+                top_gaps = [f"{g[0]} (missing in {g[1]} candidates)" for g in sorted_gaps[:3]]
+                reply = f"The most common skill gaps in the candidate pool are: {', '.join(top_gaps)}."
+            else:
+                reply = "No common skill gaps identified."
+        else:
+            reply = (
+                f"I parsed {len(req.candidates)} candidates in the queue. "
+                "You can ask me to compare their qualifications, identify the most senior profile, or analyze common skill gaps."
+            )
             
     return ChatResponse(reply=reply)
