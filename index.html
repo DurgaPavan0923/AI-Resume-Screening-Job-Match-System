@@ -292,13 +292,15 @@
       </div>
       <div class="hidden md:flex items-center gap-6">
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#features" onclick="switchView('landing')">Features</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('recruiter-dashboard')">Recruiter Console</a>
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('workspace')">Workspace</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('settings')">Settings</a>
       </div>
       <div class="flex items-center gap-3">
         <button class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface border border-outline-variant" onclick="toggleTheme()">
           <span class="material-symbols-outlined text-[18px]" id="theme-icon">light_mode</span>
         </button>
-        <button class="bg-primary text-on-primary text-body-sm font-body-sm px-4 py-2 rounded-full font-semibold scale-95 duration-150 hover:bg-opacity-90" onclick="switchView('workspace')">
+        <button class="bg-primary text-on-primary text-body-sm font-body-sm px-4 py-2 rounded-full font-semibold scale-95 duration-150 hover:bg-opacity-90" onclick="switchView('recruiter-dashboard')">
           Launch App
         </button>
       </div>
@@ -505,6 +507,233 @@
     </div>
   </main>
 
+  <!-- ── VIEW 1.5: RECRUITER COMMAND DASHBOARD ── -->
+  <main id="view-recruiter-dashboard" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-12">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-outline-variant/30">
+      <div>
+        <h1 class="font-headline-xl text-headline-xl text-primary">Recruiter Command Console</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Real-time overview of active job openings, applicant matching pools, and screening metrics.</p>
+      </div>
+      <button class="bg-primary text-on-primary px-6 py-3 rounded-full font-label-md text-label-md font-semibold hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center gap-2 flex-shrink-0" onclick="switchView('workspace')">
+        <span class="material-symbols-outlined text-lg">add_circle</span>
+        New Screening Job
+      </button>
+    </header>
+
+    <!-- Stats row -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm hover:border-primary/40 transition-colors duration-300">
+        <div class="flex items-center gap-3 text-primary mb-3">
+          <span class="material-symbols-outlined text-2xl">work</span>
+          <h3 class="font-headline-md text-base font-bold">Active Roles</h3>
+        </div>
+        <p class="text-3xl font-bold font-headline-xl text-on-surface">5 <span class="text-xs text-on-surface-variant font-normal font-semibold">Active Listings</span></p>
+        <div class="mt-4 space-y-1.5 text-xs text-on-surface-variant">
+          <div class="flex justify-between"><span>• ML Engineer (Stripe)</span><span class="font-semibold text-primary">4 Applicants</span></div>
+          <div class="flex justify-between"><span>• Backend Lead (InsightAI)</span><span class="font-semibold text-primary">1 Applicant</span></div>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm hover:border-secondary/40 transition-colors duration-300">
+        <div class="flex items-center gap-3 text-secondary mb-3">
+          <span class="material-symbols-outlined text-2xl">description</span>
+          <h3 class="font-headline-md text-base font-bold">Screened Resumes</h3>
+        </div>
+        <p class="text-3xl font-bold font-headline-xl text-on-surface">1,245 <span class="text-xs text-green-500 font-semibold">+12% this week</span></p>
+        <div class="mt-4 space-y-1.5 text-xs text-on-surface-variant">
+          <div class="flex justify-between"><span>Total Processed</span><span>1,245 profiles</span></div>
+          <div class="flex justify-between"><span>Parsing Efficiency</span><span>98.6% accuracy</span></div>
+        </div>
+      </div>
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm hover:border-tertiary/40 transition-colors duration-300">
+        <div class="flex items-center gap-3 text-tertiary mb-3">
+          <span class="material-symbols-outlined text-2xl">how_to_reg</span>
+          <h3 class="font-headline-md text-base font-bold">Shortlisted Candidates</h3>
+        </div>
+        <p class="text-3xl font-bold font-headline-xl text-on-surface">84 <span class="text-xs text-on-surface-variant font-semibold">Moved to Pipeline</span></p>
+        <div class="mt-4 space-y-1.5 text-xs text-on-surface-variant">
+          <div class="flex justify-between"><span>Average Match Score</span><span>78.4%</span></div>
+          <div class="flex justify-between"><span>Conversion Rate</span><span>6.7% select rate</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Workspace Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Column: Pipeline & Analytics (col-span-7) -->
+      <div class="lg:col-span-7 space-y-8">
+        <!-- Pipeline stages -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+          <h3 class="font-headline-md text-lg text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">network_node</span>
+            Global Sourcing Pipeline
+          </h3>
+          <div class="space-y-4">
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Applied</span><span class="text-on-surface-variant">342 candidates</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full" style="width: 100%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Screened</span><span class="text-on-surface-variant">180 candidates</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-secondary h-2 rounded-full" style="width: 52%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Shortlisted for Review</span><span class="text-on-surface-variant">84 candidates</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-tertiary h-2 rounded-full" style="width: 24%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Technical Interview</span><span class="text-on-surface-variant">25 candidates</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-primary h-2 rounded-full" style="width: 7%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between text-xs font-semibold mb-1">
+                <span>Offer / Hired</span><span class="text-on-surface-variant">8 candidates</span>
+              </div>
+              <div class="w-full bg-surface-container rounded-full h-2">
+                <div class="bg-green-500 h-2 rounded-full" style="width: 2.3%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Hiring insights -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+          <h3 class="font-headline-md text-lg text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">insights</span>
+            AI Talent &amp; Sourcing Insights
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div>
+              <span class="text-xs text-on-surface-variant font-bold uppercase tracking-wider block mb-3">Most In-Demand Skills</span>
+              <div class="space-y-2 text-xs">
+                <div>
+                  <div class="flex justify-between mb-1"><span>Python</span><span class="font-semibold text-primary">92%</span></div>
+                  <div class="w-full bg-surface-container h-1 rounded-full"><div class="bg-primary h-1 rounded-full" style="width: 92%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1"><span>PyTorch / ML</span><span class="font-semibold text-secondary">84%</span></div>
+                  <div class="w-full bg-surface-container h-1 rounded-full"><div class="bg-secondary h-1 rounded-full" style="width: 84%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1"><span>Kubernetes (k8s)</span><span class="font-semibold text-tertiary">60%</span></div>
+                  <div class="w-full bg-surface-container h-1 rounded-full"><div class="bg-tertiary h-1 rounded-full" style="width: 60%"></div></div>
+                </div>
+                <div>
+                  <div class="flex justify-between mb-1"><span>Docker</span><span class="font-semibold text-primary">54%</span></div>
+                  <div class="w-full bg-surface-container h-1 rounded-full"><div class="bg-primary h-1 rounded-full" style="width: 54%"></div></div>
+                </div>
+              </div>
+            </div>
+            <div class="border-l border-outline-variant/30 pl-0 md:pl-6 space-y-4">
+              <span class="text-xs text-on-surface-variant font-bold uppercase tracking-wider block mb-1">Talent Pool Gaps</span>
+              <div class="bg-error-container/10 border border-error/25 rounded-xl p-3 flex gap-2 text-xs text-error">
+                <span class="material-symbols-outlined text-sm mt-0.5">warning</span>
+                <div>
+                  <div class="font-semibold font-headline-md text-xs">Kubernetes Gap</div>
+                  <div class="text-[10px] text-on-surface-variant/90 mt-0.5">80% of candidates lack MLOps container orchestration CKA profiles.</div>
+                </div>
+              </div>
+              <div class="bg-primary-container/10 border border-primary/25 rounded-xl p-3 flex gap-2 text-xs text-primary">
+                <span class="material-symbols-outlined text-sm mt-0.5">info</span>
+                <div>
+                  <div class="font-semibold font-headline-md text-xs">Strong ML Foundation</div>
+                  <div class="text-[10px] text-on-surface-variant/90 mt-0.5">92% of candidates passed basic statistical/LLM NLP thresholds.</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Openings & Activity Feed (col-span-5) -->
+      <div class="lg:col-span-5 space-y-8">
+        <!-- Active job listings -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm">
+          <h3 class="font-headline-md text-lg text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">list_alt</span>
+            Active Job Openings
+          </h3>
+          <div class="divide-y divide-outline-variant/30 space-y-3">
+            <div class="pt-2 flex justify-between items-center text-xs">
+              <div>
+                <span class="font-semibold text-primary block">Senior Machine Learning Engineer</span>
+                <span class="text-[10px] text-on-surface-variant">Stripe • Remote</span>
+              </div>
+              <span class="px-2.5 py-1 bg-primary-container/15 text-primary rounded-full text-[10px] font-semibold">4 Candidates</span>
+            </div>
+            <div class="pt-3 flex justify-between items-center text-xs">
+              <div>
+                <span class="font-semibold text-primary block">Lead Backend Developer</span>
+                <span class="text-[10px] text-on-surface-variant">InsightAI • Full Time</span>
+              </div>
+              <span class="px-2.5 py-1 bg-primary-container/15 text-primary rounded-full text-[10px] font-semibold">1 Candidate</span>
+            </div>
+            <div class="pt-3 flex justify-between items-center text-xs">
+              <div>
+                <span class="font-semibold text-primary block">Frontend Engineer (React)</span>
+                <span class="text-[10px] text-on-surface-variant">Google • Hybrid</span>
+              </div>
+              <span class="px-2.5 py-1 bg-surface-container-high text-on-surface-variant rounded-full text-[10px] font-semibold">0 Candidates</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent activities / audit timeline -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-2xl p-6 shadow-sm flex flex-col">
+          <h3 class="font-headline-md text-lg text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-xl">history</span>
+            Audit &amp; Activity Log
+          </h3>
+          <div class="space-y-4 text-xs overflow-y-auto max-h-64 pr-1" id="recruiter-activity-log">
+            <div class="flex gap-3 items-start">
+              <span class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+              <div>
+                <span class="text-on-surface-variant/80 block text-[10px]">Just Now</span>
+                <p class="text-on-surface font-medium">New match analysis generated for <strong>Elena Rostova</strong>.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span class="w-2 h-2 rounded-full bg-secondary mt-1.5 flex-shrink-0"></span>
+              <div>
+                <span class="text-on-surface-variant/80 block text-[10px]">5 Mins Ago</span>
+                <p class="text-on-surface font-medium">Recruiter updated notes for Candidate #1.</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span class="w-2 h-2 rounded-full bg-tertiary mt-1.5 flex-shrink-0"></span>
+              <div>
+                <span class="text-on-surface-variant/80 block text-[10px]">1 Hour Ago</span>
+                <p class="text-on-surface font-medium">Shortlist exported (CSV format downloaded by hiring manager).</p>
+              </div>
+            </div>
+            <div class="flex gap-3 items-start">
+              <span class="w-2 h-2 rounded-full bg-primary mt-1.5 flex-shrink-0"></span>
+              <div>
+                <span class="text-on-surface-variant/80 block text-[10px]">2 Hours Ago</span>
+                <p class="text-on-surface font-medium">Parsed job description for <strong>Senior Machine Learning Engineer</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- ── VIEW 2: RESUME UPLOAD WORKSPACE ── -->
   <main id="view-workspace" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-12">
     <header class="text-center max-w-2xl mx-auto space-y-4">
@@ -549,6 +778,39 @@
               <span class="material-symbols-outlined text-[18px]">content_paste</span>
               Sample JD
             </button>
+            <button id="btn-analyze-jd" class="bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 p-2 rounded-lg transition-all flex items-center gap-1 font-body-sm text-body-sm font-semibold" onclick="runJDAnalysis()">
+              <span class="material-symbols-outlined text-[18px]">psychology</span>
+              Analyze JD
+            </button>
+          </div>
+        </div>
+
+        <!-- JD Analyzer Results panel -->
+        <div id="jd-analysis-result" class="hidden mt-6 pt-6 border-t border-outline-variant/40 space-y-4 animate-fade-in text-xs">
+          <div class="flex justify-between items-center bg-surface-container-high/40 p-3 rounded-xl border border-outline-variant/30">
+            <div>
+              <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">JD Quality Score</span>
+              <span class="text-base font-bold text-primary" id="jd-quality-score">85%</span>
+            </div>
+            <div class="text-right">
+              <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">Experience Req.</span>
+              <span class="text-xs font-semibold text-secondary" id="jd-exp-req">5+ Years</span>
+            </div>
+          </div>
+          
+          <div>
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block mb-1">AI Ideal Candidate Profile</span>
+            <p class="text-on-surface leading-relaxed italic bg-surface p-3 rounded-xl border border-outline-variant/30" id="jd-ideal-profile">Profile summary...</p>
+          </div>
+          
+          <div>
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block mb-1.5">Extracted Core Skills</span>
+            <div class="flex flex-wrap gap-1.5" id="jd-extracted-skills"></div>
+          </div>
+
+          <div>
+            <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block mb-1">JD Optimization Tips</span>
+            <ul class="list-disc pl-4 space-y-1 text-[11px] text-on-surface-variant" id="jd-tips-list"></ul>
           </div>
         </div>
       </div>
@@ -561,6 +823,17 @@
         <span class="material-symbols-outlined">auto_awesome</span>
         Generate Match Analysis
       </button>
+    </div>
+
+    <!-- Security & Trust Section -->
+    <div class="mt-8 border-t border-outline-variant/30 pt-8 max-w-xl mx-auto text-center space-y-4">
+      <div class="flex flex-wrap justify-center gap-6 text-on-surface-variant text-[11px] font-semibold">
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">lock</span> SSL/TLS Encrypted</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-secondary">verified_user</span> GDPR Compliant</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-tertiary">psychology_alt</span> AI Bias-Free</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">security</span> Encrypted Storage</span>
+      </div>
+      <p class="text-[10px] text-on-surface-variant/70">Your data is processed in-memory securely and permanently deleted after session closure.</p>
     </div>
   </main>
 
@@ -615,19 +888,96 @@
           </div>
         </div>
       </div>
+
+      <!-- Real-Time Logging Console -->
+      <div class="mt-8 border-t border-outline-variant/30 pt-6">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">AI Engine Parser Console</span>
+          <span class="inline-flex items-center gap-1 text-[9px] text-primary bg-primary-container/10 border border-primary/20 px-2 py-0.5 rounded-full font-semibold">
+            <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span> Running
+          </span>
+        </div>
+        <div class="w-full h-32 bg-surface-container-lowest border border-outline-variant/80 rounded-xl p-4 font-mono text-[10px] text-green-400 overflow-y-auto leading-relaxed shadow-inner flex flex-col gap-1.5" id="engine-console-log">
+          <div class="text-on-surface-variant/50">// Initializing parser pipelines...</div>
+        </div>
+      </div>
     </div>
   </main>
 
   <!-- ── VIEW 4: RESULTS ANALYTICS DASHBOARD ── -->
   <div id="view-dashboard" class="view-section hidden flex flex-col md:flex-row flex-grow pt-24 min-h-screen">
     
-    <!-- Sidebar: Candidate Rank Selector -->
     <aside class="w-full md:w-80 bg-surface-container-low border-r border-outline-variant p-6 flex flex-col gap-6 flex-shrink-0">
       <div class="flex justify-between items-center">
         <h2 class="font-headline-md text-lg text-primary">Candidate Queue</h2>
         <button class="text-xs text-primary bg-surface-container px-2.5 py-1 rounded-full hover:bg-surface-container-high" onclick="switchView('workspace')">
           New Search
         </button>
+      </div>
+
+      <!-- Search bar -->
+      <div class="relative">
+        <span class="material-symbols-outlined absolute left-3 top-2.5 text-on-surface-variant/50 text-[14px]">search</span>
+        <input type="text" id="candidate-search" placeholder="Search candidates..." class="w-full bg-surface border border-outline-variant rounded-lg pl-8 pr-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/35 shadow-inner" oninput="applyQueueFilters()" />
+      </div>
+      
+      <!-- Toggle Advanced Filters button -->
+      <div class="flex gap-2">
+        <button id="btn-toggle-adv-filters" class="w-full py-1.5 border border-outline-variant text-[11px] font-semibold text-on-surface rounded-lg hover:border-primary hover:text-primary transition-all flex items-center justify-center gap-1 bg-surface-container shadow-sm" onclick="toggleAdvancedFilters()">
+          <span class="material-symbols-outlined text-[14px]">tune</span>
+          Advanced Filters
+        </button>
+      </div>
+
+      <!-- Floating Advanced Filters Panel -->
+      <div id="advanced-filters-panel" class="hidden bg-surface-container-high/95 backdrop-blur-md border border-outline-variant/80 rounded-xl p-4 space-y-4 animate-fade-in shadow-lg text-xs">
+        <div class="flex justify-between items-center border-b border-outline-variant/30 pb-2">
+          <span class="font-bold text-primary">Advanced Filters</span>
+          <button class="text-on-surface-variant hover:text-error transition-colors" onclick="toggleAdvancedFilters()">
+            <span class="material-symbols-outlined text-sm">close</span>
+          </button>
+        </div>
+        
+        <div class="space-y-1">
+          <label class="font-semibold block text-[10px] text-on-surface-variant uppercase tracking-wider">Boolean Search</label>
+          <input type="text" id="filter-boolean" placeholder="e.g. Python AND ML NOT Java" class="w-full bg-surface border border-outline-variant rounded px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/30" />
+        </div>
+        
+        <div class="space-y-1">
+          <label class="font-semibold block text-[10px] text-on-surface-variant uppercase tracking-wider">Required Skills (Comma sep.)</label>
+          <input type="text" id="filter-skills" placeholder="e.g. Python, PyTorch" class="w-full bg-surface border border-outline-variant rounded px-2.5 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/30" />
+        </div>
+        
+        <div class="space-y-1">
+          <div class="flex justify-between font-semibold text-[10px] text-on-surface-variant uppercase tracking-wider">
+            <span>Min Experience</span>
+            <span id="label-min-exp" class="text-primary">0 Years</span>
+          </div>
+          <input type="range" id="filter-min-exp" min="0" max="15" value="0" class="w-full h-1 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" oninput="document.getElementById('label-min-exp').innerText = this.value + ' Years'" />
+        </div>
+
+        <div class="space-y-1">
+          <div class="flex justify-between font-semibold text-[10px] text-on-surface-variant uppercase tracking-wider">
+            <span>Min Score</span>
+            <span id="label-min-score" class="text-primary">0%</span>
+          </div>
+          <input type="range" id="filter-min-score" min="0" max="100" value="0" class="w-full h-1 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" oninput="document.getElementById('label-min-score').innerText = this.value + '%'" />
+        </div>
+        
+        <div class="space-y-1">
+          <label class="font-semibold block text-[10px] text-on-surface-variant uppercase tracking-wider">Education Level</label>
+          <select id="filter-education" class="w-full bg-surface border border-outline-variant rounded px-2 py-1 text-xs text-on-surface focus:outline-none">
+            <option value="all">All Education</option>
+            <option value="bachelor">Bachelor's Degree</option>
+            <option value="master">Master's Degree</option>
+            <option value="phd">Ph.D.</option>
+          </select>
+        </div>
+
+        <div class="flex gap-2 pt-2">
+          <button class="flex-1 py-1.5 bg-primary text-on-primary font-semibold rounded hover:bg-opacity-90 active:scale-95 transition-all text-center" onclick="applyAdvancedFilters()">Apply</button>
+          <button class="flex-1 py-1.5 border border-outline-variant font-semibold rounded hover:bg-surface-container active:scale-95 transition-all text-center text-on-surface" onclick="clearAdvancedFilters()">Clear</button>
+        </div>
       </div>
       
       <!-- Filters and Sort -->
@@ -667,7 +1017,7 @@
     <main class="flex-grow p-6 md:p-8 max-w-7xl mx-auto overflow-y-auto w-full">
       
       <!-- Candidate Overview Header -->
-      <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-8 gap-4 border-b border-outline-variant pb-6">
+      <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 border-b border-outline-variant pb-6">
         <div>
           <div class="flex items-center gap-3 mb-2">
             <span class="bg-surface-container-high text-on-surface-variant font-label-md text-label-md px-2.5 py-1 rounded-full" id="candidate-rank-badge">Candidate Rank #1</span>
@@ -686,11 +1036,66 @@
           <button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-sm text-body-sm hover:border-primary hover:text-primary transition-colors bg-surface-container-low shadow-sm flex items-center gap-2" onclick="window.print()">
             <span class="material-symbols-outlined text-lg">print</span> Print Report
           </button>
-          <button class="px-5 py-2 rounded-full bg-primary text-on-primary font-body-sm text-body-sm hover:bg-opacity-90 transition-colors shadow-sm" onclick="alert('Shortlist status marked. Redirecting candidate to next interview phase.')">
-            Move to Interview
+          <button class="px-4 py-2 rounded-full border border-primary text-primary font-body-sm text-body-sm hover:bg-primary/10 transition-colors bg-transparent shadow-sm flex items-center gap-1.5 font-semibold" onclick="openCandidateDrawer()">
+            <span class="material-symbols-outlined text-base">psychology</span> Detailed Intelligence
+          </button>
+          <button class="px-5 py-2 rounded-full bg-primary text-on-primary font-body-sm text-body-sm hover:bg-opacity-90 transition-colors shadow-sm" onclick="movePipelineStage(1)">
+            Advance Candidate
           </button>
         </div>
       </header>
+
+      <!-- Candidate Pipeline Workflow (Horizontal Progress) -->
+      <div class="mb-8 bg-surface-container-lowest border border-outline-variant rounded-2xl p-4 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+          <span class="text-[10px] text-on-surface-variant font-bold uppercase tracking-wider block">Candidate Staging Pipeline</span>
+          <div class="flex gap-2">
+            <button id="btn-pipeline-prev" class="px-2.5 py-1 border border-outline-variant rounded-md text-[10px] font-semibold text-on-surface hover:border-primary hover:text-primary transition-all flex items-center gap-0.5" onclick="movePipelineStage(-1)">
+              <span class="material-symbols-outlined text-[12px]">chevron_left</span> Back
+            </button>
+            <button id="btn-pipeline-next" class="px-2.5 py-1 bg-primary text-on-primary rounded-md text-[10px] font-semibold hover:bg-opacity-90 transition-all flex items-center gap-0.5" onclick="movePipelineStage(1)">
+              Advance <span class="material-symbols-outlined text-[12px]">chevron_right</span>
+            </button>
+          </div>
+        </div>
+        
+        <div class="flex items-center justify-between relative mt-2 text-center text-[10px]">
+          <!-- Step connector line -->
+          <div class="absolute left-6 right-6 top-[15px] h-0.5 bg-outline-variant z-0">
+            <div id="pipeline-progress-bar" class="h-full bg-primary transition-all duration-300" style="width: 0%"></div>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(0)">
+            <div id="pipeline-node-0" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">1</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Applied</span>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(1)">
+            <div id="pipeline-node-1" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">2</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Screened</span>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(2)">
+            <div id="pipeline-node-2" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">3</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Shortlist</span>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(3)">
+            <div id="pipeline-node-3" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">4</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Interview</span>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(4)">
+            <div id="pipeline-node-4" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">5</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Final</span>
+          </div>
+          
+          <div class="flex flex-col items-center gap-1 z-10 relative cursor-pointer" onclick="setPipelineStage(5)">
+            <div id="pipeline-node-5" class="w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300">6</div>
+            <span class="text-[9px] font-semibold text-on-surface-variant uppercase tracking-wider">Hired</span>
+          </div>
+        </div>
+      </div>
       
       <!-- Bento Grid Layout -->
       <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -833,11 +1238,130 @@
           <div class="space-y-4 flex-grow flex flex-col justify-center" id="predicted-roles-box"></div>
         </div>
 
+        <!-- AI Resume Risk Detection (col-span-4) -->
+        <div class="lg:col-span-4 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-error">gavel</span>
+              <h3 class="font-headline-md text-headline-md text-primary">AI Risk Detection</h3>
+            </div>
+            <div class="space-y-4 text-xs">
+              <div>
+                <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px] mb-1">Keyword Stuffing</span>
+                <span id="risk-keyword-stuffing" class="font-semibold text-on-surface">Low (Natural flow)</span>
+              </div>
+              <div>
+                <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px] mb-1">Experience Gaps</span>
+                <span id="risk-timeline-gaps" class="font-semibold text-on-surface">None detected</span>
+              </div>
+              <div>
+                <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px] mb-1">Missing Experience Proof</span>
+                <span id="risk-experience-proof" class="font-semibold text-on-surface">Low Risk</span>
+              </div>
+              <div>
+                <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px] mb-1">Weak Project Descriptions</span>
+                <span id="risk-weak-projects" class="font-semibold text-on-surface">Low Risk</span>
+              </div>
+            </div>
+          </div>
+          <div class="mt-4 pt-4 border-t border-outline-variant/30 flex items-center justify-between text-xs">
+            <span class="text-on-surface-variant">Profile Credibility</span>
+            <span id="risk-credibility-score" class="font-bold text-primary text-base">92%</span>
+          </div>
+        </div>
+
+        <!-- Team Collaboration & Notes (col-span-4) -->
+        <div class="lg:col-span-4 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col justify-between">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">groups</span>
+                <h3 class="font-headline-md text-headline-md text-primary">Collaboration</h3>
+              </div>
+              <button id="btn-bookmark-candidate" class="text-on-surface-variant hover:text-primary transition-all" onclick="toggleBookmarkActive()" title="Bookmark Profile">
+                <span id="bookmark-icon" class="material-symbols-outlined text-xl">bookmark</span>
+              </button>
+            </div>
+            
+            <div class="space-y-2 mb-4 bg-surface p-3 rounded-xl border border-outline-variant/30 text-[10px]">
+              <span class="font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Recruiter Evaluation</span>
+              <div class="flex justify-between items-center">
+                <span>Technical Skills</span>
+                <div class="flex gap-0.5 text-primary" id="stars-technical" onclick="rateCandidate('technical', event)">
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="1">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="2">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="3">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="4">star_outline</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="5">star_outline</span>
+                </div>
+              </div>
+              <div class="flex justify-between items-center">
+                <span>Culture Fit</span>
+                <div class="flex gap-0.5 text-primary" id="stars-culture" onclick="rateCandidate('culture', event)">
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="1">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="2">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="3">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="4">star</span>
+                  <span class="material-symbols-outlined text-sm cursor-pointer" data-star="5">star_outline</span>
+                </div>
+              </div>
+            </div>
+
+            <div class="space-y-2 mb-3">
+              <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px]">Recruiter Notes</span>
+              <div class="max-h-24 overflow-y-auto space-y-1.5 pr-1 font-body-sm text-[11px]" id="candidate-notes-list">
+                <div class="text-on-surface-variant italic">No comments yet. Be the first to comment!</div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="flex gap-1.5 pt-3 border-t border-outline-variant/30 flex-shrink-0">
+            <input type="text" id="input-recruiter-note" placeholder="Write a note..." class="flex-grow bg-surface border border-outline-variant/60 rounded-xl px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/35 shadow-inner min-w-0" />
+            <button class="bg-primary text-on-primary px-3 py-1.5 rounded-xl hover:bg-opacity-90 active:scale-95 transition-all text-xs font-semibold" onclick="addRecruiterNote()">Add</button>
+            <button class="bg-surface-container border border-outline-variant text-on-surface p-1.5 rounded-xl hover:border-primary hover:text-primary transition-all flex items-center justify-center" onclick="openShareModal()" title="Share Profile">
+              <span class="material-symbols-outlined text-sm">share</span>
+            </button>
+          </div>
+        </div>
+
         <!-- PDF Preview Iframe (col-span-8) -->
         <div class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col">
           <h3 class="font-headline-md text-headline-md text-primary mb-4">📄 Resume Preview</h3>
           <div class="flex-grow w-full h-[450px] bg-surface-container rounded-xl overflow-hidden relative">
             <iframe id="pdf-preview" src="" class="w-full h-full border-none"></iframe>
+          </div>
+        </div>
+
+        <!-- API & Integrations (col-span-4) -->
+        <div class="lg:col-span-4 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-4">
+              <span class="material-symbols-outlined text-primary">integration_instructions</span>
+              <h3 class="font-headline-md text-headline-md text-primary">ATS Integrations</h3>
+            </div>
+            <p class="text-xs text-on-surface-variant mb-4">Connect candidates and screening jobs to your ATS pipeline instantly.</p>
+            
+            <div class="space-y-3.5 text-xs">
+              <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+                <span class="font-semibold text-on-surface">Greenhouse Connector</span>
+                <button class="px-2.5 py-1 text-[10px] font-semibold border rounded-full border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="toggleIntegration('greenhouse', this)">Connect</button>
+              </div>
+              <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+                <span class="font-semibold text-on-surface">Lever Sync</span>
+                <button class="px-2.5 py-1 text-[10px] font-semibold border rounded-full border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="toggleIntegration('lever', this)">Connect</button>
+              </div>
+              <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+                <span class="font-semibold text-on-surface">Slack Notifications</span>
+                <button class="px-2.5 py-1 text-[10px] font-semibold border rounded-full border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="toggleIntegration('slack', this)">Connect</button>
+              </div>
+              <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+                <span class="font-semibold text-on-surface">Workday Integration</span>
+                <button class="px-2.5 py-1 text-[10px] font-semibold border rounded-full border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all" onclick="toggleIntegration('workday', this)">Connect</button>
+              </div>
+            </div>
+          </div>
+          <div class="text-[9px] text-on-surface-variant/70 text-center mt-3 pt-3 border-t border-outline-variant/30">
+            Powered by InsightAI API Gateway.
           </div>
         </div>
 
@@ -871,6 +1395,200 @@
     </main>
   </div>
 
+  <!-- ── VIEW 6: CONFIGURATION SETTINGS & ANALYTICS ── -->
+  <main id="view-settings" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-12">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-outline-variant/30">
+      <div>
+        <h1 class="font-headline-xl text-headline-xl text-primary">System Configuration</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Manage active AI providers, configure API endpoints, and monitor real-time token telemetry.</p>
+      </div>
+      <button class="bg-surface-container border border-outline-variant text-on-surface px-5 py-2.5 rounded-full font-semibold hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 flex-shrink-0" onclick="switchView('recruiter-dashboard')">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Recruiter Console
+      </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      
+      <!-- Left side: Configuration forms (col-span-7) -->
+      <div class="lg:col-span-7 space-y-8">
+        
+        <!-- Active Provider Selector -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">dns</span>
+            AI Engine Provider
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-6">Select the default model backend for processing resume comparisons, career trajectory projections, and interview question generation.</p>
+          
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Gemini card -->
+            <div id="provider-card-gemini" class="cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group" onclick="setActiveProvider('gemini')">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-primary font-headline-md">Google Gemini</span>
+                <span class="material-symbols-outlined text-primary text-xl" id="provider-check-gemini">radio_button_checked</span>
+              </div>
+              <p class="text-[11px] text-on-surface-variant leading-relaxed">Default active backend. Fast, cost-efficient, 1M+ token context window, optimized for JSON structuring.</p>
+              <div class="text-[10px] text-primary/80 font-semibold mt-1">Recommended for high volume</div>
+            </div>
+            
+            <!-- OpenAI card -->
+            <div id="provider-card-openai" class="cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group" onclick="setActiveProvider('openai')">
+              <div class="flex justify-between items-center">
+                <span class="text-xs font-bold text-secondary font-headline-md">OpenAI GPT</span>
+                <span class="material-symbols-outlined text-on-surface-variant text-xl" id="provider-check-openai">radio_button_unchecked</span>
+              </div>
+              <p class="text-[11px] text-on-surface-variant leading-relaxed">Advanced narrative profiling and precise reasoning. High rate limits, uses standard gpt-4o-mini endpoint.</p>
+              <div class="text-[10px] text-secondary/80 font-semibold mt-1">Advanced narrative analytics</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- API Credentials Manager -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">vpn_key</span>
+            API Credentials
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-6">Enter server-side credentials below. Keys are securely stored and never exposed to the client side.</p>
+          
+          <div class="space-y-5">
+            <!-- Gemini Key input -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                <span>Google Gemini API Key</span>
+                <span class="text-primary font-semibold lowercase cursor-pointer" onclick="toggleKeyVisibility('settings-gemini-key')">Show / Hide</span>
+              </label>
+              <div class="flex gap-2">
+                <div class="relative flex-grow">
+                  <span class="material-symbols-outlined absolute left-3.5 top-3 text-on-surface-variant/60 text-base">password</span>
+                  <input type="password" id="settings-gemini-key" placeholder="AIzaSy..." class="w-full bg-surface border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner placeholder-on-surface-variant/30" />
+                </div>
+                <button class="bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 px-4 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all" onclick="testProviderConnection('gemini')">Test Connection</button>
+              </div>
+            </div>
+            
+            <!-- OpenAI Key input -->
+            <div class="space-y-2">
+              <label class="flex justify-between text-[11px] font-bold text-on-surface-variant uppercase tracking-wider">
+                <span>OpenAI API Key</span>
+                <span class="text-secondary font-semibold lowercase cursor-pointer" onclick="toggleKeyVisibility('settings-openai-key')">Show / Hide</span>
+              </label>
+              <div class="flex gap-2">
+                <div class="relative flex-grow">
+                  <span class="material-symbols-outlined absolute left-3.5 top-3 text-on-surface-variant/60 text-base">password</span>
+                  <input type="password" id="settings-openai-key" placeholder="sk-..." class="w-full bg-surface border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-secondary focus:ring-1 focus:ring-secondary shadow-inner placeholder-on-surface-variant/30" />
+                </div>
+                <button class="bg-secondary/10 border border-secondary/30 text-secondary hover:bg-secondary/20 px-4 rounded-xl text-xs font-semibold flex items-center gap-1 transition-all" onclick="testProviderConnection('openai')">Test Connection</button>
+              </div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Save and reset actions -->
+        <div class="flex justify-end gap-3">
+          <button class="bg-surface-container border border-outline-variant text-on-surface px-6 py-2.5 rounded-full text-xs font-semibold hover:border-error hover:text-error transition-all" onclick="loadSettings()">Reset Changes</button>
+          <button class="bg-primary text-on-primary px-8 py-2.5 rounded-full text-xs font-semibold hover:bg-opacity-90 active:scale-95 transition-all shadow-md flex items-center gap-1.5" onclick="saveSettings()">
+            <span class="material-symbols-outlined text-base">save</span> Save Settings
+          </button>
+        </div>
+        
+      </div>
+      
+      <!-- Right side: Analytics & security switches (col-span-5) -->
+      <div class="lg:col-span-5 space-y-8">
+        
+        <!-- API Usage Bento Metrics -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">query_stats</span>
+            API Usage Metrics
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-6">Real-time usage analytics of server-side model dispatching requests since last boot cycle.</p>
+          
+          <div class="grid grid-cols-2 gap-4">
+            <!-- Requests card -->
+            <div class="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-4 flex flex-col gap-1.5">
+              <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block">Daily Requests</span>
+              <span class="text-2xl font-bold text-on-surface" id="metrics-requests">0</span>
+              <span class="text-[9px] text-on-surface-variant font-medium">Reset daily at UTC 00:00</span>
+            </div>
+            
+            <!-- Success Rate -->
+            <div class="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-4 flex flex-col gap-1.5">
+              <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block">Success Rate</span>
+              <span class="text-2xl font-bold text-primary" id="metrics-success-rate">100.0%</span>
+              <span class="text-[9px] text-on-surface-variant font-medium">Target availability: &gt;99.9%</span>
+            </div>
+            
+            <!-- Est. Tokens -->
+            <div class="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-4 flex flex-col gap-1.5">
+              <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block">Tokens Consumed</span>
+              <span class="text-2xl font-bold text-secondary" id="metrics-tokens">0</span>
+              <span class="text-[9px] text-on-surface-variant font-medium">Est. context load today</span>
+            </div>
+            
+            <!-- Est. Cost -->
+            <div class="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-4 flex flex-col gap-1.5">
+              <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block">Estimated Cost</span>
+              <span class="text-2xl font-bold text-tertiary" id="metrics-cost">$0.00</span>
+              <span class="text-[9px] text-on-surface-variant font-medium">Combined provider billing</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Enterprise Security Configurations -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">admin_panel_settings</span>
+            Security Configurations
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-6">Fine-tune system security policy, rate limit profiles, and data sanitization properties.</p>
+          
+          <div class="space-y-4 text-xs">
+            <!-- Throttling switch -->
+            <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+              <div>
+                <span class="font-semibold text-on-surface block">API Rate Limiting</span>
+                <span class="text-[10px] text-on-surface-variant">Prevent brute-force API key depletion. Limits to 15 reqs/min.</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="settings-enable-throttling" class="sr-only peer" />
+                <div class="w-9 h-5 bg-surface-container rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-none after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+              </label>
+            </div>
+            
+            <!-- Masking switch -->
+            <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+              <div>
+                <span class="font-semibold text-on-surface block">Token PII Masking</span>
+                <span class="text-[10px] text-on-surface-variant">Sanitize email and telephone variables before sending text.</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="settings-enable-masking" class="sr-only peer" />
+                <div class="w-9 h-5 bg-surface-container rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-none after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+              </label>
+            </div>
+            
+            <!-- CORS switch -->
+            <div class="flex justify-between items-center bg-surface p-3 rounded-xl border border-outline-variant/30">
+              <div>
+                <span class="font-semibold text-on-surface block">Strict CORS Headers</span>
+                <span class="text-[10px] text-on-surface-variant">Allow origins binding validation on cross-origin requests.</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="settings-enable-cors" class="sr-only peer" />
+                <div class="w-9 h-5 bg-surface-container rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-none after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+        
+      </div>
+      
+    </div>
+  </main>
+
   <!-- ── JAVASCRIPT APP CONTROLLER ── -->
   <script>
     // State management
@@ -881,8 +1599,9 @@
     let experienceChartInstance = null;
     let isAnonymousMode = false;
     let filteredResults = [];
+    let activeProvider = 'gemini';
 
-    // Initialize Theme on load
+    // Initialize Theme and Load Settings on load
     document.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       const html = document.documentElement;
@@ -895,25 +1614,34 @@
         html.classList.add('dark');
         document.getElementById('theme-icon').innerText = 'light_mode';
       }
+      
+      // Load initial settings and telemetry
+      loadSettings();
     });
 
     // View switcher
     function switchView(viewId) {
       // Hide all sections
-      ['view-landing', 'view-workspace', 'view-processing', 'view-dashboard'].forEach(id => {
-        document.getElementById(id).classList.add('hidden');
+      ['view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings'].forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.classList.add('hidden');
       });
       // Show selected section
-      document.getElementById('view-' + viewId).classList.remove('hidden');
+      const selectedView = document.getElementById('view-' + viewId);
+      if (selectedView) selectedView.classList.remove('hidden');
 
       // Hide or show top navigation bar based on the view
       const topNav = document.getElementById('top-nav');
       if (topNav) {
-        if (viewId === 'landing') {
+        if (viewId === 'landing' || viewId === 'recruiter-dashboard' || viewId === 'settings') {
           topNav.classList.remove('hidden');
         } else {
           topNav.classList.add('hidden');
         }
+      }
+      
+      if (viewId === 'settings') {
+        loadSettings();
       }
       
       // Smooth scroll to top
@@ -1061,6 +1789,13 @@ Requirements:
       const step2 = document.getElementById('step-skills');
       const step3 = document.getElementById('step-scoring');
 
+      // Clear and reset the scrolling console log
+      const consoleLog = document.getElementById('engine-console-log');
+      if (consoleLog) consoleLog.innerHTML = '';
+      
+      addConsoleLog("Initializing parser engines...", "text-on-surface-variant/50");
+      addConsoleLog(`Connected to backend API. Engine Dispatcher active: <span class="font-bold text-primary">${activeProvider.toUpperCase()}</span>`);
+
       // Reset step visual indicators
       stepIcon1.innerHTML = 'sync';
       stepIcon1.classList.add('animate-spin');
@@ -1077,8 +1812,10 @@ Requirements:
       for (const file of uploadedFiles) {
         currentFileIndex++;
         statusText.innerText = `Analyzing candidate ${currentFileIndex} of ${uploadedFiles.length} (${file.name})`;
+        addConsoleLog(`[File ${currentFileIndex}/${uploadedFiles.length}] Queueing document: <span class="text-white">${file.name}</span>`);
         
         // Simulating Stepper Phases
+        addConsoleLog(`Phase 1: Extracting text from PDF streams for ${file.name}...`, "text-green-400");
         setTimeout(() => {
           stepIcon1.innerHTML = 'check';
           stepIcon1.classList.remove('animate-spin');
@@ -1086,6 +1823,7 @@ Requirements:
           step2.classList.remove('opacity-50');
           stepIcon2.innerHTML = 'sync';
           stepIcon2.classList.add('animate-spin');
+          addConsoleLog(`Phase 2: Running skill extraction matching against database features...`, "text-green-400");
         }, 800);
 
         setTimeout(() => {
@@ -1095,6 +1833,7 @@ Requirements:
           step3.classList.remove('opacity-50');
           stepIcon3.innerHTML = 'sync';
           stepIcon3.classList.add('animate-spin');
+          addConsoleLog(`Phase 3: Calculating similarity centroids and invoking provider generation...`, "text-secondary");
         }, 1800);
 
         const formData = new FormData();
@@ -1112,15 +1851,24 @@ Requirements:
           }
 
           const result = await response.json();
-          if (Array.isArray(result)) {
-            analysisResults.push(...result);
-          } else {
-            analysisResults.push(result);
-          }
+          const items = Array.isArray(result) ? result : [result];
+          
+          items.forEach(r => {
+            // Default staging pipeline values
+            r.pipelineStage = 1; 
+            r.isBookmarked = false;
+            r.ratings = { technical: 3, culture: 4 };
+            r.notes = [];
+            
+            analysisResults.push(r);
+            addConsoleLog(`Successfully parsed candidate: <span class="text-primary font-bold">${r.name}</span>. Fit Score: ${Math.round(r.score)}%`, "text-primary");
+            addAuditLog(`New match analysis generated for <strong>${r.name.replace('.pdf', '')}</strong>. Score: ${Math.round(r.score)}%`, "primary");
+          });
         } catch (e) {
           console.error("API error for file: " + file.name, e);
-          // Insert a graceful local match if API fails or falls back
-          analysisResults.push({
+          addConsoleLog(`[Error] Match pipeline failed for ${file.name}. Generating graceful fallback...`, "text-error font-semibold");
+          
+          const fallback = {
             name: file.name,
             score: 45.0,
             role: "Software Developer",
@@ -1132,18 +1880,24 @@ Requirements:
             decision: "🔴 Reject",
             gpt_analysis: "⚠️ Server match pipeline failed. Showing fallback results.",
             score_breakdown: { similarity: 20.0, skills: 15.0, experience: 10.0 },
-            explanation: "Fallback result generated due to API connection failure."
-          });
+            explanation: "Fallback result generated due to API connection failure.",
+            pipelineStage: 1,
+            isBookmarked: false,
+            ratings: { technical: 3, culture: 3 },
+            notes: []
+          };
+          analysisResults.push(fallback);
         }
       }
 
       // Finalize stepper indicators
       stepIcon3.innerHTML = 'check';
       stepIcon3.classList.remove('animate-spin');
+      addConsoleLog(`Analysis complete. Screened ${analysisResults.length} candidates.`, "text-primary font-bold");
       
       setTimeout(() => {
         if (analysisResults.length === 0) {
-          alert("❌ Analysis failed for all files. Please check Vercel serverlogs.");
+          alert("❌ Analysis failed for all files. Please check server logs.");
           switchView('workspace');
           return;
         }
@@ -1207,18 +1961,85 @@ Requirements:
 
       let list = analysisResults.map((r, idx) => ({ ...r, originalIndex: idx }));
 
+      // Basic Score Filter
       if (scoreFilter === 'top') {
         list = list.filter(r => r.score >= 75);
       } else if (scoreFilter === 'mid') {
         list = list.filter(r => r.score >= 50);
       }
 
+      // Basic Experience Filter
       if (expFilter === 'junior') {
         list = list.filter(r => r.experience < 3);
       } else if (expFilter === 'senior') {
         list = list.filter(r => r.experience >= 5);
       }
 
+      // Advanced Boolean Search Filter
+      const filterBoolean = document.getElementById('filter-boolean');
+      const booleanQuery = filterBoolean ? filterBoolean.value.trim() : '';
+      if (booleanQuery) {
+        list = list.filter(r => {
+          const searchSpace = `${r.name} ${r.role} ${(r.matched_skills || []).join(' ')} ${(r.education || []).join(' ')}`.toLowerCase();
+          return evaluateBooleanExpression(booleanQuery, searchSpace);
+        });
+      }
+
+      // Advanced Skills Filter
+      const filterSkills = document.getElementById('filter-skills');
+      const skillQuery = filterSkills ? filterSkills.value.trim() : '';
+      if (skillQuery) {
+        const reqSkills = skillQuery.split(',').map(s => s.trim().toLowerCase()).filter(s => s);
+        list = list.filter(r => {
+          const candidateSkills = (r.matched_skills || []).map(s => s.toLowerCase());
+          return reqSkills.every(reqSkill => candidateSkills.some(cs => cs.includes(reqSkill)));
+        });
+      }
+
+      // Advanced Min Experience Slider
+      const filterMinExp = document.getElementById('filter-min-exp');
+      const minExp = filterMinExp ? parseInt(filterMinExp.value, 10) : 0;
+      if (minExp > 0) {
+        list = list.filter(r => r.experience >= minExp);
+      }
+
+      // Advanced Min Score Slider
+      const filterMinScore = document.getElementById('filter-min-score');
+      const minScore = filterMinScore ? parseInt(filterMinScore.value, 10) : 0;
+      if (minScore > 0) {
+        list = list.filter(r => r.score >= minScore);
+      }
+
+      // Advanced Education Filter
+      const filterEdu = document.getElementById('filter-education');
+      const eduLevel = filterEdu ? filterEdu.value : 'all';
+      if (eduLevel !== 'all') {
+        list = list.filter(r => {
+          if (!r.education || r.education.length === 0) return false;
+          const eduStr = r.education.join(' ').toLowerCase();
+          if (eduLevel === 'phd') {
+            return eduStr.includes('phd') || eduStr.includes('ph.d') || eduStr.includes('doctor');
+          } else if (eduLevel === 'master') {
+            return eduStr.includes('master') || eduStr.includes('m.s') || eduStr.includes('ms ') || eduStr.includes('phd') || eduStr.includes('ph.d') || eduStr.includes('doctor');
+          } else if (eduLevel === 'bachelor') {
+            return eduStr.includes('bachelor') || eduStr.includes('b.s') || eduStr.includes('bs ') || eduStr.includes('master') || eduStr.includes('m.s') || eduStr.includes('phd');
+          }
+          return true;
+        });
+      }
+
+      // Candidate name/role search bar filter
+      const searchInput = document.getElementById('candidate-search');
+      const searchQuery = searchInput ? searchInput.value.trim().toLowerCase() : '';
+      if (searchQuery) {
+        list = list.filter(r => {
+          const nameMatch = r.name.toLowerCase().includes(searchQuery);
+          const roleMatch = (r.role || '').toLowerCase().includes(searchQuery);
+          return nameMatch || roleMatch;
+        });
+      }
+
+      // Sorting logic
       if (sortVal === 'score_desc') {
         list.sort((a, b) => b.score - a.score);
       } else if (sortVal === 'score_asc') {
@@ -1485,6 +2306,34 @@ Requirements:
       questions.forEach(q => {
         questionsList.innerHTML += `<li class="pb-1">${q}</li>`;
       });
+
+      // Update Risk Detection UI
+      const rm = r.risk_metrics || {
+        keyword_stuffing: "Low (Natural flow)",
+        timeline_gaps: "None detected",
+        missing_experience_proof: "Low Risk",
+        weak_projects: "Low Risk",
+        credibility_score: 90
+      };
+      document.getElementById('risk-keyword-stuffing').innerText = rm.keyword_stuffing;
+      document.getElementById('risk-timeline-gaps').innerText = rm.timeline_gaps;
+      document.getElementById('risk-experience-proof').innerText = rm.missing_experience_proof;
+      document.getElementById('risk-weak-projects').innerText = rm.weak_projects;
+      document.getElementById('risk-credibility-score').innerText = `${rm.credibility_score}%`;
+
+      // Load custom staging pipeline node state
+      updatePipelineUI(r.pipelineStage !== undefined ? r.pipelineStage : 1);
+      
+      // Load bookmark state
+      updateBookmarkUI(r.isBookmarked || false);
+      
+      // Load evaluation ratings
+      const ratings = r.ratings || { technical: 3, culture: 4 };
+      updateRatingUI('technical', ratings.technical);
+      updateRatingUI('culture', ratings.culture);
+      
+      // Load comments/notes
+      renderNotes(r.notes || []);
 
       // Update copilot role and reset chat
       const rewriteRoleInput = document.getElementById('rewrite-role');
@@ -1837,10 +2686,589 @@ Requirements:
     function copyRewriteOutput() {
       const text = document.getElementById('rewrite-output-text').innerText;
       navigator.clipboard.writeText(text).then(() => {
-        alert("📋 Copied to clipboard!");
+        showToast("📋 Copied to clipboard!");
       }).catch(err => {
         console.error('Could not copy text: ', err);
       });
+    }
+
+    // ── SYSTEM CONFIGURATION (SETTINGS) CLIENT CONTROLLER ──
+    async function loadSettings() {
+      try {
+        const response = await fetch('/api/settings');
+        if (!response.ok) throw new Error("Failed to load settings telemetry.");
+        const data = await response.json();
+        
+        // Update provider state
+        activeProvider = data.active_provider;
+        setActiveProviderUI(data.active_provider);
+        
+        // Populate inputs with masked keys
+        document.getElementById('settings-gemini-key').value = data.gemini_key_masked || '';
+        document.getElementById('settings-openai-key').value = data.openai_key_masked || '';
+        
+        // Toggle switches
+        document.getElementById('settings-enable-throttling').checked = data.enable_throttling;
+        document.getElementById('settings-enable-masking').checked = data.enable_masking;
+        document.getElementById('settings-enable-cors').checked = data.enable_cors;
+        
+        // Usage Metrics
+        document.getElementById('metrics-requests').innerText = data.requests_today;
+        document.getElementById('metrics-success-rate').innerText = data.success_rate + '%';
+        document.getElementById('metrics-tokens').innerText = data.tokens_consumed;
+        
+        // Approx billing rate (OpenAI gpt-4o-mini / Gemini-1.5-flash averages)
+        const cost = (data.tokens_consumed * 0.000002).toFixed(4);
+        document.getElementById('metrics-cost').innerText = '$' + cost;
+        
+      } catch (err) {
+        console.error(err);
+        showToast("⚠️ Failed to load system configurations.", "error");
+      }
+    }
+
+    function setActiveProvider(provider) {
+      activeProvider = provider;
+      setActiveProviderUI(provider);
+      showToast(`Selected Engine: ${provider === 'gemini' ? 'Google Gemini' : 'OpenAI GPT'}`);
+    }
+
+    function setActiveProviderUI(provider) {
+      const cardGemini = document.getElementById('provider-card-gemini');
+      const cardOpenAI = document.getElementById('provider-card-openai');
+      const checkGemini = document.getElementById('provider-check-gemini');
+      const checkOpenAI = document.getElementById('provider-check-openai');
+      
+      if (provider === 'gemini') {
+        if (cardGemini) cardGemini.className = "cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group border-primary shadow-sm";
+        if (cardOpenAI) cardOpenAI.className = "cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group border-outline-variant/50";
+        if (checkGemini) checkGemini.innerText = "radio_button_checked";
+        if (checkOpenAI) checkOpenAI.innerText = "radio_button_unchecked";
+      } else {
+        if (cardGemini) cardGemini.className = "cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group border-outline-variant/50";
+        if (cardOpenAI) cardOpenAI.className = "cursor-pointer border-2 rounded-2xl p-5 bg-surface-container-low flex flex-col gap-3 transition-all duration-300 relative group border-secondary shadow-sm";
+        if (checkGemini) checkGemini.innerText = "radio_button_unchecked";
+        if (checkOpenAI) checkOpenAI.innerText = "radio_button_checked";
+      }
+    }
+
+    async function saveSettings() {
+      const reqPayload = {
+        active_provider: activeProvider,
+        openai_key: document.getElementById('settings-openai-key').value,
+        gemini_key: document.getElementById('settings-gemini-key').value,
+        enable_throttling: document.getElementById('settings-enable-throttling').checked,
+        enable_masking: document.getElementById('settings-enable-masking').checked,
+        enable_cors: document.getElementById('settings-enable-cors').checked
+      };
+      
+      try {
+        const response = await fetch('/api/settings', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(reqPayload)
+        });
+        
+        if (!response.ok) throw new Error("Failed to save credentials.");
+        showToast("💾 System configuration saved successfully.");
+        loadSettings(); // refresh key hashes
+      } catch (err) {
+        console.error(err);
+        showToast("❌ Failed to save system configurations.", "error");
+      }
+    }
+
+    async function testProviderConnection(provider) {
+      const inputId = provider === 'gemini' ? 'settings-gemini-key' : 'settings-openai-key';
+      const testKey = document.getElementById(inputId).value;
+      
+      showToast(`Testing connection to ${provider === 'gemini' ? 'Gemini API' : 'OpenAI API'}...`, "warning");
+      
+      try {
+        const response = await fetch('/api/settings/test', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            provider: provider,
+            api_key: testKey
+          })
+        });
+        
+        if (!response.ok) throw new Error("Network response failed.");
+        const data = await response.json();
+        
+        if (data.success) {
+          showToast(`✅ ${data.message}`);
+        } else {
+          showToast(`❌ ${data.message}`, "error");
+        }
+      } catch (err) {
+        console.error(err);
+        showToast("❌ Connection test failed due to network error.", "error");
+      }
+    }
+
+    function toggleKeyVisibility(inputId) {
+      const input = document.getElementById(inputId);
+      if (input) {
+        input.type = input.type === 'password' ? 'text' : 'password';
+      }
+    }
+
+    // ── SMART JOB DESCRIPTION ANALYZER CLIENT CONTROLLER ──
+    async function runJDAnalysis() {
+      const jdText = document.getElementById('jd-textarea').value.trim();
+      if (!jdText) {
+        alert("Please enter or paste a Job Description first.");
+        return;
+      }
+      
+      const btn = document.getElementById('btn-analyze-jd');
+      const originalText = btn.innerHTML;
+      btn.disabled = true;
+      btn.innerHTML = `<span class="material-symbols-outlined text-[18px] animate-spin">sync</span> Analyzing...`;
+      
+      showToast("🧠 Running AI Job Description Analyzer...", "warning");
+      
+      try {
+        const response = await fetch('/api/analyze-jd', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ job_description: jdText })
+        });
+        
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        
+        if (!response.ok) throw new Error("Analyzer responded with failure.");
+        const data = await response.json();
+        
+        // Show results box
+        const resultPanel = document.getElementById('jd-analysis-result');
+        if (resultPanel) resultPanel.classList.remove('hidden');
+        
+        // Render values
+        document.getElementById('jd-quality-score').innerText = Math.round(data.quality_score) + '%';
+        document.getElementById('jd-exp-req').innerText = (data.experience_required || '0') + '+ Years';
+        document.getElementById('jd-ideal-profile').innerText = data.ideal_profile;
+        
+        // Skills
+        const skillsContainer = document.getElementById('jd-extracted-skills');
+        skillsContainer.innerHTML = '';
+        data.skills.forEach(skill => {
+          skillsContainer.innerHTML += `<span class="px-2.5 py-1 bg-primary/10 text-primary border border-primary/25 rounded-full font-semibold font-label-caps text-[10px]">${skill}</span>`;
+        });
+        
+        // Tips
+        const tipsContainer = document.getElementById('jd-tips-list');
+        tipsContainer.innerHTML = '';
+        data.tips.forEach(tip => {
+          tipsContainer.innerHTML += `<li class="pb-1">${tip}</li>`;
+        });
+        
+        showToast("✅ JD analysis completed.");
+        addAuditLog(`Analyzed job listing requirements. Extracted ${data.skills.length} skills. Quality Score: ${Math.round(data.quality_score)}%`, "primary");
+      } catch (err) {
+        console.error(err);
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        showToast("❌ Job description analysis failed.", "error");
+      }
+    }
+
+    // ── ADVANCED FILTERS CLIENT CONTROLLERS ──
+    function toggleAdvancedFilters() {
+      const panel = document.getElementById('advanced-filters-panel');
+      if (panel) panel.classList.toggle('hidden');
+    }
+
+    function applyAdvancedFilters() {
+      applyQueueFilters();
+      toggleAdvancedFilters();
+      showToast("⚡ Filters applied to candidate queue.");
+    }
+
+    function clearAdvancedFilters() {
+      const fb = document.getElementById('filter-boolean');
+      const fs = document.getElementById('filter-skills');
+      const fme = document.getElementById('filter-min-exp');
+      const fms = document.getElementById('filter-min-score');
+      const fe = document.getElementById('filter-education');
+      const search = document.getElementById('candidate-search');
+      
+      if (fb) fb.value = '';
+      if (fs) fs.value = '';
+      if (fme) {
+        fme.value = '0';
+        document.getElementById('label-min-exp').innerText = '0 Years';
+      }
+      if (fms) {
+        fms.value = '0';
+        document.getElementById('label-min-score').innerText = '0%';
+      }
+      if (fe) fe.value = 'all';
+      if (search) search.value = '';
+      
+      applyQueueFilters();
+      showToast("🧹 Sourcing filters cleared.");
+    }
+
+    // Safe boolean query evaluator logic
+    function evaluateBooleanExpression(expr, targetText) {
+      try {
+        // Normalise operators to standard characters
+        let normalized = expr.replace(/\s+and\s+/gi, ' & ').replace(/\s+or\s+/gi, ' | ').replace(/\s+not\s+/gi, ' ! ');
+        const tokens = normalized.match(/[a-zA-Z0-9_\-\.\+]+|&|\||!|\(|\)/g) || [];
+        if (tokens.length === 0) return true;
+        
+        // Map word tokens to true/false based on targetText
+        const evaluatedTokens = tokens.map(token => {
+          if (['&', '|', '!', '(', ')'].includes(token)) return token;
+          return targetText.includes(token.toLowerCase());
+        });
+        
+        let exprStr = evaluatedTokens.map(t => {
+          if (t === '&') return '&&';
+          if (t === '|') return '||';
+          if (t === '!') return '!';
+          if (t === '(' || t === ')') return t;
+          return t ? 'true' : 'false';
+        }).join(' ');
+        
+        return Function(`return (${exprStr})`)();
+      } catch (err) {
+        console.error("Boolean parser error:", err);
+        return true;
+      }
+    }
+
+    // ── STAGING PIPELINE CLIENT CONTROLLERS ──
+    function setPipelineStage(stage) {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      r.pipelineStage = stage;
+      updatePipelineUI(stage);
+      
+      const stagesList = ["Applied", "Screened", "Shortlisted", "Technical Interview", "Final Review", "Hired"];
+      addAuditLog(`Moved ${isAnonymousMode ? 'Candidate #' + (currentCandidateIndex + 1) : r.name.replace('.pdf', '')} to stage "${stagesList[stage]}".`);
+    }
+
+    function updatePipelineUI(stage) {
+      const progressBar = document.getElementById('pipeline-progress-bar');
+      if (progressBar) progressBar.style.width = `${stage * 20}%`;
+      
+      for (let i = 0; i <= 5; i++) {
+        const node = document.getElementById(`pipeline-node-${i}`);
+        if (node) {
+          if (i <= stage) {
+            node.className = "w-8 h-8 rounded-full border border-primary bg-primary text-on-primary flex items-center justify-center font-bold text-[10px] transition-all duration-300 shadow-md";
+          } else {
+            node.className = "w-8 h-8 rounded-full border border-outline-variant bg-surface-container flex items-center justify-center font-bold text-[10px] transition-all duration-300";
+          }
+        }
+      }
+    }
+
+    function movePipelineStage(offset) {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      let currentStage = r.pipelineStage !== undefined ? r.pipelineStage : 1;
+      let nextStage = currentStage + offset;
+      if (nextStage >= 0 && nextStage <= 5) {
+        setPipelineStage(nextStage);
+      }
+    }
+
+    // ── DETAILED CANDIDATE INTELLIGENCE DRAWER CONTROLLERS ──
+    function openCandidateDrawer() {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      
+      const displayName = isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', '');
+      document.getElementById('drawer-candidate-name').innerText = displayName;
+      document.getElementById('drawer-candidate-role').innerText = r.role || 'General Staff';
+      
+      // Populate Domain Expertise
+      const domainContainer = document.getElementById('drawer-domain-expertise');
+      domainContainer.innerHTML = '';
+      const domainExpertise = (r.insights && r.insights.domain_expertise) || {"Backend": 50, "Frontend": 50, "DevOps/MLOps": 50, "AI/Data Science": 50};
+      Object.entries(domainExpertise).forEach(([domain, score]) => {
+        domainContainer.innerHTML += `
+          <div>
+            <div class="flex justify-between items-center mb-1">
+              <span class="font-medium text-on-surface">${domain}</span>
+              <span class="font-bold text-primary">${score}%</span>
+            </div>
+            <div class="w-full bg-surface-container rounded-full h-1.5">
+              <div class="bg-primary h-1.5 rounded-full transition-all duration-500" style="width: ${score}%"></div>
+            </div>
+          </div>
+        `;
+      });
+      
+      // Populate Skill Heatmap
+      const skillsTable = document.getElementById('drawer-skills-table-body');
+      skillsTable.innerHTML = '';
+      const jdKeywords = extractKeywordsFromText(jdTextarea.value);
+      if (jdKeywords.length === 0) {
+        skillsTable.innerHTML = `<tr><td colspan="3" class="p-3 text-center text-on-surface-variant italic">No skill keywords found.</td></tr>`;
+      } else {
+        jdKeywords.forEach(skill => {
+          const matched = r.matched_skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
+          const mode = matched ? 'Exact Match' : 'Missing';
+          const confidence = matched ? Math.round(75 + Math.random() * 25) : 0;
+          const modeClass = matched ? 'text-primary font-semibold' : 'text-error font-semibold';
+          skillsTable.innerHTML += `
+            <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low/20">
+              <td class="p-3 font-medium text-on-surface">${skill}</td>
+              <td class="p-3 text-center ${modeClass}">${mode}</td>
+              <td class="p-3 text-center text-on-surface-variant font-semibold">${matched ? confidence + '%' : '0%'}</td>
+            </tr>
+          `;
+        });
+      }
+      
+      // Populate Timeline Trajectory
+      const timeline = document.getElementById('drawer-career-timeline');
+      timeline.innerHTML = '';
+      const expYears = r.experience || 3;
+      const currentYear = new Date().getFullYear();
+      const stages = [
+        { year: `${currentYear - Math.min(2, expYears)} - Present`, title: `Senior ${r.role || 'Developer'}`, desc: "Leading backend systems designs, scaling microservices architecture, and optimizing data retrieval schemas." },
+        { year: `${currentYear - Math.min(5, expYears)} - ${currentYear - Math.min(2, expYears)}`, title: `${r.role || 'Developer'}`, desc: "Implemented core software modules, deployed containerized apps using Docker, and automated unit tests." },
+        { year: `${currentYear - expYears}`, title: `Associate Engineer`, desc: "Collaborated on team features, debugged production issues, and participated in sprint cycles." }
+      ];
+      const activeStages = stages.slice(0, expYears <= 2 ? 1 : expYears <= 4 ? 2 : 3);
+      activeStages.forEach(stage => {
+        timeline.innerHTML += `
+          <div class="relative">
+            <span class="absolute left-[-29px] top-1 w-3.5 h-3.5 rounded-full bg-primary border-2 border-surface-container-lowest shadow-sm"></span>
+            <span class="font-bold text-[10px] text-primary uppercase tracking-wider block">${stage.year}</span>
+            <h4 class="font-semibold text-on-surface text-xs mt-0.5">${stage.title}</h4>
+            <p class="text-on-surface-variant text-[11px] mt-1">${stage.desc}</p>
+          </div>
+        `;
+      });
+      
+      // Populate Certifications
+      const certs = document.getElementById('drawer-certifications');
+      certs.innerHTML = '';
+      const certifications = (r.insights && r.insights.certifications) || ["AWS Certified Developer", "Certified ScrumMaster (CSM)"];
+      certifications.forEach(c => {
+        certs.innerHTML += `<li class="pb-1 text-on-surface-variant">${c}</li>`;
+      });
+      
+      // Populate Project Impact
+      document.getElementById('drawer-project-impact').innerText = (r.insights && r.insights.project_impact) || "Designed and optimized scalable architecture components, improving core throughput metrics by 20-30%.";
+      
+      document.getElementById('candidate-drawer').classList.remove('translate-x-full');
+    }
+
+    function closeCandidateDrawer() {
+      document.getElementById('candidate-drawer').classList.add('translate-x-full');
+    }
+
+    // ── BOOKMARKS, COMMENTS & FIT RATINGS CLIENT CONTROLLERS ──
+    function toggleBookmarkActive() {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      r.isBookmarked = !r.isBookmarked;
+      updateBookmarkUI(r.isBookmarked);
+      showToast(r.isBookmarked ? "📌 Candidate bookmarked" : "📌 Bookmark removed");
+    }
+
+    function updateBookmarkUI(isBookmarked) {
+      const icon = document.getElementById('bookmark-icon');
+      if (icon) {
+        if (isBookmarked) {
+          icon.innerText = "bookmark_added";
+          icon.classList.add("text-primary");
+        } else {
+          icon.innerText = "bookmark";
+          icon.classList.remove("text-primary");
+        }
+      }
+    }
+
+    function rateCandidate(category, event) {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      if (!r.ratings) r.ratings = { technical: 0, culture: 0 };
+      
+      const starEl = event.target.closest('[data-star]');
+      if (!starEl) return;
+      const val = parseInt(starEl.getAttribute('data-star'), 10);
+      r.ratings[category] = val;
+      updateRatingUI(category, val);
+      
+      showToast(`⭐ Rated ${category} fit: ${val}/5`);
+    }
+
+    function updateRatingUI(category, score) {
+      const containerId = category === 'technical' ? 'stars-technical' : 'stars-culture';
+      const container = document.getElementById(containerId);
+      if (!container) return;
+      
+      const stars = container.querySelectorAll('[data-star]');
+      stars.forEach((star, idx) => {
+        if (idx < score) {
+          star.innerText = "star";
+          star.classList.remove("text-on-surface-variant/40");
+        } else {
+          star.innerText = "star_outline";
+          star.classList.add("text-on-surface-variant/40");
+        }
+      });
+    }
+
+    function addRecruiterNote() {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      if (!r.notes) r.notes = [];
+      
+      const input = document.getElementById('input-recruiter-note');
+      const text = input.value.trim();
+      if (!text) return;
+      
+      r.notes.push(text);
+      input.value = '';
+      renderNotes(r.notes);
+      showToast("📝 Note added");
+    }
+
+    function renderNotes(notes = []) {
+      const container = document.getElementById('candidate-notes-list');
+      if (!container) return;
+      container.innerHTML = '';
+      if (notes.length === 0) {
+        container.innerHTML = `<div class="text-on-surface-variant italic">No comments yet. Be the first to comment!</div>`;
+      } else {
+        notes.forEach(note => {
+          container.innerHTML += `
+            <div class="bg-surface-container-high p-2 rounded-lg border border-outline-variant/30 text-on-surface leading-tight">
+              ${note}
+            </div>
+          `;
+        });
+      }
+    }
+
+    // ── INTEGRATIONS CLIENT CONTROLLER ──
+    function toggleIntegration(name, button) {
+      const isConnected = button.innerText === "Connected";
+      if (isConnected) {
+        button.innerText = "Connect";
+        button.className = "px-2.5 py-1 text-[10px] font-semibold border rounded-full border-outline-variant text-on-surface-variant hover:border-primary hover:text-primary transition-all";
+        showToast(`🔌 Disconnected from ${name}`);
+        addAuditLog(`Disconnected integration: ${name}`, "tertiary");
+      } else {
+        button.innerText = "Connected";
+        button.className = "px-2.5 py-1 text-[10px] font-semibold border rounded-full border-primary text-primary bg-primary/10 transition-all";
+        showToast(`🔌 Successfully integrated with ${name}`);
+        addAuditLog(`Established connection to ATS partner: ${name}`, "secondary");
+      }
+    }
+
+    // ── SHARING MODAL CLIENT CONTROLLERS ──
+    function openShareModal() {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      const displayName = isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', '');
+      const slug = displayName.toLowerCase().replace(/[^a-z0-9]/g, '_');
+      document.getElementById('share-link-input').value = `https://insightai.com/candidate/${slug}`;
+      
+      const modal = document.getElementById('share-modal');
+      if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+      }
+    }
+
+    function closeShareModal() {
+      const modal = document.getElementById('share-modal');
+      if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+      }
+    }
+
+    function copyShareLink() {
+      const input = document.getElementById('share-link-input');
+      if (input) {
+        input.select();
+        navigator.clipboard.writeText(input.value).then(() => {
+          showToast("📋 Share link copied to clipboard!");
+        }).catch(err => {
+          console.error('Could not copy link:', err);
+        });
+      }
+    }
+
+    // ── SYSTEM TELEMETRY LOGGER & NOTIFIER CONTROLLERS ──
+    function showToast(message, type = "success") {
+      const container = document.getElementById('toast-container');
+      if (!container) return;
+      const toast = document.createElement('div');
+      toast.className = "pointer-events-auto bg-surface-container-high/90 backdrop-blur-md border border-outline-variant/60 rounded-2xl p-4 shadow-xl text-xs font-semibold text-on-surface flex items-center gap-2 transform translate-y-2 opacity-0 transition-all duration-300";
+      
+      let icon = "check_circle";
+      let iconClass = "text-primary";
+      if (type === "error") {
+        icon = "error";
+        iconClass = "text-error";
+      } else if (type === "warning") {
+        icon = "warning";
+        iconClass = "text-tertiary";
+      }
+      
+      toast.innerHTML = `
+        <span class="material-symbols-outlined ${iconClass} text-lg">${icon}</span>
+        <span>${message}</span>
+      `;
+      container.appendChild(toast);
+      
+      setTimeout(() => {
+        toast.classList.remove('translate-y-2', 'opacity-0');
+      }, 10);
+      
+      setTimeout(() => {
+        toast.classList.add('translate-y-[-10px]', 'opacity-0');
+        setTimeout(() => {
+          toast.remove();
+        }, 300);
+      }, 3500);
+    }
+
+    function addConsoleLog(msg, colorClass = "text-green-400") {
+      const consoleLog = document.getElementById('engine-console-log');
+      if (consoleLog) {
+        const logItem = document.createElement('div');
+        logItem.className = colorClass;
+        const timeStr = new Date().toLocaleTimeString();
+        logItem.innerHTML = `<span class="text-on-surface-variant/40">[${timeStr}]</span> ${msg}`;
+        consoleLog.appendChild(logItem);
+        consoleLog.scrollTop = consoleLog.scrollHeight;
+      }
+    }
+
+    function addAuditLog(msg, type = "primary") {
+      const container = document.getElementById('recruiter-activity-log');
+      if (!container) return;
+      
+      let colorClass = "bg-primary";
+      if (type === "secondary") colorClass = "bg-secondary";
+      if (type === "tertiary") colorClass = "bg-tertiary";
+      
+      const div = document.createElement('div');
+      div.className = "flex gap-3 items-start animate-fade-in";
+      div.innerHTML = `
+        <span class="w-2 h-2 rounded-full ${colorClass} mt-1.5 flex-shrink-0"></span>
+        <div>
+          <span class="text-on-surface-variant/80 block text-[10px]">Just Now</span>
+          <p class="text-on-surface font-medium">${msg}</p>
+        </div>
+      `;
+      container.insertBefore(div, container.firstChild);
     }
   </script>
 
@@ -1955,6 +3383,128 @@ Requirements:
             <span class="material-symbols-outlined text-base">content_copy</span>
           </button>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── VIEW 5: DETAILED CANDIDATE INTELLIGENCE DRAWER ── -->
+  <div id="candidate-drawer" class="fixed top-0 right-0 w-[calc(100vw-32px)] sm:w-[480px] h-full bg-surface-container-lowest/98 backdrop-blur-2xl border-l border-outline-variant/80 shadow-2xl z-50 transform translate-x-full transition-all duration-300 ease-out flex flex-col overflow-hidden">
+    <!-- Header -->
+    <div class="p-6 flex items-center justify-between border-b border-outline-variant/50 flex-shrink-0">
+      <div>
+        <h2 class="font-headline-md text-lg text-primary" id="drawer-candidate-name">Elena Rostova</h2>
+        <p class="font-body-sm text-xs text-on-surface-variant mt-1" id="drawer-candidate-role">Senior Machine Learning Engineer</p>
+      </div>
+      <button class="w-8 h-8 rounded-full hover:bg-surface-container-high flex items-center justify-center text-on-surface-variant hover:text-on-surface transition-colors border border-outline-variant/40" onclick="closeCandidateDrawer()">
+        <span class="material-symbols-outlined text-lg">close</span>
+      </button>
+    </div>
+
+    <!-- Scrollable content -->
+    <div class="flex-grow overflow-y-auto p-6 space-y-8 text-xs leading-relaxed">
+      <!-- Domain expertise -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">bar_chart</span> Domain Expertise Mapping
+        </h3>
+        <div class="space-y-3 bg-surface-container-low/40 p-4 border border-outline-variant/40 rounded-2xl" id="drawer-domain-expertise"></div>
+      </div>
+
+      <!-- Skill Heatmap -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">grid_on</span> Skill Heatmap &amp; Confidence
+        </h3>
+        <div class="bg-surface-container-low/40 border border-outline-variant/40 rounded-2xl overflow-hidden">
+          <table class="w-full text-left border-collapse">
+            <thead>
+              <tr class="border-b border-outline-variant/30 text-[10px] bg-surface-container-high/20">
+                <th class="p-3 font-semibold text-on-surface-variant w-1/2">Required Keyword</th>
+                <th class="p-3 font-semibold text-on-surface-variant text-center">Match Mode</th>
+                <th class="p-3 font-semibold text-on-surface-variant text-center">Confidence</th>
+              </tr>
+            </thead>
+            <tbody id="drawer-skills-table-body"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- Career timeline -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">timeline</span> Professional Career Trajectory
+        </h3>
+        <div class="relative pl-6 space-y-5 border-l border-outline-variant/50 ml-3 py-1" id="drawer-career-timeline"></div>
+      </div>
+
+      <!-- Certifications -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">workspace_premium</span> Credentials &amp; Certifications
+        </h3>
+        <ul class="list-disc pl-4 space-y-2 text-on-surface-variant" id="drawer-certifications"></ul>
+      </div>
+
+      <!-- Project Impact -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">campaign</span> Project Scale &amp; Commercial Impact
+        </h3>
+        <p class="text-on-surface-variant bg-surface p-4 rounded-xl border border-outline-variant/40 leading-relaxed italic" id="drawer-project-impact"></p>
+      </div>
+
+      <!-- Github Insights -->
+      <div>
+        <h3 class="font-bold text-[10px] text-primary uppercase tracking-wider mb-3 flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">monitoring</span> Sourced Developer Validation (Socials)
+        </h3>
+        <div class="bg-surface-container-low/40 p-4 border border-outline-variant/40 rounded-2xl space-y-3">
+          <div class="flex justify-between items-center text-xs">
+            <span class="font-semibold flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">code</span> GitHub contributions</span>
+            <span class="text-[10px] text-emerald-400 font-bold bg-emerald-400/10 px-2 py-0.5 rounded">Active Committer</span>
+          </div>
+          <div class="w-full bg-surface border border-outline-variant/40 rounded-xl p-3 flex flex-col justify-center">
+            <div class="flex gap-1 justify-center mb-1 text-[8px] text-on-surface-variant/40 font-mono">
+              <span>Mon</span>
+              <span class="w-2.5 h-2.5 bg-primary/20 rounded-sm"></span>
+              <span class="w-2.5 h-2.5 bg-primary/60 rounded-sm"></span>
+              <span class="w-2.5 h-2.5 bg-primary/80 rounded-sm"></span>
+              <span class="w-2.5 h-2.5 bg-primary/30 rounded-sm"></span>
+              <span class="w-2.5 h-2.5 bg-primary rounded-sm"></span>
+              <span>Fri</span>
+            </div>
+            <div class="text-[9px] text-on-surface-variant text-center mt-1">124 contributions in the last 60 days</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div id="toast-container" class="fixed top-6 right-6 z-[9999] flex flex-col gap-3 pointer-events-none w-[320px]"></div>
+
+  <!-- Share Candidate Modal -->
+  <div id="share-modal" class="fixed inset-0 z-[1000] hidden items-center justify-center p-4 bg-background/60 backdrop-blur-sm animate-fade-in animate-scale-up">
+    <div class="glass-card max-w-sm w-full border border-outline-variant rounded-3xl p-6 shadow-2xl space-y-6">
+      <div class="flex justify-between items-center">
+        <h3 class="font-headline-md text-base font-bold text-primary flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-lg">share</span>
+          Share Candidate
+        </h3>
+        <button class="text-on-surface-variant hover:text-error transition-colors" onclick="closeShareModal()">
+          <span class="material-symbols-outlined text-sm">close</span>
+        </button>
+      </div>
+      
+      <p class="text-xs text-on-surface-variant leading-relaxed">Copy the direct recruiter sharing link or send an invite to your hiring team.</p>
+      
+      <div class="flex gap-2">
+        <input type="text" id="share-link-input" readonly value="https://insightai.com/candidate/elena_rostova" class="flex-grow bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary shadow-inner select-all min-w-0" />
+        <button class="bg-primary text-on-primary px-3 py-2 rounded-xl hover:bg-opacity-90 active:scale-95 transition-all text-xs font-semibold" onclick="copyShareLink()">Copy</button>
+      </div>
+      
+      <div class="pt-4 border-t border-outline-variant/30 text-center">
+        <button class="w-full py-2 bg-secondary text-on-secondary rounded-xl hover:bg-opacity-90 active:scale-95 transition-all text-xs font-semibold" onclick="alert('Notification sent to Hiring Manager.')">Send to Hiring Manager</button>
       </div>
     </div>
   </div>

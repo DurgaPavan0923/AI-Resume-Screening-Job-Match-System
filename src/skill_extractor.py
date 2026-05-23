@@ -52,6 +52,31 @@ def load_skills(path: str | Path) -> dict[str, int]:
     return skills
 
 
+SYNONYMS = {
+    r"\breactjs\b": "react",
+    r"\breact\.js\b": "react",
+    r"\bml\b": "machine learning",
+    r"\bdl\b": "deep learning",
+    r"\bk8s\b": "kubernetes",
+    r"\baws\b": "amazon web services",
+    r"\bgcp\b": "google cloud platform",
+    r"\bazure\b": "microsoft azure",
+    r"\bjs\b": "javascript",
+    r"\bts\b": "typescript",
+    r"\bnodejs\b": "node.js",
+    r"\bpython3\b": "python",
+    r"\bnlp\b": "natural language processing",
+    r"\bcv\b": "computer vision",
+    r"\bai\b": "artificial intelligence"
+}
+
+def expand_synonyms(text: str) -> str:
+    text_lower = text.lower()
+    for pattern, canonical in SYNONYMS.items():
+        text_lower = re.sub(pattern, canonical, text_lower)
+    return text_lower
+
+
 def extract_skills(text: str, skills_db: dict[str, int]) -> dict[str, int]:
     """
     Find which skills from ``skills_db`` are mentioned in ``text``.
@@ -66,7 +91,7 @@ def extract_skills(text: str, skills_db: dict[str, int]) -> dict[str, int]:
     if not text or not skills_db:
         return {}
 
-    text_lower = text.lower()
+    text_lower = expand_synonyms(text.lower())
     matched: dict[str, int] = {}
 
     for skill, weight in skills_db.items():
