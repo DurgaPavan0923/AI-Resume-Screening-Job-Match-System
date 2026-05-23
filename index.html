@@ -409,6 +409,9 @@
   <!-- ── VIEW 2: RESUME UPLOAD WORKSPACE ── -->
   <main id="view-workspace" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-12">
     <header class="text-center max-w-2xl mx-auto space-y-4">
+      <button class="text-xs text-on-surface-variant hover:text-primary flex items-center gap-1 mx-auto bg-surface-container-high/40 px-3.5 py-1.5 rounded-full border border-outline-variant/40 shadow-sm transition-all duration-200 hover:translate-y-[-1px]" onclick="switchView('landing')">
+        <span class="material-symbols-outlined text-sm">arrow_back</span> Back to Home
+      </button>
       <h1 class="font-headline-xl text-headline-xl text-primary">Resume Analysis Workspace</h1>
       <p class="font-body-lg text-body-lg text-on-surface-variant">Upload candidate PDF resumes and paste the job description to run the screening pipeline.</p>
     </header>
@@ -803,6 +806,16 @@
       });
       // Show selected section
       document.getElementById('view-' + viewId).classList.remove('hidden');
+
+      // Hide or show top navigation bar based on the view
+      const topNav = document.getElementById('top-nav');
+      if (topNav) {
+        if (viewId === 'landing') {
+          topNav.classList.remove('hidden');
+        } else {
+          topNav.classList.add('hidden');
+        }
+      }
       
       // Smooth scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
