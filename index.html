@@ -280,6 +280,55 @@
     .animate-fade-in {
       animation: fadeIn 0.22s ease-out forwards;
     }
+    
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #000000 !important;
+      }
+      #top-nav,
+      #view-dashboard > aside,
+      #copilot-fab,
+      #copilot-tooltip,
+      #copilot-drawer,
+      #toast-container,
+      #share-modal,
+      #candidate-drawer,
+      button,
+      iframe,
+      .lg:col-span-4,
+      .lg:col-span-8,
+      #btn-pipeline-prev,
+      #btn-pipeline-next,
+      .material-symbols-outlined {
+        display: none !important;
+      }
+      main, #view-dashboard {
+        padding: 0 !important;
+        margin: 0 !important;
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+      }
+      .glass-card, 
+      .bg-surface-container-low, 
+      .bg-surface-container-lowest, 
+      .bg-surface, 
+      .bg-surface-container {
+        background: #ffffff !important;
+        border: 1px solid #dddddd !important;
+        color: #000000 !important;
+        box-shadow: none !important;
+        backdrop-filter: none !important;
+      }
+      h1, h2, h3, h4, span, p, div, td, th, li {
+        color: #000000 !important;
+      }
+      .lg:col-span-12 {
+        width: 100% !important;
+        display: block !important;
+      }
+    }
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col">

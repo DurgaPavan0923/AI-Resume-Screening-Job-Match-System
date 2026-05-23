@@ -4,7 +4,7 @@ import os
 
 def test_gemini():
     key = "AIzaSyBjOMSP6Bl9jZKxgJVZh6X1Ca38wkjiD48"
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
     
     payload = {
         "contents": [
@@ -16,7 +16,7 @@ def test_gemini():
         ]
     }
     
-    print("Sending request to Gemini API...")
+    print("Sending request to Gemini API (gemini-2.5-flash)...")
     try:
         req = urllib.request.Request(
             url,

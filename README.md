@@ -1,7 +1,7 @@
 # 🤖 AI Resume Screening & Job Match System
 
-> A production-ready, AI-powered ATS dashboard built with **Streamlit** and **FastAPI**.  
-> Upload resumes, paste a job description, and instantly rank candidates by match score.
+> A premium, enterprise-grade AI-powered ATS (Applicant Tracking System) and Resume Screening Platform.  
+> Serve the single-page application locally or on serverless Vercel, matching candidate resumes against job descriptions with dual-provider AI support (Google Gemini + OpenAI GPT).
 
 ---
 
@@ -9,18 +9,17 @@
 
 | Feature | Description |
 |---|---|
-| 📄 PDF Parsing | Extract clean text from any PDF resume |
-| 🧠 Skill Extraction | Weighted skill matching against a curated skills database |
-| 📊 Similarity Scoring | TF-IDF cosine similarity between JD and resume |
-| 🎓 Education Detection | Detect degrees and institutions automatically |
-| 💼 Experience Extraction | Parse years of experience from resume text |
-| 🏷️ Role Prediction | ML classifier maps each resume to likely job roles |
-| 🤖 GPT Analysis | Optional OpenAI-powered narrative analysis per candidate |
-| 📈 Recruiter Dashboard | KPI metrics, bar & scatter charts, ranked candidate cards |
-| 🔍 Skill Gap Analysis | Highlights skills in the JD missing from the resume |
-| 🎤 Interview Questions | Auto-generated, role-specific interview question sets |
-| 📥 CSV Export | Download the full shortlist as a spreadsheet |
-| ⚡ FastAPI Backend | REST API for programmatic access to the pipeline |
+| 📄 PDF & ZIP Parsing | Extract clean text from single PDF resumes or bulk upload multiple profiles via ZIP archives. |
+| 🧠 Smart JD Analyzer | Auto-analyze Job Descriptions for quality scores, minimum experience required, ideal candidate summaries, and text optimization recommendations. |
+| 🛡️ Enterprise Security | CENTRALIZED server-side key management,滑动窗口 rate-limiting (throttling), CORS checks, and client PII masking (emails/phones). |
+| ⚙️ Configuration Manager | Toggle active AI engines, manage API credentials with visibility switches, and monitor real-time token telemetry/billing logs. |
+| 🎛️ Advanced Sourcing Filters | Candidate search bar combined with advanced Boolean search query syntax (e.g. `Python AND ML NOT Java`), experience sliders, score ranges, and education filters. |
+| 🔗 Staging Pipeline | Visually advance candidates through a 6-stage recruiting pipeline (Applied → Screened → Shortlisted → Interview → Final → Hired). |
+| 🧭 Candidate Drawer | Slide-over drawer loading career trajectory timelines, domain expertise breakdowns, social validations (e.g. GitHub contributions), and credentials. |
+| 📝 Recruiter Notes & Ratings | Add bookmark status, comment logs, and star ratings (technical/culture fit) mapped dynamically to candidate states. |
+| 🎨 Glassmorphic Theme | Stunning dark/light mode responsive bento layout built with HTML5, TailwindCSS, and Google Material Icons. |
+| 🖨️ Print-Ready Layout | Clean, high-contrast `@media print` style sheets formatting report sections and hiding sidebars/widgets during print. |
+| 📥 CSV Export | Download ranked candidate shortlists directly as a spreadsheet. |
 
 ---
 
@@ -29,51 +28,31 @@
 ```
 AI-Resume-Job-Match-System/
 │
-├── app.py                  # Streamlit frontend entry point
-├── config.py               # All constants and path configuration
-├── requirements.txt        # Python dependencies
-├── README.md
-├── LICENSE
-├── .gitignore
-│
 ├── api/
-│   └── main.py             # FastAPI REST API
+│   └── main.py             # FastAPI REST API & Static Page Router
 │
 ├── src/
 │   ├── __init__.py
 │   ├── preprocess.py       # Text cleaning & normalisation
 │   ├── pdf_parser.py       # PDF → plain text extraction
-│   ├── skill_extractor.py  # Skill detection & weighting
-│   ├── similarity.py       # TF-IDF / SBERT cosine similarity
-│   ├── job_predictor.py    # ML role classifier
+│   ├── skill_extractor.py  # Skill detection, synonyms, & weighting
+│   ├── similarity.py       # TF-IDF / Cosine similarity matching
+│   ├── job_predictor.py    # ML role classifier model
 │   ├── experience_extractor.py
 │   ├── education_parser.py
-│   ├── explainer.py        # SHAP / LIME explainability
-│   ├── explainer_llm.py    # LLM-based explanation
-│   ├── gpt_analyzer.py     # OpenAI GPT resume analysis
-│   ├── highlighter.py      # Keyword highlighting
 │   ├── pipeline.py         # End-to-end pipeline orchestrator
 │   └── train.py            # Model training & vectorizer
 │
 ├── data/
-│   ├── skills.txt          # One skill per line
+│   ├── skills.txt          # Weighted skills dictionary
 │   └── job_roles.csv       # Training data: text, label
 │
-├── utils/
-│   └── helpers.py          # Shared utility functions
-│
-├── assets/
-│   ├── styles.css          # External stylesheet (glassmorphism)
-│   └── screenshots/
-│       ├── home.png
-│       ├── upload.png
-│       └── result.png
-│
-├── notebooks/
-│   └── exploration.ipynb   # EDA and model prototyping
-│
-└── .devcontainer/
-    └── devcontainer.json   # VS Code Dev Container config
+├── index.html              # Upgraded responsive SPA UI Dashboard
+├── styles.css              # Custom styled definitions
+├── requirements.txt        # Python dependencies
+├── README.md
+├── LICENSE
+└── vercel.json             # Vercel Serverless configuration
 ```
 
 ---
@@ -99,87 +78,31 @@ venv\Scripts\activate
 
 ### 3. Install dependencies
 
-To run the **Streamlit Dashboard** (or both frontend & backend locally):
-```bash
-pip install -r requirements-streamlit.txt
-```
-
-To install **only the FastAPI backend dependencies** (e.g. for Vercel optimization):
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Set environment variables
-
-Create a `.env` file in the project root:
-
-```env
-OPENAI_API_KEY=sk-...          # optional — GPT analysis only
-API_HOST=0.0.0.0
-API_PORT=8000
-LOG_LEVEL=INFO
-```
-
-### 5. Run the Streamlit app
-
-```bash
-streamlit run app.py
-```
-
-### 6. Run the FastAPI backend (optional)
+### 4. Run the FastAPI server locally
 
 ```bash
 uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 ```
 
-API docs available at `http://localhost:8000/docs`
+### 5. Access the Platform
 
-### 7. Deploy FastAPI Backend to Vercel (Serverless)
-
-The FastAPI REST API backend is pre-configured for Vercel Serverless Functions:
-1. Connect your repository to the **Vercel Dashboard** or install the **Vercel CLI** (`npm i -g vercel`).
-2. Run `vercel` in the project root to deploy, or let Vercel trigger deployments on git pushes automatically.
-3. Configure environment variables (like `OPENAI_API_KEY`) in the Vercel project settings if you are using the AI Analysis feature.
+Open your browser and navigate to:
+```
+http://localhost:8000/
+```
+The FastAPI backend serves the premium HTML5 SPA dashboard directly at the root URL.
 
 ---
 
-## 📊 Scoring Formula
+## ⚙️ AI Models & Credentials Configuration
 
-```
-Final Score = 0.50 × Similarity Score
-            + 0.30 × Skill Match Score
-            + 0.20 × Normalised Experience Score
-```
-
-| Score Range | Decision |
-|---|---|
-| ≥ 75% | 🟢 **Hire** |
-| 50–74% | 🟡 **Consider** |
-| < 50% | 🔴 **Reject** |
-
----
-
-## 🗃️ Data Files
-
-### `data/skills.txt`
-One skill per line, optionally followed by a weight separated by a comma:
-
-```
-python,3
-machine learning,5
-sql,2
-docker
-kubernetes,4
-```
-
-### `data/job_roles.csv`
-Training data for the role classifier:
-
-```csv
-text,label
-"experience with python scikit-learn pandas...",Data Scientist
-"built rest apis using fastapi postgresql...",Backend Engineer
-```
+The system uses **Google Gemini** (`gemini-2.5-flash`) as the default active AI provider for out-of-the-box resume analysis and JD parsing. 
+* To update your API credentials or switch the active provider to **OpenAI GPT** (`gpt-4o-mini`), click the **Settings** link in the navigation bar.
+* Test your API connection directly from the UI and save credentials securely on the server-side.
 
 ---
 
@@ -187,54 +110,26 @@ text,label
 
 | Method | Endpoint | Description |
 |---|---|---|
-| `GET` | `/` | Health check |
-| `POST` | `/analyze` | Analyse a single resume against a JD |
-| `POST` | `/batch` | Analyse multiple resumes, returns ranked list |
-| `GET` | `/skills` | List all skills in the database |
-
----
-
-## 🧪 Running Tests
-
-```bash
-pytest tests/ -v
-```
-
----
-
-## 🖥️ Screenshots
-
-| Home | Upload | Results |
-|---|---|---|
-| ![home](assets/screenshots/home.png) | ![upload](assets/screenshots/upload.png) | ![result](assets/screenshots/result.png) |
+| `GET` | `/` | Serves the SPA frontend dashboard |
+| `POST` | `/api/analyze` | Process PDF/ZIP resumes against a target JD |
+| `POST` | `/api/analyze-jd` | Analyze JD parameters & extract quality metrics |
+| `GET` | `/api/settings` | Retrieve active AI provider, security states, and telemetry |
+| `POST` | `/api/settings` | Save active AI provider and server-side credentials |
+| `POST` | `/api/settings/test`| Run a lightweight connection check to Gemini/OpenAI |
+| `POST` | `/api/rewrite` | ATS optimization helper for resume bullet points |
+| `POST` | `/api/chat` | Chat request handler for recruiting co-pilot |
 
 ---
 
 ## 🛠️ Tech Stack
 
-- **Frontend** — Streamlit, Plotly, custom CSS (Glassmorphism)
-- **Backend** — FastAPI, Uvicorn
-- **NLP** — scikit-learn TF-IDF, spaCy, sentence-transformers
-- **LLM** — OpenAI GPT-3.5-turbo
-- **PDF** — pdfplumber, PyMuPDF
-- **Explainability** — SHAP, LIME
+* **Frontend** — HTML5, Javascript (ES6), TailwindCSS, Chart.js, Google Material Icons.
+* **Backend** — FastAPI, Uvicorn server, HTTP Client (`urllib`).
+* **NLP & Models** — scikit-learn TF-IDF, NLTK-based cleaning.
+* **LLM Integrations** — Google Gemini (Default), OpenAI.
 
 ---
 
 ## 📄 License
 
 MIT License — see [LICENSE](LICENSE) for details.
-
----
-
-## 🤝 Contributing
-
-1. Fork the repository  
-2. Create a feature branch (`git checkout -b feature/your-feature`)  
-3. Commit your changes (`git commit -m 'Add your feature'`)  
-4. Push to the branch (`git push origin feature/your-feature`)  
-5. Open a Pull Request  
-
----
-
-<p align="center">Built with ❤️ using Streamlit & FastAPI</p>

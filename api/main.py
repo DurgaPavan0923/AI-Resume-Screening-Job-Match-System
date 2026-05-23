@@ -92,7 +92,7 @@ def call_gemini_api(prompt: str, system_instruction: str = "") -> str:
     if not key:
         raise ValueError("Google Gemini API Key is not configured.")
         
-    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={key}"
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
     full_prompt = f"{system_instruction}\n\n{prompt}" if system_instruction else prompt
     
     payload = {
@@ -415,7 +415,7 @@ async def test_connection(req: ConnectionTestRequest) -> ConnectionTestResponse:
         gemini_key = test_key or AIConfig.gemini_key
         if not gemini_key:
             return ConnectionTestResponse(success=False, message="Gemini Key is empty.")
-        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={gemini_key}"
+        url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={gemini_key}"
         payload = {"contents": [{"parts": [{"text": "Reply with only 'OK'"}]}]}
         try:
             req_http = urllib.request.Request(
