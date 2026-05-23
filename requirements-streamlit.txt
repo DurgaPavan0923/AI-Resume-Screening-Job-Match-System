@@ -1,6 +1,7 @@
-# Install core backend dependencies first
+# Reference backend requirements
 -r requirements.txt
 
-# Streamlit-specific frontend dependencies
+# Streamlit UI & Charting dependencies
 streamlit==1.37.1
 plotly==5.22.0
+pandas==2.2.2

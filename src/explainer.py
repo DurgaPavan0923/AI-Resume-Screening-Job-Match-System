@@ -1,16 +1,10 @@
 """
-src/explainer.py — SHAP / LIME-based feature importance explainer
-for the job-role classifier.
-
-Generates human-readable explanations of why a particular role
-was predicted for a candidate.
+src/explainer.py — Centroid-based feature importance explainer.
 """
 
 from __future__ import annotations
 
 import logging
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -22,22 +16,7 @@ def explain_prediction(
     top_n: int = 10,
 ) -> list[tuple[str, float]]:
     """
-    Return the top-N TF-IDF features that drove the model's
-    top prediction, using the model's own coefficients.
-
-    Parameters
-    ----------
-    text : str
-        Cleaned resume/JD text.
-    model : fitted LogisticRegression
-    vectorizer : fitted TfidfVectorizer
-    top_n : int
-        Number of features to return.
-
-    Returns
-    -------
-    list[tuple[str, float]]
-        ``[(feature_name, importance_score), ...]`` sorted descending.
+    Return the top-N features that drove the prediction.
     """
     if not text.strip():
         return []
@@ -45,23 +24,22 @@ def explain_prediction(
     try:
         vec   = vectorizer.transform([text])
         proba = model.predict_proba(vec)[0]
-        top_class_idx = int(np.argmax(proba))
-
-        # Coefficients for the predicted class
-        coefs = model.coef_[top_class_idx]
-        feature_names = vectorizer.get_feature_names_out()
-
-        # Weight coefficients by the actual TF-IDF value in this document
-        tfidf_vals = vec.toarray()[0]
-        scores     = coefs * tfidf_vals
-
-        # Top-N positive contributors
-        ranked = np.argsort(scores)[::-1][:top_n]
-        return [
-            (feature_names[i], round(float(scores[i]), 4))
-            for i in ranked
-            if scores[i] > 0
-        ]
+        
+        # Find the predicted class
+        top_class_idx = proba.index(max(proba))
+        cls = model.classes_[top_class_idx]
+        
+        # Get centroid features matching the document
+        centroid = model.centroids.get(cls, {})
+        v = vec.rows[0]
+        
+        scores = []
+        for word, val in v.items():
+            if word in centroid and val > 0:
+                scores.append((word, round(float(val * centroid[word]), 4)))
+                
+        scores.sort(key=lambda x: x[1], reverse=True)
+        return scores[:top_n]
 
     except Exception as exc:
         logger.error("Explanation failed: %s", exc)

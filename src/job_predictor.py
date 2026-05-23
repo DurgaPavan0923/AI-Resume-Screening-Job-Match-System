@@ -1,13 +1,10 @@
 """
-src/job_predictor.py — Predict likely job roles from resume text
-using the trained classifier.
+src/job_predictor.py — Predict likely job roles from resume text.
 """
 
 from __future__ import annotations
 
 import logging
-
-import numpy as np
 
 logger = logging.getLogger(__name__)
 
@@ -24,23 +21,6 @@ def predict_roles(
 ) -> tuple[list[str], list[tuple[str, float]]]:
     """
     Predict the most likely job roles for a candidate.
-
-    Parameters
-    ----------
-    clean_text : str
-        Pre-processed resume text.
-    skills : dict
-        Extracted skill → weight mapping (used to augment text).
-    model : fitted LogisticRegression
-    vectorizer : fitted TfidfVectorizer
-    top_n : int
-        How many roles to return.
-
-    Returns
-    -------
-    tuple[list[str], list[tuple[str, float]]]
-        ``(role_names, [(role, confidence_pct), ...])``
-        where confidence is rounded to 1 decimal place.
     """
     if not clean_text.strip():
         return [], []
@@ -54,13 +34,16 @@ def predict_roles(
         proba = model.predict_proba(vec)[0]
         classes = model.classes_
 
-        # Sort descending by confidence
-        ranked_idx = np.argsort(proba)[::-1][:top_n]
-        role_names = [classes[i] for i in ranked_idx]
-        ml_roles   = [
-            (classes[i], round(float(proba[i]) * 100, 1))
-            for i in ranked_idx
-        ]
+        # Sort classes descending by probability
+        ranked = sorted(
+            list(zip(classes, proba)),
+            key=lambda x: x[1],
+            reverse=True
+        )[:top_n]
+        
+        role_names = [r for r, p in ranked]
+        ml_roles   = [(r, round(float(p) * 100, 1)) for r, p in ranked]
+        
         return role_names, ml_roles
 
     except Exception as exc:
