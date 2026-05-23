@@ -304,9 +304,9 @@
           </div>
           <p class="font-body-md text-body-md text-primary font-medium mb-2">Drag and drop PDFs here</p>
           <p class="font-body-sm text-body-sm text-on-surface-variant mb-6">or click to browse files from your computer</p>
-          <button class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md font-semibold hover:bg-opacity-90 transition-opacity">Select Files</button>
-          <input accept=".pdf" class="hidden" id="file-input" type="file" multiple/>
+          <button type="button" class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md font-semibold hover:bg-opacity-90 transition-opacity">Select Files</button>
         </div>
+        <input accept=".pdf" class="hidden" id="file-input" type="file" multiple/>
         <!-- Uploaded Files List -->
         <div class="mt-6 flex flex-col gap-3" id="file-list-container"></div>
       </div>
@@ -637,6 +637,10 @@ Requirements:
     }, false);
 
     dropArea.addEventListener('click', () => fileInput.click());
+
+    fileInput.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
 
     fileInput.addEventListener('change', function() {
       addFiles(this.files);
@@ -1093,10 +1097,8 @@ Requirements:
         `"${r.role || 'Unspecified'}"`
       ]);
 
-      const csvContent = "data:text/csv;charset=utf-8," 
-        + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
-
-      const encodedUri = encodeURI(csvContent);
+      const csvBody = [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+      const encodedUri = "data:text/csv;charset=utf-8," + encodeURIComponent(csvBody);
       const link = document.createElement("a");
       link.setAttribute("href", encodedUri);
       link.setAttribute("download", "shortlisted_candidates.csv");
