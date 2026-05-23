@@ -7,5 +7,4 @@ models/
 *.csv
 !data/job_roles.csv
 *.pdf
-assets/
 notebooks/
