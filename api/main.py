@@ -85,6 +85,7 @@ class AnalyzeResponse(BaseModel):
     missing_skills: list[str]
     ml_roles:       list[dict]
     decision:       str
+    gpt_analysis:   str
 
 
 # ---------------------------------------------------------------------------
@@ -143,6 +144,14 @@ async def analyze(
     import re  # noqa: PLC0415
     decision_plain = re.sub(r"<[^>]+>", "", result.decision)
 
+    gpt_analysis = "⚠️ AI analysis unavailable (check API key / quota)."
+    if os.environ.get("OPENAI_API_KEY"):
+        try:
+            from src.gpt_analyzer import analyze_resume
+            gpt_analysis = analyze_resume(result.raw_text, job_description)
+        except Exception as exc:
+            logger.error("GPT analysis failed: %s", exc)
+
     return AnalyzeResponse(
         name           = result.name,
         score          = result.score,
@@ -153,4 +162,5 @@ async def analyze(
         missing_skills = result.missing_skills,
         ml_roles       = [{"role": r, "confidence": c} for r, c in result.ml_roles],
         decision       = decision_plain,
+        gpt_analysis   = gpt_analysis,
     )
