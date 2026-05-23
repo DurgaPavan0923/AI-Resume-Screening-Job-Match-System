@@ -267,6 +267,13 @@
     .view-section {
       transition: opacity 0.25s ease-in-out;
     }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .animate-fade-in {
+      animation: fadeIn 0.22s ease-out forwards;
+    }
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col">
@@ -1369,8 +1376,9 @@ Requirements:
       const copilotChatMessages = document.getElementById('copilot-chat-messages');
       if (copilotChatMessages) {
         copilotChatMessages.innerHTML = `
-          <div class="text-xs text-on-surface-variant italic text-center py-4">
-            Ask anything about candidate ${displayName}.
+          <div class="text-xs text-on-surface-variant italic text-center py-6 flex flex-col items-center gap-2 animate-fade-in">
+            <span class="material-symbols-outlined text-primary text-3xl opacity-40">chat_bubble</span>
+            <span>Ask anything about candidate <strong class="text-primary">${displayName}</strong>.</span>
           </div>
         `;
       }
@@ -1547,7 +1555,10 @@ Requirements:
     // ── COPILOT WIDGET CONTROLS ──
     function toggleCopilotDrawer() {
       const drawer = document.getElementById('copilot-drawer');
-      drawer.classList.toggle('translate-x-full');
+      drawer.classList.toggle('opacity-0');
+      drawer.classList.toggle('translate-y-8');
+      drawer.classList.toggle('scale-95');
+      drawer.classList.toggle('pointer-events-none');
     }
 
     function switchCopilotTab(tab) {
@@ -1559,17 +1570,15 @@ Requirements:
       if (tab === 'chat') {
         tabChat.classList.remove('hidden');
         tabRewrite.classList.add('hidden');
-        btnChat.classList.add('border-primary', 'text-primary');
-        btnChat.classList.remove('text-on-surface-variant');
-        btnRewrite.classList.remove('border-primary', 'text-primary');
-        btnRewrite.classList.add('text-on-surface-variant');
+        
+        btnChat.className = "flex-1 py-2 text-center text-xs font-semibold rounded-lg bg-surface text-primary shadow-sm transition-all duration-200";
+        btnRewrite.className = "flex-1 py-2 text-center text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-all duration-200";
       } else {
         tabChat.classList.add('hidden');
         tabRewrite.classList.remove('hidden');
-        btnChat.classList.remove('border-primary', 'text-primary');
-        btnChat.classList.add('text-on-surface-variant');
-        btnRewrite.classList.add('border-primary', 'text-primary');
-        btnRewrite.classList.remove('text-on-surface-variant');
+        
+        btnRewrite.className = "flex-1 py-2 text-center text-xs font-semibold rounded-lg bg-surface text-primary shadow-sm transition-all duration-200";
+        btnChat.className = "flex-1 py-2 text-center text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-all duration-200";
       }
     }
 
@@ -1633,9 +1642,9 @@ Requirements:
       }
 
       if (sender === 'user') {
-        msg.className = "self-end bg-primary/20 text-on-surface rounded-lg p-2.5 max-w-[85%] text-xs ml-auto border border-primary/30";
+        msg.className = "self-end bg-primary text-on-primary rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] text-xs ml-auto shadow-md border border-primary/10 transition-all duration-200 animate-fade-in";
       } else {
-        msg.className = "self-start bg-surface-container-high text-on-surface rounded-lg p-2.5 max-w-[85%] text-xs mr-auto border border-outline-variant";
+        msg.className = "self-start bg-surface border border-outline-variant/60 text-on-surface rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[85%] text-xs mr-auto shadow-sm transition-all duration-200 animate-fade-in";
       }
       msg.innerText = text;
       container.appendChild(msg);
@@ -1649,11 +1658,11 @@ Requirements:
       loaderCounter++;
       const id = `chat-loader-${loaderCounter}`;
       loader.id = id;
-      loader.className = "self-start bg-surface-container-high text-on-surface-variant rounded-lg p-2.5 text-xs mr-auto border border-outline-variant flex items-center gap-1";
+      loader.className = "self-start bg-surface border border-outline-variant/60 text-on-surface-variant rounded-2xl rounded-tl-none px-4 py-2.5 text-xs mr-auto shadow-sm flex items-center gap-1.5 transition-all duration-200 animate-fade-in";
       loader.innerHTML = `
-        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce"></span>
-        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce [animation-delay:0.2s]"></span>
-        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce [animation-delay:0.4s]"></span>
+        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce"></span>
+        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1.5 h-1.5 bg-primary rounded-full animate-bounce [animation-delay:0.4s]"></span>
       `;
       container.appendChild(loader);
       container.scrollTop = container.scrollHeight;
@@ -1718,68 +1727,76 @@ Requirements:
   </script>
 
   <!-- Floating FAB for Recruitment Co-pilot -->
-  <button id="copilot-fab" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 pulse-animation animate-bounce" onclick="toggleCopilotDrawer()">
-    <span class="material-symbols-outlined text-2xl">sparkles</span>
+  <button id="copilot-fab" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-primary to-secondary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 z-40 pulse-animation group" onclick="toggleCopilotDrawer()">
+    <span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform duration-300">sparkles</span>
   </button>
 
-  <!-- Copilot Drawer -->
-  <div id="copilot-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-surface-container-low border-l border-outline-variant shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+  <!-- Copilot Popover Drawer (Floating style) -->
+  <div id="copilot-drawer" class="fixed bottom-24 right-6 w-[calc(100vw-32px)] sm:w-[420px] h-[620px] bg-surface-container-low/95 backdrop-blur-2xl border border-outline-variant/80 shadow-2xl rounded-3xl z-50 transform translate-y-8 scale-95 opacity-0 pointer-events-none transition-all duration-300 ease-out flex flex-col overflow-hidden">
     <!-- Header -->
-    <div class="p-6 border-b border-outline-variant flex items-center justify-between bg-surface-container-high">
-      <div class="flex items-center gap-2">
-        <span class="material-symbols-outlined text-primary text-2xl">smart_toy</span>
+    <div class="p-5 flex items-center justify-between bg-gradient-to-r from-primary to-secondary text-on-primary shadow-sm flex-shrink-0">
+      <div class="flex items-center gap-3">
+        <div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-on-primary/10 border border-on-primary/20">
+          <span class="material-symbols-outlined text-[22px] text-on-primary">smart_toy</span>
+          <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-primary animate-pulse"></span>
+        </div>
         <div>
-          <h3 class="font-headline-md text-[18px] text-primary leading-none">Recruitment Co-pilot</h3>
-          <p class="text-xs text-on-surface-variant mt-1">Advanced AI Workspace Assistant</p>
+          <h3 class="font-headline-md text-sm font-bold leading-none text-on-primary">InsightAI Co-pilot</h3>
+          <p class="text-[10px] text-on-primary/80 mt-1 font-medium flex items-center gap-1">
+            <span class="inline-block w-1.5 h-1.5 rounded-full bg-emerald-400"></span> Active Recruiting Assistant
+          </p>
         </div>
       </div>
-      <button class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant" onclick="toggleCopilotDrawer()">
-        <span class="material-symbols-outlined">close</span>
+      <button class="w-8 h-8 rounded-full hover:bg-on-primary/10 flex items-center justify-center text-on-primary transition-colors" onclick="toggleCopilotDrawer()">
+        <span class="material-symbols-outlined text-lg">close</span>
       </button>
     </div>
 
     <!-- Tabs -->
-    <div class="flex border-b border-outline-variant bg-surface-container">
-      <button id="tab-btn-chat" class="flex-1 py-3 text-center text-sm font-semibold border-b-2 border-primary text-primary transition-all" onclick="switchCopilotTab('chat')">
-        AI Copilot Chat
-      </button>
-      <button id="tab-btn-rewrite" class="flex-1 py-3 text-center text-sm font-semibold text-on-surface-variant transition-all" onclick="switchCopilotTab('rewrite')">
-        Resume Optimizer
-      </button>
+    <div class="p-3 border-b border-outline-variant bg-surface-container/30 flex-shrink-0">
+      <div class="flex bg-surface-container-high/80 rounded-xl p-1 border border-outline-variant/40">
+        <button id="tab-btn-chat" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg bg-surface text-primary shadow-sm transition-all duration-200" onclick="switchCopilotTab('chat')">
+          AI Copilot Chat
+        </button>
+        <button id="tab-btn-rewrite" class="flex-1 py-2 text-center text-xs font-semibold rounded-lg text-on-surface-variant hover:text-on-surface transition-all duration-200" onclick="switchCopilotTab('rewrite')">
+          Resume Optimizer
+        </button>
+      </div>
     </div>
 
     <!-- Content Area -->
-    <div class="flex-grow overflow-y-auto p-6">
+    <div class="flex-grow overflow-y-auto p-5 flex flex-col min-h-0 bg-surface-container-lowest/40">
       <!-- Chat Tab -->
-      <div id="copilot-tab-chat" class="h-full flex flex-col gap-4">
+      <div id="copilot-tab-chat" class="flex-grow flex flex-col gap-4 min-h-0">
         <!-- Suggested prompts -->
         <div class="space-y-2">
-          <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider block">Suggested Questions:</span>
-          <div class="flex flex-wrap gap-2">
-            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
-              🔍 Missing Skills Gap
+          <span class="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">Suggested Questions:</span>
+          <div class="flex flex-wrap gap-1.5">
+            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
+              🔍 Missing Skills
             </button>
-            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
+            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
               💬 Tailored Questions
             </button>
-            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
-              📋 Candidate Evaluation
+            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
+              📋 Evaluation
             </button>
           </div>
         </div>
 
         <!-- Chat Messages list -->
-        <div id="copilot-chat-messages" class="flex-grow bg-surface border border-outline-variant rounded-xl p-4 overflow-y-auto space-y-3 min-h-[200px] max-h-[350px]">
-          <div class="text-xs text-on-surface-variant italic text-center py-4">
-            Ask anything about the active candidate's skills, qualifications, or interview readiness.
+        <div id="copilot-chat-messages" class="flex-grow bg-surface/50 backdrop-blur-md border border-outline-variant/60 rounded-2xl p-4 overflow-y-auto space-y-3 min-h-[160px] max-h-[300px] flex flex-col shadow-inner">
+          <div class="text-xs text-on-surface-variant italic text-center py-8 flex flex-col items-center gap-2">
+            <span class="material-symbols-outlined text-primary text-3xl opacity-40">chat_bubble</span>
+            <span>Ask anything about the candidate's skills, qualifications, or interview readiness.</span>
           </div>
         </div>
 
         <!-- Chat Input block -->
-        <div class="flex gap-2">
-          <input type="text" id="copilot-chat-input" class="flex-grow bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/40" placeholder="Ask about this candidate..." onkeydown="if(event.key === 'Enter') sendCopilotChat()"/>
-          <button class="bg-primary text-on-primary p-2 rounded-lg hover:bg-opacity-90 flex items-center justify-center flex-shrink-0" onclick="sendCopilotChat()">
-            <span class="material-symbols-outlined">send</span>
+        <div class="flex gap-2 p-2 bg-surface-container-high/40 border border-outline-variant/40 rounded-2xl mt-auto">
+          <input type="text" id="copilot-chat-input" class="flex-grow bg-surface border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/40 text-on-surface shadow-inner" placeholder="Ask about this candidate..." onkeydown="if(event.key === 'Enter') sendCopilotChat()"/>
+          <button class="bg-primary text-on-primary p-2.5 rounded-xl hover:bg-opacity-90 flex items-center justify-center flex-shrink-0 shadow-md hover:scale-105 active:scale-95 transition-all" onclick="sendCopilotChat()">
+            <span class="material-symbols-outlined text-lg">send</span>
           </button>
         </div>
       </div>
@@ -1787,30 +1804,30 @@ Requirements:
       <!-- Rewrite Tab -->
       <div id="copilot-tab-rewrite" class="hidden flex flex-col gap-4">
         <div>
-          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Rewrite Target Role:</label>
-          <input type="text" id="rewrite-role" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" value="Senior Machine Learning Engineer"/>
+          <label class="block text-[10px] font-bold text-on-surface-variant/85 uppercase tracking-wider mb-2">Rewrite Target Role:</label>
+          <input type="text" id="rewrite-role" class="w-full bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-on-surface shadow-sm" value="Senior Machine Learning Engineer"/>
         </div>
         <div>
-          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Optimization Mode:</label>
-          <select id="rewrite-mode" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+          <label class="block text-[10px] font-bold text-on-surface-variant/85 uppercase tracking-wider mb-2">Optimization Mode:</label>
+          <select id="rewrite-mode" class="w-full bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-on-surface shadow-sm">
             <option value="bullet">Rewrite Bullet Point (Impact & Action Verbs)</option>
             <option value="summary">Generate Professional Summary</option>
             <option value="ats">ATS Keyword Alignment</option>
           </select>
         </div>
         <div>
-          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Original Text:</label>
-          <textarea id="rewrite-input" class="w-full h-24 bg-surface border border-outline-variant rounded-lg p-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder-on-surface-variant/30" placeholder="Paste resume bullet or details here..."></textarea>
+          <label class="block text-[10px] font-bold text-on-surface-variant/85 uppercase tracking-wider mb-2">Original Text:</label>
+          <textarea id="rewrite-input" class="w-full h-24 bg-surface border border-outline-variant/60 rounded-xl p-3 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder-on-surface-variant/30 text-on-surface shadow-sm" placeholder="Paste resume bullet or details here..."></textarea>
         </div>
-        <button id="btn-rewrite-submit" class="bg-primary text-on-primary py-2.5 rounded-lg hover:bg-opacity-90 transition-all font-semibold text-sm flex items-center justify-center gap-2" onclick="runResumeRewrite()">
+        <button id="btn-rewrite-submit" class="bg-primary text-on-primary py-2.5 rounded-xl hover:bg-opacity-90 hover:scale-[1.02] active:scale-[0.98] transition-all font-semibold text-xs flex items-center justify-center gap-2 shadow-md" onclick="runResumeRewrite()">
           <span class="material-symbols-outlined text-lg">auto_fix</span> Optimize Text
         </button>
         
-        <div id="rewrite-output-box" class="hidden mt-2 p-4 bg-surface border border-outline-variant rounded-xl relative">
-          <label class="block text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Optimized Output:</label>
-          <p id="rewrite-output-text" class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap pr-8"></p>
-          <button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" onclick="copyRewriteOutput()" title="Copy to clipboard">
-            <span class="material-symbols-outlined text-lg">content_copy</span>
+        <div id="rewrite-output-box" class="hidden mt-2 p-4 bg-surface border border-outline-variant/60 rounded-2xl relative shadow-md animate-fade-in">
+          <label class="block text-[9px] font-bold text-primary uppercase tracking-wider mb-1">Optimized Output:</label>
+          <p id="rewrite-output-text" class="text-xs text-on-surface leading-relaxed whitespace-pre-wrap pr-8"></p>
+          <button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary transition-colors" onclick="copyRewriteOutput()" title="Copy to clipboard">
+            <span class="material-symbols-outlined text-base">content_copy</span>
           </button>
         </div>
       </div>
