@@ -129,6 +129,13 @@ uvicorn api.main:app --reload --host 0.0.0.0 --port 8000
 
 API docs available at `http://localhost:8000/docs`
 
+### 7. Deploy FastAPI Backend to Vercel (Serverless)
+
+The FastAPI REST API backend is pre-configured for Vercel Serverless Functions:
+1. Connect your repository to the **Vercel Dashboard** or install the **Vercel CLI** (`npm i -g vercel`).
+2. Run `vercel` in the project root to deploy, or let Vercel trigger deployments on git pushes automatically.
+3. Configure environment variables (like `OPENAI_API_KEY`) in the Vercel project settings if you are using the AI Analysis feature.
+
 ---
 
 ## 📊 Scoring Formula

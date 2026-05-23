@@ -12,6 +12,12 @@ GET  /health    — health check
 
 from __future__ import annotations
 
+import os
+import sys
+
+# Add project root to path for Vercel Serverless Function imports
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
 import io
 import logging
 
