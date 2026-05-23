@@ -396,14 +396,104 @@
       </div>
     </section>
     
-    <!-- Footer -->
-    <footer class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop border-t border-outline-variant mt-32 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-on-surface-variant text-sm">
-      <div>© 2026 InsightAI Platform</div>
-      <div class="flex gap-6">
-        <a href="#" class="hover:text-primary transition-colors">Privacy</a>
-        <a href="#" class="hover:text-primary transition-colors">Terms</a>
+    <!-- Upgraded Premium Footer -->
+    <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mt-32 w-full">
+      <!-- Subtle animated gradient divider line -->
+      <div class="w-full h-px bg-gradient-to-r from-transparent via-primary/40 to-transparent relative mb-16">
+        <div class="absolute inset-0 bg-primary/20 blur-[2px]"></div>
       </div>
-    </footer>
+
+      <footer class="grid grid-cols-1 md:grid-cols-12 gap-12 pb-8 text-on-surface-variant text-sm">
+        <!-- Left: Logo + Tagline + Stats -->
+        <div class="md:col-span-4 space-y-6">
+          <div>
+            <span class="font-headline-md text-headline-md font-bold text-primary cursor-pointer hover:opacity-90" onclick="switchView('landing')">
+              InsightAI
+            </span>
+            <p class="text-xs text-on-surface-variant mt-2 font-medium">Intelligent Resume Screening Powered by AI</p>
+          </div>
+          
+          <!-- Mini Stats Row -->
+          <div class="flex gap-6 border-t border-outline-variant/30 pt-4 w-fit">
+            <div>
+              <div class="font-headline-md text-base font-bold text-primary leading-none">10K+</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Resumes Screened</div>
+            </div>
+            <div class="border-l border-outline-variant/30 pl-6">
+              <div class="font-headline-md text-base font-bold text-secondary leading-none">95%</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Match Accuracy</div>
+            </div>
+            <div class="border-l border-outline-variant/30 pl-6">
+              <div class="font-headline-md text-base font-bold text-tertiary leading-none">500+</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Recruiters</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Center: Quick Links -->
+        <div class="md:col-span-4 grid grid-cols-2 gap-4">
+          <div class="space-y-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-primary block">Platform</span>
+            <ul class="space-y-2 text-xs">
+              <li><a href="#" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing')">About Us</a></li>
+              <li><a href="#features" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing')">Features</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors duration-150" onclick="switchView('workspace')">Dashboard</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors duration-150" onclick="alert('Contact us at support@insightai.com')">Contact Sales</a></li>
+            </ul>
+          </div>
+          <div class="space-y-3">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-secondary block">Trust &amp; Legal</span>
+            <ul class="space-y-2 text-xs">
+              <li><a href="#" class="hover:text-primary transition-colors duration-150">Privacy Policy</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors duration-150">Terms of Service</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors duration-150">Security Standard</a></li>
+              <li><a href="#" class="hover:text-primary transition-colors duration-150">Cookie Preferences</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Right: Newsletter + Socials -->
+        <div class="md:col-span-4 space-y-6">
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-primary block">Subscribe to Updates</span>
+            <p class="text-xs text-on-surface-variant">Get AI hiring updates and platform announcements.</p>
+            <div class="flex gap-2 max-w-sm">
+              <input type="email" placeholder="Email address" class="flex-grow bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/35 shadow-inner min-w-0" />
+              <button class="bg-primary text-on-primary text-xs px-4 py-2 rounded-xl hover:bg-opacity-90 active:scale-95 transition-all font-semibold shadow-md flex-shrink-0" onclick="alert('Thank you for subscribing!')">Subscribe</button>
+            </div>
+          </div>
+
+          <!-- Social Icons -->
+          <div class="space-y-2">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-on-surface-variant block">Find Us On</span>
+            <div class="flex gap-3">
+              <a href="#" class="w-8 h-8 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary hover:text-primary transition-all duration-200 flex items-center justify-center shadow-sm" title="GitHub">
+                <span class="material-symbols-outlined text-[18px]">code</span>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary hover:text-primary transition-all duration-200 flex items-center justify-center shadow-sm" title="LinkedIn">
+                <span class="material-symbols-outlined text-[18px]">diversity_3</span>
+              </a>
+              <a href="#" class="w-8 h-8 rounded-xl bg-surface border border-outline-variant/60 hover:border-primary hover:text-primary transition-all duration-200 flex items-center justify-center shadow-sm" title="Twitter / X">
+                <span class="material-symbols-outlined text-[18px]">public</span>
+              </a>
+            </div>
+          </div>
+        </div>
+      </footer>
+
+      <!-- Bottom Bar -->
+      <div class="border-t border-outline-variant/30 py-6 flex flex-col sm:flex-row justify-between items-center gap-4 text-xs text-on-surface-variant">
+        <div class="flex flex-wrap gap-x-2 gap-y-1">
+          <span>© 2026 InsightAI Platform. All rights reserved.</span>
+          <span class="hidden sm:inline text-outline-variant">•</span>
+          <span class="text-[10px] text-on-surface-variant/70">Built with next-gen models &amp; fast semantic matching</span>
+        </div>
+        <div class="flex items-center gap-1 text-[11px] font-semibold">
+          <span>Powered by</span>
+          <span class="bg-clip-text bg-gradient-to-r from-primary to-secondary text-transparent font-bold">InsightAI Engine™</span>
+        </div>
+      </div>
+    </div>
   </main>
 
   <!-- ── VIEW 2: RESUME UPLOAD WORKSPACE ── -->
@@ -1744,6 +1834,13 @@ Requirements:
       });
     }
   </script>
+
+  <!-- AI Assistant Tooltip -->
+  <div id="copilot-tooltip" class="fixed bottom-8 right-24 bg-surface-container-low/95 backdrop-blur-xl border border-outline-variant/80 rounded-2xl px-4 py-2 text-xs text-on-surface shadow-2xl z-40 transition-all duration-300 hover:translate-y-[-1px] cursor-pointer flex items-center gap-1.5 group font-medium" onclick="toggleCopilotDrawer(); this.remove();">
+    <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+    <span>Need help? Ask Co-pilot!</span>
+    <span class="material-symbols-outlined text-[14px] text-primary group-hover:translate-x-0.5 transition-transform">arrow_forward</span>
+  </div>
 
   <!-- Floating FAB for Recruitment Co-pilot -->
   <button id="copilot-fab" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-primary to-secondary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 z-40 pulse-animation group" onclick="toggleCopilotDrawer()">
