@@ -99,9 +99,14 @@ venv\Scripts\activate
 
 ### 3. Install dependencies
 
+To run the **Streamlit Dashboard** (or both frontend & backend locally):
+```bash
+pip install -r requirements-streamlit.txt
+```
+
+To install **only the FastAPI backend dependencies** (e.g. for Vercel optimization):
 ```bash
 pip install -r requirements.txt
-python -m spacy download en_core_web_sm
 ```
 
 ### 4. Set environment variables

@@ -1,0 +1,6 @@
+# Install core backend dependencies first
+-r requirements.txt
+
+# Streamlit-specific frontend dependencies
+streamlit==1.37.1
+plotly==5.22.0
