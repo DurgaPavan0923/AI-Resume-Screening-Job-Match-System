@@ -39,6 +39,8 @@ class CandidateResult:
     education:      list[str]       = field(default_factory=list)
     gpt_analysis:   str             = ""
     decision:       str             = ""
+    score_breakdown: dict[str, float] = field(default_factory=dict)
+    explanation:    str             = ""
 
 
 # ---------------------------------------------------------------------------
@@ -100,6 +102,20 @@ def run_pipeline(
         else:
             decision = "<span style='color:#ff5252;font-weight:700'>🔴 Reject</span>"
 
+        score_breakdown = {
+            "similarity": round(WEIGHT_SIMILARITY * sim_score * 100, 2),
+            "skills": round(WEIGHT_SKILL * s_score * 100, 2),
+            "experience": round(WEIGHT_EXPERIENCE * min(experience / MAX_EXPERIENCE_YEARS, 1.0) * 100, 2)
+        }
+
+        # Match explanation
+        if score_pct >= 75:
+            explanation = f"Strong semantic match ({score_breakdown['similarity']}%). Candidate possesses key required skills and relevant experience."
+        elif score_pct >= 50:
+            explanation = f"Moderate match. Good skill alignment ({score_breakdown['skills']}%) but has some missing keywords or experience gaps."
+        else:
+            explanation = f"Low match score of {score_pct}%. Candidate lacks core required skills or sufficient years of experience."
+
         return CandidateResult(
             name           = getattr(file, "name", "unknown"),
             raw_text       = raw_text,
@@ -112,6 +128,8 @@ def run_pipeline(
             experience     = experience,
             education      = education,
             decision       = decision,
+            score_breakdown = score_breakdown,
+            explanation    = explanation,
         )
 
     except Exception as exc:

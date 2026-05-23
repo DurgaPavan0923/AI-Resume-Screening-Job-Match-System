@@ -412,11 +412,11 @@
           <div class="w-16 h-16 rounded-full bg-primary-container/20 text-primary-container flex items-center justify-center mb-4 group-hover:scale-110 transition-transform duration-300">
             <span class="material-symbols-outlined text-4xl">upload_file</span>
           </div>
-          <p class="font-body-md text-body-md text-primary font-medium mb-2">Drag and drop PDFs here</p>
+          <p class="font-body-md text-body-md text-primary font-medium mb-2">Drag and drop PDFs or ZIPs here</p>
           <p class="font-body-sm text-body-sm text-on-surface-variant mb-6">or click to browse files from your computer</p>
           <button type="button" class="bg-primary text-on-primary px-6 py-2 rounded-full font-label-md text-label-md font-semibold hover:bg-opacity-90 transition-opacity">Select Files</button>
         </div>
-        <input accept=".pdf" class="hidden" id="file-input" type="file" multiple/>
+        <input accept=".pdf,.zip" class="hidden" id="file-input" type="file" multiple/>
         <!-- Uploaded Files List -->
         <div class="mt-6 flex flex-col gap-3" id="file-list-container"></div>
       </div>
@@ -515,6 +515,27 @@
         </button>
       </div>
       
+      <!-- Filters and Sort -->
+      <div class="space-y-3 border-b border-outline-variant pb-4">
+        <div class="flex gap-2">
+          <select id="queue-filter-score" class="flex-grow bg-surface border border-outline-variant rounded-lg px-2 py-1 text-[11px] text-on-surface focus:outline-none" onchange="applyQueueFilters()">
+            <option value="all">All Scores</option>
+            <option value="top">Hire (>=75%)</option>
+            <option value="mid">Consider (>=50%)</option>
+          </select>
+          <select id="queue-filter-exp" class="flex-grow bg-surface border border-outline-variant rounded-lg px-2 py-1 text-[11px] text-on-surface focus:outline-none" onchange="applyQueueFilters()">
+            <option value="all">All Exp</option>
+            <option value="junior">Junior (<3 yrs)</option>
+            <option value="senior">Senior (>=5 yrs)</option>
+          </select>
+        </div>
+        <select id="queue-sort" class="w-full bg-surface border border-outline-variant rounded-lg px-2 py-1 text-[11px] text-on-surface focus:outline-none" onchange="applyQueueFilters()">
+          <option value="score_desc">Sort by Score (Highest)</option>
+          <option value="score_asc">Sort by Score (Lowest)</option>
+          <option value="exp_desc">Sort by Experience (Highest)</option>
+        </select>
+      </div>
+
       <!-- Ranked Candidate Selector List -->
       <div class="flex-grow overflow-y-auto space-y-3 pr-1" id="dashboard-candidate-list"></div>
       
@@ -542,7 +563,11 @@
           <h2 class="font-headline-lg text-primary tracking-tight" id="candidate-full-name">Elena Rostova</h2>
           <p class="font-body-lg text-on-surface-variant mt-1" id="candidate-predicted-role">Senior Machine Learning Engineer</p>
         </div>
-        <div class="flex gap-3">
+        <div class="flex gap-3 items-center">
+          <div class="flex items-center gap-2 bg-surface-container-high px-3.5 py-2 rounded-full border border-outline-variant shadow-sm text-xs">
+            <span class="font-semibold text-on-surface-variant">Anonymous Mode</span>
+            <input type="checkbox" id="anonymous-toggle" class="form-checkbox h-3.5 w-3.5 text-primary bg-surface border-outline rounded focus:ring-0 cursor-pointer" onchange="toggleAnonymousMode()"/>
+          </div>
           <button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-sm text-body-sm hover:border-primary hover:text-primary transition-colors bg-surface-container-low shadow-sm flex items-center gap-2" onclick="window.print()">
             <span class="material-symbols-outlined text-lg">print</span> Print Report
           </button>
@@ -588,6 +613,39 @@
               <div class="font-body-md text-primary font-semibold" id="score-readability">94%</div>
             </div>
           </div>
+          <!-- Explainability Breakdown Progress Bars -->
+          <div class="w-full mt-6 pt-4 border-t border-outline-variant space-y-3 z-10 text-[11px]">
+            <h4 class="font-label-caps text-label-caps text-on-surface-variant font-bold text-left mb-1">Score Breakdown</h4>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>Semantic similarity (50% max)</span>
+                <span class="font-semibold text-primary" id="breakdown-similarity">35%</span>
+              </div>
+              <div class="w-full bg-surface-container-highest rounded-full h-1">
+                <div class="bg-primary h-1 rounded-full transition-all duration-500" id="bar-similarity" style="width: 70%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>Skill overlap (30% max)</span>
+                <span class="font-semibold text-secondary" id="breakdown-skills">21%</span>
+              </div>
+              <div class="w-full bg-surface-container-highest rounded-full h-1">
+                <div class="bg-secondary h-1 rounded-full transition-all duration-500" id="bar-skills" style="width: 70%"></div>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between mb-1">
+                <span>Experience fit (20% max)</span>
+                <span class="font-semibold text-tertiary" id="breakdown-experience">14%</span>
+              </div>
+              <div class="w-full bg-surface-container-highest rounded-full h-1">
+                <div class="bg-tertiary h-1 rounded-full transition-all duration-500" id="bar-experience" style="width: 70%"></div>
+              </div>
+            </div>
+          </div>
+          <!-- AI Explanation Text -->
+          <p class="text-[11px] text-on-surface-variant mt-4 text-center leading-relaxed italic z-10" id="match-explanation-text"></p>
         </div>
         
         <!-- Experience heat map Table (col-span-8) -->
@@ -599,17 +657,40 @@
               <span class="w-3 h-3 rounded-sm bg-primary"></span><span class="text-xs text-on-surface-variant">Matched</span>
             </div>
           </div>
-          <div class="overflow-x-auto flex-grow">
-            <table class="w-full text-left border-collapse">
-              <thead>
-                <tr class="border-b border-outline-variant">
-                  <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium w-1/2">Key JD Required Skills</th>
-                  <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium text-center">Detected in Resume</th>
-                  <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium text-center">Relevance Status</th>
-                </tr>
-              </thead>
-              <tbody class="font-body-sm text-body-sm text-on-surface" id="heatmap-table-body"></tbody>
-            </table>
+          <div class="flex flex-col md:flex-row gap-6 flex-grow items-center">
+            <!-- Left: Table -->
+            <div class="overflow-x-auto flex-grow w-full md:w-3/5">
+              <table class="w-full text-left border-collapse">
+                <thead>
+                  <tr class="border-b border-outline-variant">
+                    <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium w-1/2">Key JD Required Skills</th>
+                    <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium text-center">Detected in Resume</th>
+                    <th class="pb-3 font-body-sm text-xs text-on-surface-variant font-medium text-center">Relevance Status</th>
+                  </tr>
+                </thead>
+                <tbody class="font-body-sm text-body-sm text-on-surface" id="heatmap-table-body"></tbody>
+              </table>
+            </div>
+            <!-- Right: SVG Radar Chart -->
+            <div class="w-44 h-44 flex-shrink-0 flex items-center justify-center relative border border-outline-variant bg-surface rounded-2xl p-2">
+              <svg class="w-full h-full" viewBox="0 0 100 100" id="skills-radar-svg">
+                <!-- Radar grid rings -->
+                <polygon points="50,15 80,35 80,65 50,85 20,65 20,35" fill="none" stroke="var(--color-outline-variant)" stroke-width="0.75" stroke-dasharray="2 2" />
+                <polygon points="50,26.5 72.5,41.5 72.5,61.5 50,76.5 27.5,61.5 27.5,41.5" fill="none" stroke="var(--color-outline-variant)" stroke-width="0.75" stroke-dasharray="2 2" />
+                <polygon points="50,38 65,48 65,58 50,68 35,58 35,48" fill="none" stroke="var(--color-outline-variant)" stroke-width="0.75" stroke-dasharray="2 2" />
+                
+                <!-- Axis lines -->
+                <line x1="50" y1="50" x2="50" y2="15" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                <line x1="50" y1="50" x2="80" y2="35" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                <line x1="50" y1="50" x2="80" y2="65" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                <line x1="50" y1="50" x2="50" y2="85" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                <line x1="50" y1="50" x2="20" y2="65" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                <line x1="50" y1="50" x2="20" y2="35" stroke="var(--color-outline-variant)" stroke-width="0.75" />
+                
+                <!-- Candidate skill shape -->
+                <polygon id="radar-shape" points="50,50 50,50 50,50 50,50 50,50 50,50" fill="rgba(173, 198, 255, 0.35)" stroke="var(--color-primary)" stroke-width="1.5" class="transition-all duration-700 ease-out" />
+              </svg>
+            </div>
           </div>
         </div>
         
@@ -656,9 +737,17 @@
 
         <!-- Tailored Interview Questions (col-span-12) -->
         <div class="lg:col-span-12 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient mb-8">
-          <div class="flex items-center gap-2 mb-4">
-            <span class="material-symbols-outlined text-primary">forum</span>
-            <h3 class="font-headline-md text-headline-md text-primary">Tailored Interview Questions</h3>
+          <div class="flex justify-between items-center mb-4">
+            <div class="flex items-center gap-2">
+              <span class="material-symbols-outlined text-primary">forum</span>
+              <h3 class="font-headline-md text-headline-md text-primary">Tailored Interview Questions</h3>
+            </div>
+            <!-- Difficulty Selector -->
+            <select id="questions-difficulty" class="bg-surface border border-outline-variant rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none" onchange="changeQuestionsDifficulty()">
+              <option value="intermediate">Intermediate Level</option>
+              <option value="beginner">Beginner Level</option>
+              <option value="advanced">Advanced Level</option>
+            </select>
           </div>
           <ul class="space-y-3 pl-5 list-decimal text-on-surface-variant" id="interview-questions"></ul>
         </div>
@@ -675,6 +764,23 @@
     let currentCandidateIndex = 0;
     let scoreChartInstance = null;
     let experienceChartInstance = null;
+    let isAnonymousMode = false;
+    let filteredResults = [];
+
+    // Initialize Theme on load
+    document.addEventListener('DOMContentLoaded', () => {
+      const savedTheme = localStorage.getItem('theme') || 'dark';
+      const html = document.documentElement;
+      if (savedTheme === 'light') {
+        html.classList.remove('dark');
+        html.classList.add('light');
+        document.getElementById('theme-icon').innerText = 'dark_mode';
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        document.getElementById('theme-icon').innerText = 'light_mode';
+      }
+    });
 
     // View switcher
     function switchView(viewId) {
@@ -691,15 +797,17 @@
 
     // Theme manager
     function toggleTheme() {
-      const isLight = document.documentElement.classList.contains('light');
-      if (isLight) {
-        document.documentElement.classList.remove('light');
-        document.documentElement.classList.add('dark');
-        document.getElementById('theme-icon').innerText = 'light_mode';
-      } else {
-        document.documentElement.classList.remove('dark');
-        document.documentElement.classList.add('light');
+      const html = document.documentElement;
+      if (html.classList.contains('dark')) {
+        html.classList.remove('dark');
+        html.classList.add('light');
         document.getElementById('theme-icon').innerText = 'dark_mode';
+        localStorage.setItem('theme', 'light');
+      } else {
+        html.classList.remove('light');
+        html.classList.add('dark');
+        document.getElementById('theme-icon').innerText = 'light_mode';
+        localStorage.setItem('theme', 'dark');
       }
     }
 
@@ -758,12 +866,14 @@ Requirements:
 
     function addFiles(files) {
       for (const file of files) {
-        if (file.type === "application/pdf") {
+        const isPdf = file.type === "application/pdf" || file.name.toLowerCase().endsWith('.pdf');
+        const isZip = file.type === "application/zip" || file.type === "application/x-zip-compressed" || file.name.toLowerCase().endsWith('.zip');
+        if (isPdf || isZip) {
           if (!uploadedFiles.some(f => f.name === file.name)) {
             uploadedFiles.push(file);
           }
         } else {
-          alert(`⚠️ Only PDF files are supported. Skipping: ${file.name}`);
+          alert(`⚠️ Only PDF and ZIP files are supported. Skipping: ${file.name}`);
         }
       }
       renderFileList();
@@ -877,7 +987,11 @@ Requirements:
           }
 
           const result = await response.json();
-          analysisResults.push(result);
+          if (Array.isArray(result)) {
+            analysisResults.push(...result);
+          } else {
+            analysisResults.push(result);
+          }
         } catch (e) {
           console.error("API error for file: " + file.name, e);
           // Insert a graceful local match if API fails or falls back
@@ -891,7 +1005,9 @@ Requirements:
             missing_skills: ["PyTorch", "Kubernetes"],
             ml_roles: [{"role": "Backend Engineer", "confidence": 60}],
             decision: "🔴 Reject",
-            gpt_analysis: "⚠️ Server match pipeline failed. Showing fallback results."
+            gpt_analysis: "⚠️ Server match pipeline failed. Showing fallback results.",
+            score_breakdown: { similarity: 20.0, skills: 15.0, experience: 10.0 },
+            explanation: "Fallback result generated due to API connection failure."
           });
         }
       }
@@ -922,11 +1038,12 @@ Requirements:
 
     // ── RESULTS SELECTOR & BENTO CARD INJECTORS ──
     
-    function renderCandidateSelector() {
+    function renderCandidateSelector(list = analysisResults) {
       const container = document.getElementById('dashboard-candidate-list');
       container.innerHTML = '';
 
-      analysisResults.forEach((r, idx) => {
+      list.forEach((r) => {
+        const idx = r.originalIndex !== undefined ? r.originalIndex : analysisResults.indexOf(r);
         let decisionBadgeClass = "border-outline-variant bg-surface-container";
         if (r.decision.toLowerCase().includes('hire')) {
           decisionBadgeClass = "border-primary bg-primary-container/10 text-primary";
@@ -938,12 +1055,14 @@ Requirements:
 
         const btn = document.createElement('button');
         btn.id = `candidate-pill-${idx}`;
-        btn.className = `w-full text-left p-4 rounded-xl border border-outline-variant hover:border-primary-container bg-surface-container-lowest transition-colors relative flex justify-between items-center group`;
+        btn.className = `w-full text-left p-4 rounded-xl border border-outline-variant hover:border-primary-container bg-surface-container-lowest transition-colors relative flex justify-between items-center group ${currentCandidateIndex === idx ? 'border-primary-fixed-dim bg-surface-container-low' : ''}`;
         btn.onclick = () => selectCandidate(idx);
+        
+        const displayName = isAnonymousMode ? `Candidate #${idx + 1}` : r.name.replace('.pdf', '');
         
         btn.innerHTML = `
           <div>
-            <div class="font-body-md text-primary font-semibold text-sm group-hover:text-primary-fixed truncate max-w-[150px]">${r.name.replace('.pdf', '')}</div>
+            <div class="font-body-md text-primary font-semibold text-sm group-hover:text-primary-fixed truncate max-w-[150px]">${displayName}</div>
             <div class="font-body-sm text-xs text-on-surface-variant mt-1">${r.role || 'General Staff'} • ${r.experience} yrs</div>
           </div>
           <div class="flex flex-col items-end gap-1.5">
@@ -956,18 +1075,122 @@ Requirements:
       });
     }
 
+    function applyQueueFilters() {
+      const scoreFilter = document.getElementById('queue-filter-score').value;
+      const expFilter = document.getElementById('queue-filter-exp').value;
+      const sortVal = document.getElementById('queue-sort').value;
+
+      let list = analysisResults.map((r, idx) => ({ ...r, originalIndex: idx }));
+
+      if (scoreFilter === 'top') {
+        list = list.filter(r => r.score >= 75);
+      } else if (scoreFilter === 'mid') {
+        list = list.filter(r => r.score >= 50);
+      }
+
+      if (expFilter === 'junior') {
+        list = list.filter(r => r.experience < 3);
+      } else if (expFilter === 'senior') {
+        list = list.filter(r => r.experience >= 5);
+      }
+
+      if (sortVal === 'score_desc') {
+        list.sort((a, b) => b.score - a.score);
+      } else if (sortVal === 'score_asc') {
+        list.sort((a, b) => a.score - b.score);
+      } else if (sortVal === 'exp_desc') {
+        list.sort((a, b) => b.experience - a.experience);
+      }
+
+      filteredResults = list;
+      renderCandidateSelector(filteredResults);
+
+      if (filteredResults.length > 0) {
+        selectCandidate(filteredResults[0].originalIndex);
+      } else {
+        document.getElementById('candidate-full-name').innerText = "No Candidates Matched";
+        document.getElementById('candidate-predicted-role').innerText = "Adjust filters to see results";
+        document.getElementById('heatmap-table-body').innerHTML = "";
+        document.getElementById('skill-gap-accordion').innerHTML = "";
+        document.getElementById('ai-suggestions-list').innerHTML = "";
+        document.getElementById('predicted-roles-box').innerHTML = "";
+        document.getElementById('pdf-preview').src = "";
+        document.getElementById('gpt-narrative').innerHTML = "";
+        document.getElementById('interview-questions').innerHTML = "";
+        document.getElementById('gauge-score').innerText = "0%";
+        document.getElementById('gauge-circle').style.strokeDashoffset = 282.7;
+        document.getElementById('radar-shape').setAttribute('points', "50,50 50,50 50,50 50,50 50,50 50,50");
+      }
+    }
+
+    function toggleAnonymousMode() {
+      isAnonymousMode = document.getElementById('anonymous-toggle').checked;
+      
+      const scoreFilter = document.getElementById('queue-filter-score').value;
+      const expFilter = document.getElementById('queue-filter-exp').value;
+      if (scoreFilter !== 'all' || expFilter !== 'all') {
+        renderCandidateSelector(filteredResults);
+      } else {
+        const list = analysisResults.map((r, idx) => ({ ...r, originalIndex: idx }));
+        renderCandidateSelector(list);
+      }
+
+      if (currentCandidateIndex !== null && analysisResults[currentCandidateIndex]) {
+        const r = analysisResults[currentCandidateIndex];
+        const displayName = isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', '');
+        document.getElementById('candidate-full-name').innerText = displayName;
+      }
+    }
+
+    function updateRadarChart(r) {
+      const scoreBreakdown = r.score_breakdown || { similarity: r.score * 0.5, skills: r.score * 0.3, experience: r.score * 0.2 };
+      
+      const v0 = (r.score || 0) / 100;
+      const v1 = Math.min((scoreBreakdown.similarity || 0) / 50, 1.0);
+      const v2 = Math.min((scoreBreakdown.skills || 0) / 30, 1.0);
+      const v3 = Math.min((scoreBreakdown.experience || 0) / 20, 1.0);
+      
+      const totalKeywords = (r.matched_skills ? r.matched_skills.length : 0) + (r.missing_skills ? r.missing_skills.length : 0);
+      const v4 = totalKeywords > 0 ? (r.matched_skills.length / totalKeywords) : 0.5;
+      const v5 = 0.8;
+      
+      const p0 = `50,${(50 - 35 * v0).toFixed(1)}`;
+      const p1 = `${(50 + 30 * v1).toFixed(1)},${(50 - 15 * v1).toFixed(1)}`;
+      const p2 = `${(50 + 30 * v2).toFixed(1)},${(50 + 15 * v2).toFixed(1)}`;
+      const p3 = `50,${(50 + 35 * v3).toFixed(1)}`;
+      const p4 = `${(50 - 30 * v4).toFixed(1)},${(50 + 15 * v4).toFixed(1)}`;
+      const p5 = `${(50 - 30 * v5).toFixed(1)},${(50 - 15 * v5).toFixed(1)}`;
+      
+      const pointsStr = `${p0} ${p1} ${p2} ${p3} ${p4} ${p5}`;
+      document.getElementById('radar-shape').setAttribute('points', pointsStr);
+    }
+
+    function changeQuestionsDifficulty() {
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
+      const r = analysisResults[currentCandidateIndex];
+      const diff = document.getElementById('questions-difficulty').value;
+      const questionsList = document.getElementById('interview-questions');
+      questionsList.innerHTML = '';
+      const questions = generateQuestions(r.role, r.matched_skills, diff);
+      questions.forEach(q => {
+        questionsList.innerHTML += `<li class="pb-1">${q}</li>`;
+      });
+    }
+
     function selectCandidate(index) {
       currentCandidateIndex = index;
       
       // Update highlights in sidebar list
       analysisResults.forEach((_, idx) => {
         const item = document.getElementById(`candidate-pill-${idx}`);
-        if (idx === index) {
-          item.classList.add('border-primary-fixed-dim', 'bg-surface-container-low');
-          item.classList.remove('border-outline-variant', 'bg-surface-container-lowest');
-        } else {
-          item.classList.remove('border-primary-fixed-dim', 'bg-surface-container-low');
-          item.classList.add('border-outline-variant', 'bg-surface-container-lowest');
+        if (item) {
+          if (idx === index) {
+            item.classList.add('border-primary-fixed-dim', 'bg-surface-container-low');
+            item.classList.remove('border-outline-variant', 'bg-surface-container-lowest');
+          } else {
+            item.classList.remove('border-primary-fixed-dim', 'bg-surface-container-low');
+            item.classList.add('border-outline-variant', 'bg-surface-container-lowest');
+          }
         }
       });
 
@@ -975,7 +1198,8 @@ Requirements:
 
       // Update Header
       document.getElementById('candidate-rank-badge').innerText = `Candidate Rank #${index + 1}`;
-      document.getElementById('candidate-full-name').innerText = r.name.replace('.pdf', '');
+      const displayName = isAnonymousMode ? `Candidate #${index + 1}` : r.name.replace('.pdf', '');
+      document.getElementById('candidate-full-name').innerText = displayName;
       document.getElementById('candidate-predicted-role').innerText = r.role || 'Unspecified Candidate Role';
       
       if (index === 0) {
@@ -988,7 +1212,6 @@ Requirements:
       document.getElementById('gauge-score').innerHTML = `${Math.round(r.score)}<span class="text-[20px] text-on-surface-variant">%</span>`;
       document.getElementById('gauge-rating').innerText = r.decision;
       
-      // Set offset
       const offset = 282.7 * (1 - r.score / 100);
       document.getElementById('gauge-circle').style.strokeDashoffset = offset;
 
@@ -996,6 +1219,22 @@ Requirements:
       document.getElementById('score-keywords').innerText = `${Math.round(r.score * 1.05 > 100 ? 100 : r.score * 1.05)}%`;
       document.getElementById('score-structure').innerText = `${Math.round(r.score * 0.95)}%`;
       document.getElementById('score-readability').innerText = `${Math.round(r.score * 0.98)}%`;
+
+      // Update Explainability Breakdown Progress Bars
+      const breakdown = r.score_breakdown || { similarity: r.score * 0.5, skills: r.score * 0.3, experience: r.score * 0.2 };
+      document.getElementById('breakdown-similarity').innerText = `${Math.round(breakdown.similarity)}%`;
+      document.getElementById('breakdown-skills').innerText = `${Math.round(breakdown.skills)}%`;
+      document.getElementById('breakdown-experience').innerText = `${Math.round(breakdown.experience)}%`;
+      
+      document.getElementById('bar-similarity').style.width = `${(breakdown.similarity / 50) * 100}%`;
+      document.getElementById('bar-skills').style.width = `${(breakdown.skills / 30) * 100}%`;
+      document.getElementById('bar-experience').style.width = `${(breakdown.experience / 20) * 100}%`;
+
+      // Update explainability explanation text
+      document.getElementById('match-explanation-text').innerText = r.explanation || `Candidate has a match score of ${r.score}% with a detailed breakdown shown above.`;
+
+      // Update Radar/Match Chart
+      updateRadarChart(r);
 
       // Render Experience Heatmap
       const jdKeywords = extractKeywordsFromText(jdTextarea.value);
@@ -1064,9 +1303,8 @@ Requirements:
           </li>
         `;
       } else {
-        // Suggest addressing top 3 missing skills
         const topGaps = r.missing_skills.slice(0, 3);
-        topGaps.forEach((skill, sIdx) => {
+        topGaps.forEach((skill) => {
           sugList.innerHTML += `
             <li class="flex items-start gap-3">
               <span class="material-symbols-outlined text-primary text-lg mt-0.5">check_circle</span>
@@ -1117,10 +1355,25 @@ Requirements:
       // Tailored Interview Questions
       const questionsList = document.getElementById('interview-questions');
       questionsList.innerHTML = '';
-      const questions = generateQuestions(r.role, r.matched_skills);
+      const diff = document.getElementById('questions-difficulty').value;
+      const questions = generateQuestions(r.role, r.matched_skills, diff);
       questions.forEach(q => {
         questionsList.innerHTML += `<li class="pb-1">${q}</li>`;
       });
+
+      // Update copilot role and reset chat
+      const rewriteRoleInput = document.getElementById('rewrite-role');
+      if (rewriteRoleInput) {
+        rewriteRoleInput.value = r.role || 'Software Engineer';
+      }
+      const copilotChatMessages = document.getElementById('copilot-chat-messages');
+      if (copilotChatMessages) {
+        copilotChatMessages.innerHTML = `
+          <div class="text-xs text-on-surface-variant italic text-center py-4">
+            Ask anything about candidate ${displayName}.
+          </div>
+        `;
+      }
     }
 
     // Helper to pull key skill terms from the JD to build Heatmap
@@ -1148,45 +1401,118 @@ Requirements:
     }
 
     // Role-based Interview Questions generator (identical to backend rules in app.py)
-    function generateQuestions(role, skills) {
+    function generateQuestions(role, skills, difficulty = 'intermediate') {
       role = String(role).toLowerCase();
       let questions = [];
 
       if (role.includes("data scientist")) {
-        questions = [
-          "Explain supervised vs unsupervised learning with real-world examples.",
-          "How do you handle missing data in a dataset?",
-          "What evaluation metrics do you use and when?"
-        ];
+        if (difficulty === 'beginner') {
+          questions = [
+            "What is the difference between supervised and unsupervised learning?",
+            "Explain what a linear regression model does.",
+            "What is overfitting and how do you spot it?"
+          ];
+        } else if (difficulty === 'advanced') {
+          questions = [
+            "Detail the mathematical formulation of loss functions in custom transformer models.",
+            "How do you design a distributed training pipeline for terabyte-scale tabular datasets?",
+            "Explain target leakage and how you prevent it in complex feature engineering graphs."
+          ];
+        } else {
+          questions = [
+            "Explain supervised vs unsupervised learning with real-world examples.",
+            "How do you handle missing data in a dataset?",
+            "What evaluation metrics do you use and when?"
+          ];
+        }
       } else if (role.includes("ai engineer") || role.includes("machine learning")) {
-        questions = [
-          "Explain how neural networks learn from data.",
-          "What is backpropagation and why does it matter?",
-          "How do you optimize a deep learning model for production?"
-        ];
+        if (difficulty === 'beginner') {
+          questions = [
+            "What is a neural network?",
+            "What are weights and biases?",
+            "How do you load a pre-trained model from Hugging Face?"
+          ];
+        } else if (difficulty === 'advanced') {
+          questions = [
+            "How does FlashAttention optimize self-attention layers mathematically?",
+            "Walk through your experience debugging vanishing/exploding gradients in deep networks.",
+            "Describe the architecture for zero-shot retrieval in a low-latency production RAG system."
+          ];
+        } else {
+          questions = [
+            "Explain how neural networks learn from data.",
+            "What is backpropagation and why does it matter?",
+            "How do you optimize a deep learning model for production?"
+          ];
+        }
       } else if (role.includes("backend")) {
-        questions = [
-          "What principles guide your REST API design?",
-          "How do you implement secure authentication and authorization?",
-          "How have you scaled backend systems under high load?"
-        ];
+        if (difficulty === 'beginner') {
+          questions = [
+            "What is a REST API?",
+            "Explain the difference between GET and POST requests.",
+            "What is a database index?"
+          ];
+        } else if (difficulty === 'advanced') {
+          questions = [
+            "How do you design a database schema for scale-free operations with high write throughput?",
+            "Describe how you handle event-driven microservices transactions using the Saga pattern.",
+            "Explain the connection pool exhaustion issues and how you debug them in production."
+          ];
+        } else {
+          questions = [
+            "What principles guide your REST API design?",
+            "How do you implement secure authentication and authorization?",
+            "How have you scaled backend systems under high load?"
+          ];
+        }
       } else if (role.includes("frontend") || role.includes("web")) {
-        questions = [
-          "How do you approach responsive design?",
-          "Explain the browser's rendering pipeline.",
-          "How do you optimize frontend performance?"
-        ];
+        if (difficulty === 'beginner') {
+          questions = [
+            "What is HTML/CSS/JS?",
+            "How do you make a div centered?",
+            "What is a state in a frontend application?"
+          ];
+        } else if (difficulty === 'advanced') {
+          questions = [
+            "How do you implement micro-frontend architecture safely?",
+            "Explain CSS Containment and its impact on layout recalculation performance.",
+            "How do you profile and optimize browser repaint/reflow cycles in complex SPAs?"
+          ];
+        } else {
+          questions = [
+            "How do you approach responsive design?",
+            "Explain the browser's rendering pipeline.",
+            "How do you optimize frontend performance?"
+          ];
+        }
       } else {
-        questions = [
-          "Walk me through a system you designed end-to-end.",
-          "How do you prioritize tasks when deadlines conflict?"
-        ];
+        if (difficulty === 'beginner') {
+          questions = [
+            "What are your core strengths?",
+            "How do you work in a team environment?"
+          ];
+        } else if (difficulty === 'advanced') {
+          questions = [
+            "Walk me through a high-availability distributed architecture you designed from scratch.",
+            "How do you balance technical debt versus speed-to-market in greenfield projects?"
+          ];
+        } else {
+          questions = [
+            "Walk me through a system you designed end-to-end.",
+            "How do you prioritize tasks when deadlines conflict?"
+          ];
+        }
       }
 
-      // Add skill-specific questions
       const topSkills = skills.slice(0, 2);
       topSkills.forEach(skill => {
-        questions.push(`What is your depth of experience with ${skill.toUpperCase()}?`);
+        if (difficulty === 'advanced') {
+          questions.push(`Design an enterprise system architecture leveraging ${skill.toUpperCase()} under high concurrency.`);
+        } else if (difficulty === 'beginner') {
+          questions.push(`What is ${skill.toUpperCase()} used for in simple projects?`);
+        } else {
+          questions.push(`What is your depth of experience with ${skill.toUpperCase()}?`);
+        }
       });
 
       questions.push("Describe the most technically challenging project you have worked on.");
@@ -1217,7 +1543,279 @@ Requirements:
       link.click();
       document.body.removeChild(link);
     }
+
+    // ── COPILOT WIDGET CONTROLS ──
+    function toggleCopilotDrawer() {
+      const drawer = document.getElementById('copilot-drawer');
+      drawer.classList.toggle('translate-x-full');
+    }
+
+    function switchCopilotTab(tab) {
+      const tabChat = document.getElementById('copilot-tab-chat');
+      const tabRewrite = document.getElementById('copilot-tab-rewrite');
+      const btnChat = document.getElementById('tab-btn-chat');
+      const btnRewrite = document.getElementById('tab-btn-rewrite');
+
+      if (tab === 'chat') {
+        tabChat.classList.remove('hidden');
+        tabRewrite.classList.add('hidden');
+        btnChat.classList.add('border-primary', 'text-primary');
+        btnChat.classList.remove('text-on-surface-variant');
+        btnRewrite.classList.remove('border-primary', 'text-primary');
+        btnRewrite.classList.add('text-on-surface-variant');
+      } else {
+        tabChat.classList.add('hidden');
+        tabRewrite.classList.remove('hidden');
+        btnChat.classList.remove('border-primary', 'text-primary');
+        btnChat.classList.add('text-on-surface-variant');
+        btnRewrite.classList.add('border-primary', 'text-primary');
+        btnRewrite.classList.remove('text-on-surface-variant');
+      }
+    }
+
+    async function sendCopilotChat() {
+      const input = document.getElementById('copilot-chat-input');
+      const message = input.value.trim();
+      if (!message) return;
+      
+      if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) {
+        alert("Please select a candidate first.");
+        return;
+      }
+
+      const r = analysisResults[currentCandidateIndex];
+      input.value = '';
+
+      appendChatMessage('user', message);
+
+      const loaderId = appendChatLoader();
+
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            message: message,
+            candidate_name: isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', ''),
+            candidate_score: r.score,
+            candidate_role: r.role || 'Unspecified',
+            missing_skills: r.missing_skills || [],
+            matched_skills: r.matched_skills || []
+          })
+        });
+
+        removeChatLoader(loaderId);
+
+        if (!response.ok) {
+          throw new Error(`Server status ${response.status}`);
+        }
+
+        const data = await response.json();
+        appendChatMessage('assistant', data.reply);
+      } catch (e) {
+        console.error(e);
+        removeChatLoader(loaderId);
+        appendChatMessage('assistant', "⚠️ Error: Failed to contact Recruitment Co-pilot server. Please try again.");
+      }
+    }
+
+    function sendSuggestedChat(text) {
+      document.getElementById('copilot-chat-input').value = text;
+      sendCopilotChat();
+    }
+
+    function appendChatMessage(sender, text) {
+      const container = document.getElementById('copilot-chat-messages');
+      const msg = document.createElement('div');
+      
+      if (container.querySelector('.italic')) {
+        container.innerHTML = '';
+      }
+
+      if (sender === 'user') {
+        msg.className = "self-end bg-primary/20 text-on-surface rounded-lg p-2.5 max-w-[85%] text-xs ml-auto border border-primary/30";
+      } else {
+        msg.className = "self-start bg-surface-container-high text-on-surface rounded-lg p-2.5 max-w-[85%] text-xs mr-auto border border-outline-variant";
+      }
+      msg.innerText = text;
+      container.appendChild(msg);
+      container.scrollTop = container.scrollHeight;
+    }
+
+    let loaderCounter = 0;
+    function appendChatLoader() {
+      const container = document.getElementById('copilot-chat-messages');
+      const loader = document.createElement('div');
+      loaderCounter++;
+      const id = `chat-loader-${loaderCounter}`;
+      loader.id = id;
+      loader.className = "self-start bg-surface-container-high text-on-surface-variant rounded-lg p-2.5 text-xs mr-auto border border-outline-variant flex items-center gap-1";
+      loader.innerHTML = `
+        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce"></span>
+        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce [animation-delay:0.2s]"></span>
+        <span class="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-bounce [animation-delay:0.4s]"></span>
+      `;
+      container.appendChild(loader);
+      container.scrollTop = container.scrollHeight;
+      return id;
+    }
+
+    function removeChatLoader(id) {
+      const el = document.getElementById(id);
+      if (el) el.remove();
+    }
+
+    async function runResumeRewrite() {
+      const text = document.getElementById('rewrite-input').value.trim();
+      const mode = document.getElementById('rewrite-mode').value;
+      const role = document.getElementById('rewrite-role').value.trim();
+      
+      if (!text) {
+        alert("Please enter original text to optimize.");
+        return;
+      }
+
+      const btn = document.getElementById('btn-rewrite-submit');
+      const outputBox = document.getElementById('rewrite-output-box');
+      const outputText = document.getElementById('rewrite-output-text');
+
+      btn.disabled = true;
+      btn.innerText = "Optimizing...";
+
+      try {
+        const response = await fetch('/api/rewrite', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ text, mode, role })
+        });
+
+        btn.disabled = false;
+        btn.innerHTML = `<span class="material-symbols-outlined text-lg">auto_fix</span> Optimize Text`;
+
+        if (!response.ok) {
+          throw new Error(`Server status ${response.status}`);
+        }
+
+        const data = await response.json();
+        outputText.innerText = data.enhanced;
+        outputBox.classList.remove('hidden');
+      } catch (e) {
+        console.error(e);
+        btn.disabled = false;
+        btn.innerHTML = `<span class="material-symbols-outlined text-lg">auto_fix</span> Optimize Text`;
+        alert("⚠️ Rewrite optimization failed. Please verify API key / network.");
+      }
+    }
+
+    function copyRewriteOutput() {
+      const text = document.getElementById('rewrite-output-text').innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        alert("📋 Copied to clipboard!");
+      }).catch(err => {
+        console.error('Could not copy text: ', err);
+      });
+    }
   </script>
+
+  <!-- Floating FAB for Recruitment Co-pilot -->
+  <button id="copilot-fab" class="fixed bottom-6 right-6 w-14 h-14 bg-primary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all z-40 pulse-animation animate-bounce" onclick="toggleCopilotDrawer()">
+    <span class="material-symbols-outlined text-2xl">sparkles</span>
+  </button>
+
+  <!-- Copilot Drawer -->
+  <div id="copilot-drawer" class="fixed top-0 right-0 h-full w-full sm:w-[450px] bg-surface-container-low border-l border-outline-variant shadow-2xl z-50 transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+    <!-- Header -->
+    <div class="p-6 border-b border-outline-variant flex items-center justify-between bg-surface-container-high">
+      <div class="flex items-center gap-2">
+        <span class="material-symbols-outlined text-primary text-2xl">smart_toy</span>
+        <div>
+          <h3 class="font-headline-md text-[18px] text-primary leading-none">Recruitment Co-pilot</h3>
+          <p class="text-xs text-on-surface-variant mt-1">Advanced AI Workspace Assistant</p>
+        </div>
+      </div>
+      <button class="w-8 h-8 rounded-full hover:bg-surface-variant flex items-center justify-center text-on-surface-variant" onclick="toggleCopilotDrawer()">
+        <span class="material-symbols-outlined">close</span>
+      </button>
+    </div>
+
+    <!-- Tabs -->
+    <div class="flex border-b border-outline-variant bg-surface-container">
+      <button id="tab-btn-chat" class="flex-1 py-3 text-center text-sm font-semibold border-b-2 border-primary text-primary transition-all" onclick="switchCopilotTab('chat')">
+        AI Copilot Chat
+      </button>
+      <button id="tab-btn-rewrite" class="flex-1 py-3 text-center text-sm font-semibold text-on-surface-variant transition-all" onclick="switchCopilotTab('rewrite')">
+        Resume Optimizer
+      </button>
+    </div>
+
+    <!-- Content Area -->
+    <div class="flex-grow overflow-y-auto p-6">
+      <!-- Chat Tab -->
+      <div id="copilot-tab-chat" class="h-full flex flex-col gap-4">
+        <!-- Suggested prompts -->
+        <div class="space-y-2">
+          <span class="text-[11px] font-bold text-on-surface-variant uppercase tracking-wider block">Suggested Questions:</span>
+          <div class="flex flex-wrap gap-2">
+            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
+              🔍 Missing Skills Gap
+            </button>
+            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
+              💬 Tailored Questions
+            </button>
+            <button class="px-3 py-1.5 bg-surface border border-outline-variant rounded-full text-xs hover:border-primary hover:text-primary transition-colors text-left" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
+              📋 Candidate Evaluation
+            </button>
+          </div>
+        </div>
+
+        <!-- Chat Messages list -->
+        <div id="copilot-chat-messages" class="flex-grow bg-surface border border-outline-variant rounded-xl p-4 overflow-y-auto space-y-3 min-h-[200px] max-h-[350px]">
+          <div class="text-xs text-on-surface-variant italic text-center py-4">
+            Ask anything about the active candidate's skills, qualifications, or interview readiness.
+          </div>
+        </div>
+
+        <!-- Chat Input block -->
+        <div class="flex gap-2">
+          <input type="text" id="copilot-chat-input" class="flex-grow bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary placeholder-on-surface-variant/40" placeholder="Ask about this candidate..." onkeydown="if(event.key === 'Enter') sendCopilotChat()"/>
+          <button class="bg-primary text-on-primary p-2 rounded-lg hover:bg-opacity-90 flex items-center justify-center flex-shrink-0" onclick="sendCopilotChat()">
+            <span class="material-symbols-outlined">send</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Rewrite Tab -->
+      <div id="copilot-tab-rewrite" class="hidden flex flex-col gap-4">
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Rewrite Target Role:</label>
+          <input type="text" id="rewrite-role" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary" value="Senior Machine Learning Engineer"/>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Optimization Mode:</label>
+          <select id="rewrite-mode" class="w-full bg-surface border border-outline-variant rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary">
+            <option value="bullet">Rewrite Bullet Point (Impact & Action Verbs)</option>
+            <option value="summary">Generate Professional Summary</option>
+            <option value="ats">ATS Keyword Alignment</option>
+          </select>
+        </div>
+        <div>
+          <label class="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2">Original Text:</label>
+          <textarea id="rewrite-input" class="w-full h-24 bg-surface border border-outline-variant rounded-lg p-3 text-sm focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary resize-none placeholder-on-surface-variant/30" placeholder="Paste resume bullet or details here..."></textarea>
+        </div>
+        <button id="btn-rewrite-submit" class="bg-primary text-on-primary py-2.5 rounded-lg hover:bg-opacity-90 transition-all font-semibold text-sm flex items-center justify-center gap-2" onclick="runResumeRewrite()">
+          <span class="material-symbols-outlined text-lg">auto_fix</span> Optimize Text
+        </button>
+        
+        <div id="rewrite-output-box" class="hidden mt-2 p-4 bg-surface border border-outline-variant rounded-xl relative">
+          <label class="block text-[10px] font-bold text-primary uppercase tracking-wider mb-1">Optimized Output:</label>
+          <p id="rewrite-output-text" class="text-sm text-on-surface leading-relaxed whitespace-pre-wrap pr-8"></p>
+          <button class="absolute top-4 right-4 text-on-surface-variant hover:text-primary" onclick="copyRewriteOutput()" title="Copy to clipboard">
+            <span class="material-symbols-outlined text-lg">content_copy</span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
 
 </body>
 </html>
