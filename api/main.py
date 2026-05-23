@@ -22,6 +22,7 @@ import io
 import logging
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
+from fastapi.responses import RedirectResponse
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -84,6 +85,12 @@ class AnalyzeResponse(BaseModel):
 # ---------------------------------------------------------------------------
 # Endpoints
 # ---------------------------------------------------------------------------
+@app.get("/", include_in_schema=False)
+async def root() -> RedirectResponse:
+    """Redirect root access to API docs page."""
+    return RedirectResponse(url="/docs")
+
+
 @app.get("/health", response_model=HealthResponse, tags=["System"])
 async def health() -> HealthResponse:
     return HealthResponse(status="ok", version="1.0.0")
