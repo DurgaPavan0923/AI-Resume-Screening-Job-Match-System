@@ -92,11 +92,13 @@ async def root() -> RedirectResponse:
 
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
+@app.get("/api/health", response_model=HealthResponse, tags=["System"], include_in_schema=False)
 async def health() -> HealthResponse:
     return HealthResponse(status="ok", version="1.0.0")
 
 
 @app.post("/analyze", response_model=AnalyzeResponse, tags=["Resume"])
+@app.post("/api/analyze", response_model=AnalyzeResponse, tags=["Resume"], include_in_schema=False)
 async def analyze(
     job_description: str  = Form(..., description="Full job description text"),
     resume:          UploadFile = File(..., description="PDF resume file"),

@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AI Resume Screening & Job Match Dashboard</title>
+  
+  <!-- Styling -->
+  <link rel="stylesheet" href="assets/frontend.css">
+  
+  <!-- Chart.js for visualizations -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+
+  <div class="app-container">
+    
+    <!-- ── SIDEBAR (CONFIG PANEL) ────────────────────────────── -->
+    <aside class="sidebar">
+      <div class="sidebar-logo">
+        <svg viewBox="0 0 24 24">
+          <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"/>
+        </svg>
+        <span>ATS Screener</span>
+      </div>
+      
+      <!-- Theme Toggle -->
+      <div class="theme-toggle-container">
+        <span class="theme-toggle-label">Light Mode</span>
+        <label class="switch">
+          <input type="checkbox" id="theme-switch">
+          <span class="slider"></span>
+        </label>
+      </div>
+      
+      <!-- Configuration Form -->
+      <div class="form-group">
+        <label for="job-description" class="form-label">Job Description</label>
+        <textarea id="job-description" class="form-textarea" placeholder="Paste the target job description details here..."></textarea>
+      </div>
+      
+      <div class="upload-container">
+        <label class="form-label">Upload Resumes (PDF)</label>
+        <div id="dropzone" class="dropzone">
+          <svg class="dropzone-icon" viewBox="0 0 24 24">
+            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z"/>
+          </svg>
+          <p class="dropzone-text">Drag & drop files here</p>
+          <p class="dropzone-sub">or click to browse PDF files</p>
+          <input type="file" id="file-input" multiple accept="application/pdf" style="display: none;">
+        </div>
+        <div id="file-list" class="file-list"></div>
+      </div>
+      
+      <button id="btn-analyze" class="btn-primary" disabled>
+        🔍 Analyze Candidates
+      </button>
+    </aside>
+    
+    <!-- ── MAIN CONTENT AREA ────────────────────────────────── -->
+    <main class="main-content">
+      
+      <!-- Header -->
+      <header class="main-header">
+        <h1 class="main-title">AI Resume Screening Dashboard</h1>
+        <p class="subtitle">Smart hiring powered by AI — rank, analyze, and shortlist candidates</p>
+      </header>
+      
+      <!-- Initial State / Placeholder -->
+      <div id="dashboard-placeholder" class="card" style="text-align: center; padding: 3rem;">
+        <h3 style="margin-bottom: 0.5rem; color: var(--text-secondary);">No Analysis Conducted Yet</h3>
+        <p style="color: var(--text-muted);">Paste a job description on the left and upload candidate resumes to generate the screening dashboard.</p>
+      </div>
+      
+      <!-- ── DASHBOARD RESULTS (HIDDEN UNTIL LOADED) ──────────── -->
+      <div id="results-dashboard" style="display: none; flex-direction: column; gap: 2rem;">
+        
+        <!-- Recruiter Dashboard KPIs -->
+        <section class="kpi-grid">
+          <div class="kpi-card">
+            <p class="kpi-label">Total Candidates</p>
+            <h2 class="kpi-value" id="kpi-total">0</h2>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Avg Match Score</p>
+            <h2 class="kpi-value" id="kpi-avg-score">0%</h2>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Avg Experience</p>
+            <h2 class="kpi-value" id="kpi-avg-exp">0 yrs</h2>
+          </div>
+          <div class="kpi-card">
+            <p class="kpi-label">Top Match Score</p>
+            <h2 class="kpi-value" id="kpi-top-score">0%</h2>
+          </div>
+        </section>
+        
+        <!-- Plotly-like Visual Chart -->
+        <section class="card chart-container">
+          <h3 class="chart-title">Candidate Match Performance</h3>
+          <canvas id="score-chart" style="width:100%; max-height:280px;"></canvas>
+        </section>
+        
+        <!-- Ranked Candidates Grid -->
+        <section>
+          <div class="section-header">🏆 Ranked Candidates</div>
+          <div id="candidates-list" class="candidates-list" style="margin-top: 1.5rem;"></div>
+        </section>
+        
+        <!-- Export shortlists -->
+        <section class="export-container">
+          <button id="btn-export" class="btn-secondary">
+            📥 Download Shortlist (CSV)
+          </button>
+        </section>
+        
+      </div>
+      
+      <!-- Footer -->
+      <footer class="main-footer">
+        Advanced AI Resume Screening System — Powered by FastAPI & Web APIs
+      </footer>
+      
+    </main>
+    
+  </div>
+
+  <!-- ── LOADING OVERLAY ────────────────────────────────────── -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="spinner"></div>
+    <div id="loading-text" class="loading-text">Processing Resumes...</div>
+  </div>
+
+  <!-- ── JAVASCRIPT FRONTEND CONTROLLER ─────────────────────── -->
+  <script>
+    // State management
+    let uploadedFiles = [];
+    let analysisResults = [];
+    let scoreChartInstance = null;
+
+    // DOM Elements
+    const themeSwitch = document.getElementById('theme-switch');
+    const jobDescription = document.getElementById('job-description');
+    const dropzone = document.getElementById('dropzone');
+    const fileInput = document.getElementById('file-input');
+    const fileList = document.getElementById('file-list');
+    const btnAnalyze = document.getElementById('btn-analyze');
+    const loadingOverlay = document.getElementById('loading-overlay');
+    const loadingText = document.getElementById('loading-text');
+    const placeholder = document.getElementById('dashboard-placeholder');
+    const resultsDashboard = document.getElementById('results-dashboard');
+    const kpiTotal = document.getElementById('kpi-total');
+    const kpiAvgScore = document.getElementById('kpi-avg-score');
+    const kpiAvgExp = document.getElementById('kpi-avg-exp');
+    const kpiTopScore = document.getElementById('kpi-top-score');
+    const candidatesListContainer = document.getElementById('candidates-list');
+    const btnExport = document.getElementById('btn-export');
+
+    // 1. Theme Switch handler
+    themeSwitch.addEventListener('change', (e) => {
+      if (e.target.checked) {
+        document.documentElement.setAttribute('data-theme', 'light');
+      } else {
+        document.documentElement.setAttribute('data-theme', 'dark');
+      }
+    });
+
+    // 2. Dropzone events
+    dropzone.addEventListener('click', () => fileInput.click());
+    
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+    
+    dropzone.addEventListener('dragleave', () => {
+      dropzone.classList.remove('dragover');
+    });
+    
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+      addFiles(e.dataTransfer.files);
+    });
+
+    fileInput.addEventListener('change', (e) => {
+      addFiles(e.target.files);
+    });
+
+    // Validate inputs to enable/disable button
+    const validateInputs = () => {
+      const isJdOk = jobDescription.value.trim().length >= 20;
+      const isFilesOk = uploadedFiles.length > 0;
+      btnAnalyze.disabled = !(isJdOk && isFilesOk);
+    };
+
+    jobDescription.addEventListener('input', validateInputs);
+
+    function addFiles(filesList) {
+      for (const file of filesList) {
+        if (file.type === "application/pdf") {
+          // Check for duplicate file names
+          if (!uploadedFiles.some(f => f.name === file.name)) {
+            uploadedFiles.push(file);
+          }
+        } else {
+          alert(`⚠️ Only PDF files are supported. Skipping: ${file.name}`);
+        }
+      }
+      renderFileList();
+      validateInputs();
+    }
+
+    function removeFile(index) {
+      uploadedFiles.splice(index, 1);
+      renderFileList();
+      validateInputs();
+    }
+
+    function renderFileList() {
+      fileList.innerHTML = '';
+      uploadedFiles.forEach((file, index) => {
+        const item = document.createElement('div');
+        item.className = 'file-item';
+        
+        const sizeKB = (file.size / 1024).toFixed(1);
+        item.innerHTML = `
+          <span class="file-name">${file.name} (${sizeKB} KB)</span>
+          <span class="file-remove" onclick="removeFile(${index})">×</span>
+        `;
+        fileList.appendChild(item);
+      });
+    }
+
+    // Toggle accordion lists
+    window.toggleAccordion = function(index) {
+      const content = document.getElementById(`accordion-${index}`);
+      content.classList.toggle('show');
+    };
+
+    // 3. API Execution & Pipeline orchestrator
+    btnAnalyze.addEventListener('click', async () => {
+      const jd = jobDescription.value.trim();
+      if (!jd || uploadedFiles.length === 0) return;
+
+      loadingOverlay.classList.add('show');
+      analysisResults = [];
+
+      let processedCount = 0;
+      const totalCount = uploadedFiles.length;
+
+      for (const file of uploadedFiles) {
+        loadingText.innerText = `Analyzing resume ${processedCount + 1} of ${totalCount}...`;
+        
+        const formData = new FormData();
+        formData.append('job_description', jd);
+        formData.append('resume', file);
+
+        try {
+          const response = await fetch('/api/analyze', {
+            method: 'POST',
+            body: formData
+          });
+
+          if (!response.ok) {
+            throw new Error(`Server returned status code ${response.status}`);
+          }
+
+          const result = await response.json();
+          analysisResults.push(result);
+        } catch (error) {
+          console.error(`Error analyzing ${file.name}:`, error);
+          alert(`❌ Failed to process candidate resume: "${file.name}". Skipping.`);
+        }
+        processedCount++;
+      }
+
+      loadingOverlay.classList.remove('show');
+
+      if (analysisResults.length === 0) {
+        alert("❌ None of the uploaded resumes could be analyzed. Please check files and try again.");
+        return;
+      }
+
+      // Sort results descending by score
+      analysisResults.sort((a, b) => b.score - a.score);
+
+      // Render results UI
+      placeholder.style.display = 'none';
+      resultsDashboard.style.display = 'flex';
+      
+      renderDashboard();
+    });
+
+    // 4. Render Dashboard Components
+    function renderDashboard() {
+      // Calculate KPIs
+      const total = analysisResults.length;
+      const scores = analysisResults.map(r => r.score);
+      const experiences = analysisResults.map(r => r.experience);
+      
+      const avgScore = (scores.reduce((a, b) => a + b, 0) / total).toFixed(1);
+      const avgExp = (experiences.reduce((a, b) => a + b, 0) / total).toFixed(1);
+      const topScore = Math.max(...scores).toFixed(1);
+
+      kpiTotal.innerText = total;
+      kpiAvgScore.innerText = `${avgScore}%`;
+      kpiAvgExp.innerText = `${avgExp} yrs`;
+      kpiTopScore.innerText = `${topScore}%`;
+
+      // Render Chart
+      renderChart();
+
+      // Render Candidate Cards
+      renderCandidateCards();
+    }
+
+    function renderChart() {
+      const ctx = document.getElementById('score-chart').getContext('2d');
+      
+      const labels = analysisResults.map(r => r.name.replace('.pdf', ''));
+      const scores = analysisResults.map(r => r.score);
+
+      // Gradient background
+      const accentColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-cyan').trim() || '#00e5ff';
+      const secondaryColor = getComputedStyle(document.documentElement).getPropertyValue('--accent-blue').trim() || '#2979ff';
+
+      if (scoreChartInstance) {
+        scoreChartInstance.destroy();
+      }
+
+      scoreChartInstance = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Match Score (%)',
+            data: scores,
+            backgroundColor: function(context) {
+              const chart = context.chart;
+              const {ctx, chartArea} = chart;
+              if (!chartArea) return null;
+              
+              const gradient = ctx.createLinearGradient(0, chartArea.bottom, 0, chartArea.top);
+              gradient.addColorStop(0, secondaryColor);
+              gradient.addColorStop(1, accentColor);
+              return gradient;
+            },
+            borderRadius: 8,
+            borderWidth: 0,
+            barThickness: 32
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              max: 100,
+              grid: {
+                color: 'rgba(255, 255, 255, 0.05)'
+              },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)'
+              }
+            },
+            x: {
+              grid: { display: false },
+              ticks: {
+                color: 'rgba(255, 255, 255, 0.6)'
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function renderCandidateCards() {
+      candidatesListContainer.innerHTML = '';
+
+      analysisResults.forEach((r, idx) => {
+        const card = document.createElement('article');
+        card.className = 'card';
+        card.style.animationDelay = `${idx * 0.1}s`;
+
+        // Format Decision tag class
+        let decisionClass = 'consider';
+        if (r.decision.toLowerCase().includes('hire')) decisionClass = 'hire';
+        if (r.decision.toLowerCase().includes('reject')) decisionClass = 'reject';
+
+        // Format Skills
+        const matchedTags = r.matched_skills.map(s => `<span class="skill-tag">✓ ${s.toUpperCase()}</span>`).join('');
+        const missingTags = r.missing_skills.map(s => `<span class="skill-tag missing">✗ ${s.toUpperCase()}</span>`).join('');
+
+        // Confidences
+        const confidenceBars = r.ml_roles.map(roleObj => `
+          <div class="confidence-bar-item">
+            <div class="confidence-bar-labels">
+              <span>${roleObj.role}</span>
+              <span>${roleObj.confidence}%</span>
+            </div>
+            <div class="confidence-progress-bg">
+              <div class="confidence-progress-fill" style="width: ${roleObj.confidence}%"></div>
+            </div>
+          </div>
+        `).join('');
+
+        // Interview questions
+        const questionsHtml = generateQuestions(r.role, r.matched_skills);
+        const questionsListHtml = questionsHtml.map(q => `<li class="question-item">${q}</li>`).join('');
+
+        card.innerHTML = `
+          <div class="candidate-card-header">
+            <div class="candidate-name-rank">
+              <div class="rank-badge">#${idx + 1}</div>
+              <h3 class="candidate-name">${r.name}</h3>
+            </div>
+            <span class="decision-badge ${decisionClass}">${r.decision}</span>
+          </div>
+
+          <div class="candidate-details-grid">
+            
+            <!-- Column 1: Match Score & Experience -->
+            <div class="details-column">
+              <div class="details-item">
+                <span class="details-label">Match Score</span>
+                <span class="details-value large-score">${r.score}%</span>
+              </div>
+              <div class="details-item">
+                <span class="details-label">Qualifications</span>
+                <span class="details-value">${r.education.length > 0 ? r.education.join(', ') : 'Not detected'}</span>
+              </div>
+              <div class="details-item">
+                <span class="details-label">Experience</span>
+                <span class="details-value">${r.experience} years</span>
+              </div>
+              <div class="details-item">
+                <span class="details-label">Target Role</span>
+                <span class="details-value">${r.role}</span>
+              </div>
+            </div>
+
+            <!-- Column 2: Role Confidence & Skill Gap -->
+            <div class="details-column">
+              <div class="details-item">
+                <span class="details-label">Confidence Predictor</span>
+                <div class="confidence-bar-group" style="margin-top: 0.25rem;">
+                  ${confidenceBars || '<span style="color:var(--text-muted);">No predictions available</span>'}
+                </div>
+              </div>
+              
+              <div class="details-item">
+                <span class="details-label">Skill Gap Analysis</span>
+                <div class="skills-tags-container">
+                  ${matchedTags}
+                  ${missingTags}
+                  ${(r.matched_skills.length === 0 && r.missing_skills.length === 0) ? '<span style="color:var(--text-muted)">None detected</span>' : ''}
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- collapsible accordion for Interview Questions -->
+          <div class="accordion">
+            <div class="accordion-summary" onclick="toggleAccordion(${idx})">
+              <span>🎤 Tailored Interview Questions</span>
+              <svg width="12" height="12" viewBox="0 0 24 24" style="fill:currentColor;"><path d="M7 10l5 5 5-5z"/></svg>
+            </div>
+            <div id="accordion-${idx}" class="accordion-content">
+              <ul class="question-list">
+                ${questionsListHtml}
+              </ul>
+            </div>
+          </div>
+        `;
+
+        candidatesListContainer.appendChild(card);
+      });
+    }
+
+    // Role-based Interview Questions generator (identical to backend rules in app.py)
+    function generateQuestions(role, skills) {
+      role = String(role).toLowerCase();
+      let questions = [];
+
+      if (role.includes("data scientist")) {
+        questions = [
+          "Explain supervised vs unsupervised learning with real-world examples.",
+          "How do you handle missing data in a dataset?",
+          "What evaluation metrics do you use and when?"
+        ];
+      } else if (role.includes("ai engineer")) {
+        questions = [
+          "Explain how neural networks learn from data.",
+          "What is backpropagation and why does it matter?",
+          "How do you optimize a deep learning model for production?"
+        ];
+      } else if (role.includes("backend")) {
+        questions = [
+          "What principles guide your REST API design?",
+          "How do you implement secure authentication and authorization?",
+          "How have you scaled backend systems under high load?"
+        ];
+      } else if (role.includes("frontend") || role.includes("web")) {
+        questions = [
+          "How do you approach responsive design?",
+          "Explain the browser's rendering pipeline.",
+          "How do you optimize frontend performance?"
+        ];
+      } else {
+        questions = [
+          "Walk me through a system you designed end-to-end.",
+          "How do you prioritize tasks when deadlines conflict?"
+        ];
+      }
+
+      // Add skill-specific questions (up to 3)
+      const topSkills = skills.slice(0, 3);
+      topSkills.forEach(skill => {
+        questions.push(`What is your depth of experience with ${skill.toUpperCase()}?`);
+      });
+
+      questions.push("Describe the most technically challenging project you have worked on.");
+      questions.push("How do you approach debugging a problem you have never seen before?");
+
+      return questions;
+    }
+
+    // 5. Download CSV shortlist
+    btnExport.addEventListener('click', () => {
+      if (analysisResults.length === 0) return;
+
+      const headers = ['Rank', 'Resume Name', 'Match Score', 'Experience (Yrs)', 'Hiring Verdict', 'Target Role'];
+      const rows = analysisResults.map((r, idx) => [
+        idx + 1,
+        `"${r.name}"`,
+        `${r.score}%`,
+        r.experience,
+        `"${r.decision}"`,
+        `"${r.role}"`
+      ]);
+
+      const csvContent = "data:text/csv;charset=utf-8," 
+        + [headers.join(','), ...rows.map(e => e.join(','))].join('\n');
+
+      const encodedUri = encodeURI(csvContent);
+      const link = document.createElement("a");
+      link.setAttribute("href", encodedUri);
+      link.setAttribute("download", "shortlisted_candidates.csv");
+      document.body.appendChild(link);
+
+      link.click();
+      document.body.removeChild(link);
+    });
+  </script>
+
+</body>
+</html>
