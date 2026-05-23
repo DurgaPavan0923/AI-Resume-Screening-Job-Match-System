@@ -484,12 +484,28 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
     decision_plain = re.sub(r"<[^>]+>", "", result.decision)
 
     gpt_analysis = "⚠️ AI analysis unavailable (check API key / quota)."
-    if os.environ.get("OPENAI_API_KEY"):
+    if AIConfig.openai_key or AIConfig.gemini_key:
         try:
-            from src.gpt_analyzer import analyze_resume
-            gpt_analysis = analyze_resume(result.raw_text, job_description)
+            # Truncate to avoid hitting token limits
+            resume_snippet = result.raw_text[:3000]
+            jd_snippet     = job_description[:1500]
+            user_prompt = (
+                f"### Job Description\n{jd_snippet}\n\n"
+                f"### Resume\n{resume_snippet}\n\n"
+                "Provide your structured analysis."
+            )
+            system_prompt = (
+                "You are an expert technical recruiter and talent-acquisition specialist. "
+                "Analyse the candidate's resume against the provided job description. "
+                "Be concise, professional, and actionable. "
+                "Return your analysis in plain text with three labelled sections:\n"
+                "1. Strengths\n"
+                "2. Weaknesses / Gaps\n"
+                "3. Recommendation (Hire / Consider / Reject with a one-sentence rationale)"
+            )
+            gpt_analysis = get_ai_response(prompt=user_prompt, system_instruction=system_prompt)
         except Exception as exc:
-            logger.error("GPT analysis failed: %s", exc)
+            logger.error("AI narrative analysis failed: %s", exc)
 
     # Compute risk metrics
     total_words = len(result.clean_text.split())
@@ -705,11 +721,8 @@ async def analyze_job_description(req: JDAnalyzeRequest) -> JDAnalyzeResponse:
     ideal_profile = ""
     importance_scores = []
     
-    if os.environ.get("OPENAI_API_KEY"):
+    if AIConfig.openai_key or AIConfig.gemini_key:
         try:
-            from openai import OpenAI
-            client = OpenAI(api_key=os.environ.get("OPENAI_API_KEY"))
-            
             prompt = (
                 f"Analyze this Job Description and return a brief (2-3 sentences) summary of the ideal candidate profile, "
                 f"followed by a JSON list of key technical and soft keywords and their importance score from 0.0 to 1.0. "
@@ -717,16 +730,11 @@ async def analyze_job_description(req: JDAnalyzeRequest) -> JDAnalyzeResponse:
                 f"dict items with keys 'keyword' and 'importance'.\n\nJob Description:\n{jd}"
             )
             
-            response = client.chat.completions.create(
-                model="gpt-4o-mini",
-                messages=[
-                    {"role": "system", "content": "You are a professional recruiting analyst co-pilot. Keep it technical and direct."},
-                    {"role": "user", "content": prompt}
-                ],
-                max_tokens=350,
-                temperature=0.3,
+            content = get_ai_response(
+                prompt = prompt,
+                system_instruction = "You are a professional recruiting analyst co-pilot. Keep it technical and direct."
             )
-            content = response.choices[0].message.content.strip()
+            
             if "---KEYWORDS---" in content:
                 parts = content.split("---KEYWORDS---")
                 ideal_profile = parts[0].strip()
@@ -746,7 +754,7 @@ async def analyze_job_description(req: JDAnalyzeRequest) -> JDAnalyzeResponse:
                 except Exception as json_err:
                     logger.error("Failed to parse keyword JSON: %s", json_err)
         except Exception as exc:
-            logger.error("GPT JD analysis failed: %s", exc)
+            logger.error("JD analysis failed: %s", exc)
             
     if not ideal_profile:
         ideal_profile = f"The ideal candidate is a skilled professional with {experience_required or 3}+ years of industry experience, possessing solid domain knowledge and proficiency in {', '.join(skills_list[:4]) or 'core software technologies'}."
