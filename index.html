@@ -20,53 +20,53 @@
       theme: {
         extend: {
           colors: {
-            "on-surface-variant": "#c2c6d6",
-            "surface": "#10131a",
-            "tertiary-container": "#df7412",
-            "secondary-container": "#3a4a5f",
-            "error": "#ffb4ab",
-            "surface-dim": "#10131a",
-            "surface-container-low": "#191b23",
-            "tertiary": "#ffb786",
-            "on-tertiary": "#502400",
-            "on-primary-fixed": "#001a42",
-            "on-tertiary-container": "#461f00",
-            "secondary-fixed-dim": "#b7c8e1",
-            "primary": "#adc6ff",
-            "on-primary-container": "#00285d",
-            "secondary-fixed": "#d3e4fe",
-            "inverse-primary": "#005ac2",
-            "surface-container-highest": "#32353c",
-            "surface-variant": "#32353c",
-            "outline-variant": "#424754",
-            "background": "#10131a",
-            "on-secondary-fixed-variant": "#38485d",
-            "on-primary-fixed-variant": "#004395",
-            "inverse-on-surface": "#2e3038",
-            "tertiary-fixed": "#ffdcc6",
-            "primary-container": "#4d8eff",
-            "primary-fixed-dim": "#adc6ff",
-            "on-secondary": "#213145",
-            "on-background": "#e1e2ec",
-            "surface-container-lowest": "#0b0e15",
-            "inverse-surface": "#e1e2ec",
-            "on-primary": "#002e6a",
-            "on-error": "#690005",
-            "outline": "#8c909f",
-            "surface-container": "#1d2027",
-            "on-error-container": "#ffdad6",
-            "on-secondary-container": "#a9bad3",
-            "tertiary-fixed-dim": "#ffb786",
-            "on-surface": "#e1e2ec",
-            "error-container": "#93000a",
-            "secondary": "#b7c8e1",
-            "on-tertiary-fixed-variant": "#723600",
-            "on-tertiary-fixed": "#311400",
-            "surface-container-high": "#272a31",
-            "surface-bright": "#363941",
-            "primary-fixed": "#d8e2ff",
-            "on-secondary-fixed": "#0b1c30",
-            "surface-tint": "#adc6ff"
+            "on-surface-variant": "var(--color-on-surface-variant)",
+            "surface": "var(--color-surface)",
+            "tertiary-container": "var(--color-tertiary-container)",
+            "secondary-container": "var(--color-secondary-container)",
+            "error": "var(--color-error)",
+            "surface-dim": "var(--color-surface-dim)",
+            "surface-container-low": "var(--color-surface-container-low)",
+            "tertiary": "var(--color-tertiary)",
+            "on-tertiary": "var(--color-on-tertiary)",
+            "on-primary-fixed": "var(--color-on-primary-fixed)",
+            "on-tertiary-container": "var(--color-on-tertiary-container)",
+            "secondary-fixed-dim": "var(--color-secondary-fixed-dim)",
+            "primary": "var(--color-primary)",
+            "on-primary-container": "var(--color-on-primary-container)",
+            "secondary-fixed": "var(--color-secondary-fixed)",
+            "inverse-primary": "var(--color-inverse-primary)",
+            "surface-container-highest": "var(--color-surface-container-highest)",
+            "surface-variant": "var(--color-surface-variant)",
+            "outline-variant": "var(--color-outline-variant)",
+            "background": "var(--color-background)",
+            "on-secondary-fixed-variant": "var(--color-on-secondary-fixed-variant)",
+            "on-primary-fixed-variant": "var(--color-on-primary-fixed-variant)",
+            "inverse-on-surface": "var(--color-inverse-on-surface)",
+            "tertiary-fixed": "var(--color-tertiary-fixed)",
+            "primary-container": "var(--color-primary-container)",
+            "primary-fixed-dim": "var(--color-primary-fixed-dim)",
+            "on-secondary": "var(--color-on-secondary)",
+            "on-background": "var(--color-on-background)",
+            "surface-container-lowest": "var(--color-surface-container-lowest)",
+            "inverse-surface": "var(--color-inverse-surface)",
+            "on-primary": "var(--color-on-primary)",
+            "on-error": "var(--color-on-error)",
+            "outline": "var(--color-outline)",
+            "surface-container": "var(--color-surface-container)",
+            "on-error-container": "var(--color-on-error-container)",
+            "on-secondary-container": "var(--color-on-secondary-container)",
+            "tertiary-fixed-dim": "var(--color-tertiary-fixed-dim)",
+            "on-surface": "var(--color-on-surface)",
+            "error-container": "var(--color-error-container)",
+            "secondary": "var(--color-secondary)",
+            "on-tertiary-fixed-variant": "var(--color-on-tertiary-fixed-variant)",
+            "on-tertiary-fixed": "var(--color-on-tertiary-fixed)",
+            "surface-container-high": "var(--color-surface-container-high)",
+            "surface-bright": "var(--color-surface-bright)",
+            "primary-fixed": "var(--color-primary-fixed)",
+            "on-secondary-fixed": "var(--color-on-secondary-fixed)",
+            "surface-tint": "var(--color-surface-tint)"
           },
           borderRadius: {
             "DEFAULT": "0.25rem",
@@ -120,12 +120,122 @@
   </script>
   
   <style>
+    :root {
+      /* Theme base */
+      --bg-gradient: radial-gradient(circle at top right, #e8edf5 0%, #f4f6fa 50%, #eaeef6 100%);
+      --glass-bg: rgba(244, 246, 250, 0.65);
+
+      /* Colors mapping to light theme */
+      --color-background: #f4f6fa;
+      --color-on-background: #191c21;
+      --color-surface: #ffffff;
+      --color-on-surface: #191c21;
+      --color-surface-dim: #dbe3f1;
+      --color-surface-bright: #f4f6fa;
+      --color-surface-container: #eaeef6;
+      --color-surface-container-low: #f0f4f9;
+      --color-surface-container-lowest: #ffffff;
+      --color-surface-container-high: #dfe3eb;
+      --color-surface-container-highest: #d2d7df;
+      --color-surface-variant: #e1e2ec;
+      --color-on-surface-variant: #43474e;
+      --color-primary: #005ac2;
+      --color-on-primary: #ffffff;
+      --color-primary-container: #d8e2ff;
+      --color-on-primary-container: #001a42;
+      --color-primary-fixed: #d8e2ff;
+      --color-primary-fixed-dim: #adc6ff;
+      --color-on-primary-fixed: #001a42;
+      --color-on-primary-fixed-variant: #004395;
+      --color-secondary: #535f70;
+      --color-on-secondary: #ffffff;
+      --color-secondary-container: #d7e3f7;
+      --color-on-secondary-container: #101c2b;
+      --color-secondary-fixed: #d7e3f7;
+      --color-secondary-fixed-dim: #b7c8e1;
+      --color-on-secondary-fixed: #101c2b;
+      --color-on-secondary-fixed-variant: #38485d;
+      --color-tertiary: #df7412;
+      --color-on-tertiary: #ffffff;
+      --color-tertiary-container: #ffdcc6;
+      --color-on-tertiary-container: #461f00;
+      --color-tertiary-fixed: #ffdcc6;
+      --color-tertiary-fixed-dim: #ffb786;
+      --color-on-tertiary-fixed: #311400;
+      --color-on-tertiary-fixed-variant: #723600;
+      --color-outline: #73777f;
+      --color-outline-variant: #c3c7cf;
+      --color-error: #ba1a1a;
+      --color-on-error: #ffffff;
+      --color-error-container: #ffdad6;
+      --color-on-error-container: #410002;
+      --color-inverse-primary: #adc6ff;
+      --color-inverse-surface: #2e3038;
+      --color-inverse-on-surface: #f0f4f9;
+      --color-surface-tint: #005ac2;
+    }
+
+    .dark {
+      /* Theme base */
+      --bg-gradient: radial-gradient(circle at top right, #191b23 0%, #10131a 50%, #0b0e15 100%);
+      --glass-bg: rgba(16, 19, 26, 0.6);
+
+      /* Colors mapping to dark theme */
+      --color-background: #10131a;
+      --color-on-background: #e1e2ec;
+      --color-surface: #10131a;
+      --color-on-surface: #e1e2ec;
+      --color-surface-dim: #10131a;
+      --color-surface-bright: #363941;
+      --color-surface-container: #1d2027;
+      --color-surface-container-low: #191b23;
+      --color-surface-container-lowest: #0b0e15;
+      --color-surface-container-high: #272a31;
+      --color-surface-container-highest: #32353c;
+      --color-surface-variant: #32353c;
+      --color-on-surface-variant: #c2c6d6;
+      --color-primary: #adc6ff;
+      --color-on-primary: #002e6a;
+      --color-primary-container: #4d8eff;
+      --color-on-primary-container: #00285d;
+      --color-primary-fixed: #d8e2ff;
+      --color-primary-fixed-dim: #adc6ff;
+      --color-on-primary-fixed: #001a42;
+      --color-on-primary-fixed-variant: #004395;
+      --color-secondary: #b7c8e1;
+      --color-on-secondary: #213145;
+      --color-secondary-container: #3a4a5f;
+      --color-on-secondary-container: #a9bad3;
+      --color-secondary-fixed: #d3e4fe;
+      --color-secondary-fixed-dim: #b7c8e1;
+      --color-on-secondary-fixed: #0b1c30;
+      --color-on-secondary-fixed-variant: #38485d;
+      --color-tertiary: #ffb786;
+      --color-on-tertiary: #502400;
+      --color-tertiary-container: #df7412;
+      --color-on-tertiary-container: #461f00;
+      --color-tertiary-fixed: #ffdcc6;
+      --color-tertiary-fixed-dim: #ffb786;
+      --color-on-tertiary-fixed: #311400;
+      --color-on-tertiary-fixed-variant: #723600;
+      --color-outline: #8c909f;
+      --color-outline-variant: #424754;
+      --color-error: #ffb4ab;
+      --color-on-error: #690005;
+      --color-error-container: #93000a;
+      --color-on-error-container: #ffdad6;
+      --color-inverse-primary: #005ac2;
+      --color-inverse-surface: #e1e2ec;
+      --color-inverse-on-surface: #2e3038;
+      --color-surface-tint: #adc6ff;
+    }
+
     .parallax-bg {
-      background-image: radial-gradient(circle at top right, #191b23 0%, #10131a 50%, #0b0e15 100%);
+      background-image: var(--bg-gradient);
       background-attachment: fixed;
     }
     .glass-card {
-      background: rgba(16, 19, 26, 0.6);
+      background: var(--glass-bg);
       backdrop-filter: blur(12px);
       -webkit-backdrop-filter: blur(12px);
     }
@@ -133,8 +243,8 @@
       box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
     }
     .input-glow:focus-within {
-      border-color: #adc6ff;
-      box-shadow: 0 0 0 2px rgba(173, 198, 255, 0.2);
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-container);
     }
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 0.5; }
@@ -145,12 +255,12 @@
       position: absolute;
       inset: 0;
       border-radius: inherit;
-      background-color: #adc6ff;
+      background-color: var(--color-primary);
       z-index: -1;
       animation: pulse-ring 2s cubic-bezier(0.215, 0.61, 0.355, 1) infinite;
     }
     .file-drop-active {
-      border-color: #adc6ff !important;
+      border-color: var(--color-primary) !important;
       background-color: rgba(173, 198, 255, 0.05) !important;
     }
     /* Simple hide/show transition */
@@ -450,7 +560,7 @@
           <h3 class="font-headline-md text-headline-md text-primary w-full text-left mb-6">ATS Match</h3>
           <div class="relative w-44 h-44 flex items-center justify-center z-10">
             <svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
-              <circle cx="50" cy="50" fill="none" r="45" stroke="#272a31" stroke-width="8"></circle>
+              <circle cx="50" cy="50" fill="none" r="45" stroke="currentColor" class="text-surface-container-high" stroke-width="8"></circle>
               <circle id="gauge-circle" cx="50" cy="50" fill="none" r="45" stroke="url(#circleGrad)" stroke-dasharray="282.7" stroke-dashoffset="50" stroke-linecap="round" stroke-width="8" class="transition-all duration-1000 ease-out"></circle>
               <defs>
                 <linearGradient id="circleGrad" x1="0%" x2="100%" y1="0%" y2="100%">
