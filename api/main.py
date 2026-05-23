@@ -22,7 +22,8 @@ import io
 import logging
 
 from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import RedirectResponse
+from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
@@ -49,6 +50,10 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Mount static files for assets
+root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+app.mount("/assets", StaticFiles(directory=os.path.join(root_dir, "assets")), name="assets")
 
 # ---------------------------------------------------------------------------
 # Load model once at startup
@@ -86,9 +91,10 @@ class AnalyzeResponse(BaseModel):
 # Endpoints
 # ---------------------------------------------------------------------------
 @app.get("/", include_in_schema=False)
-async def root() -> RedirectResponse:
-    """Redirect root access to API docs page."""
-    return RedirectResponse(url="/docs")
+async def root() -> FileResponse:
+    """Serve the static web frontend dashboard at the root URL."""
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    return FileResponse(os.path.join(root_dir, "index.html"))
 
 
 @app.get("/health", response_model=HealthResponse, tags=["System"])
