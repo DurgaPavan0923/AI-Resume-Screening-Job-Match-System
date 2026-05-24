@@ -356,6 +356,11 @@
         background: #ffffff !important;
         color: #000000 !important;
       }
+      #print-cover-page {
+        display: flex !important;
+        page-break-after: always;
+        break-after: page;
+      }
       #top-nav,
       #view-dashboard > aside,
       #copilot-fab,
@@ -364,12 +369,11 @@
       #toast-container,
       #share-modal,
       #candidate-drawer,
-      button,
-      iframe,
-      .lg:col-span-4,
-      .lg:col-span-8,
+      #anonymous-toggle,
       #btn-pipeline-prev,
       #btn-pipeline-next,
+      button,
+      iframe,
       .material-symbols-outlined {
         display: none !important;
       }
@@ -379,6 +383,15 @@
         width: 100% !important;
         max-width: 100% !important;
         display: block !important;
+      }
+      .lg:col-span-4, .lg:col-span-8, .lg:col-span-12 {
+        width: 100% !important;
+        max-width: 100% !important;
+        display: block !important;
+        float: none !important;
+        page-break-inside: avoid;
+        break-inside: avoid;
+        margin-bottom: 2rem !important;
       }
       .glass-card, 
       .bg-surface-container-low, 
@@ -394,57 +407,199 @@
       h1, h2, h3, h4, span, p, div, td, th, li {
         color: #000000 !important;
       }
-      .lg:col-span-12 {
-        width: 100% !important;
+      /* Clean print page breaks */
+      .print-page-break {
+        page-break-before: always;
+        break-before: page;
+      }
+    }
+
+    /* Print-only Header and Footer styling */
+    @media print {
+      header.print-header {
         display: block !important;
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 8px;
+        color: rgba(0, 0, 0, 0.4) !important;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+        padding-bottom: 4px;
+        margin-bottom: 20px;
+      }
+      footer.print-footer {
+        display: block !important;
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        text-align: center;
+        font-size: 8px;
+        color: rgba(0, 0, 0, 0.4) !important;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+        padding-top: 4px;
+      }
+    }
+
+    /* Floating particles keyframe animation */
+    @keyframes float-particle {
+      0% {
+        transform: translateY(110vh) translateX(0) scale(0.6);
+        opacity: 0;
+      }
+      10% {
+        opacity: 0.5;
+      }
+      90% {
+        opacity: 0.5;
+      }
+      100% {
+        transform: translateY(-10vh) translateX(50px) scale(1.1);
+        opacity: 0;
+      }
+    }
+    .login-particle {
+      position: absolute;
+      bottom: 0;
+      border-radius: 50%;
+      background-color: var(--color-primary);
+      pointer-events: none;
+      opacity: 0;
+      z-index: 1;
+      animation: float-particle linear infinite;
+    }
+
+    /* Focus Ring & Glow styling */
+    .input-premium-focus:focus {
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 14px rgba(0, 90, 194, 0.25) !important;
+    }
+    
+    /* Active persona card selection border animation & glow */
+    .persona-card-active {
+      border-color: var(--color-primary) !important;
+      box-shadow: 0 0 20px rgba(0, 90, 194, 0.35) !important;
+      transform: translateY(-2px);
+    }
+    
+    /* Sequential Fade-In Animation utilities */
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(12px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .animate-fade-up-stagger {
+      opacity: 0;
+      animation: fadeInUp 0.45s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    .delay-1 { animation-delay: 80ms; }
+    .delay-2 { animation-delay: 160ms; }
+    .delay-3 { animation-delay: 240ms; }
+    .delay-4 { animation-delay: 320ms; }
+
+    /* Mobile viewport responsive overrides */
+    @media (max-width: 768px) {
+      .grid-cols-12 {
+        grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+      }
+      #view-dashboard {
+        padding-top: 18px !important;
+        flex-direction: column !important;
+      }
+      #view-dashboard > aside {
+        width: 100% !important;
+        border-right: none !important;
+        border-bottom: 1px solid var(--color-outline-variant) !important;
+        padding-bottom: 20px !important;
+      }
+      #dashboard-content-panel {
+        padding: 16px !important;
+      }
+      .lg:col-span-4, .lg:col-span-8, .lg:col-span-12 {
+        grid-column: span 12 / span 12 !important;
+      }
+      .overflow-x-auto {
+        display: block;
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      /* Mobile charts container scale */
+      .w-44.h-44 {
+        width: 130px !important;
+        height: 130px !important;
+      }
+    }
+
+    @media (max-width: 640px) {
+      #copilot-drawer {
+        width: 100% !important;
+        height: 100% !important;
+        bottom: 0 !important;
+        right: 0 !important;
+        top: 0 !important;
+        left: 0 !important;
+        max-width: 100% !important;
+        max-height: 100% !important;
+        border-radius: 0 !important;
+        border: none !important;
+      }
+      #candidate-drawer {
+        width: 100% !important;
+        max-width: 100% !important;
+      }
+      #onboarding-welcome-overlay {
+        padding: 12px !important;
       }
     }
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col">
+  <!-- Print Only Header/Footer -->
+  <header class="print-header hidden">
+    <span>InsightAI Enterprise Recruiter OS • Internal Evaluation Dossier</span>
+  </header>
+  <footer class="print-footer hidden">
+    <span>Confidential Talent Screening Summary Report • System-Generated Verification</span>
+  </footer>
+
   <div class="focus-overlay" id="focus-mode-backdrop" onclick="toggleFocusMode()"></div>
 
   <!-- ── VIEW 0: LOGIN & ONBOARDING PORTAL ── -->
-  <main id="view-login" class="view-section flex-grow flex items-center justify-center pt-32 pb-24 px-margin-mobile">
-    <div class="glass-card max-w-md w-full border border-outline-variant rounded-[32px] p-8 shadow-2xl space-y-6 relative overflow-hidden">
-      <!-- Ambient light effect -->
-      <div class="absolute inset-0 bg-gradient-to-tr from-primary/10 to-secondary/10 opacity-30 pointer-events-none"></div>
+  <main id="view-login" class="view-section flex-grow flex items-center justify-center pt-32 pb-24 px-margin-mobile relative overflow-hidden">
+    <!-- Premium Gradient Background Mesh -->
+    <div class="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(41,121,255,0.08)_0%,transparent_40%),radial-gradient(circle_at_70%_60%,rgba(173,198,255,0.05)_0%,transparent_45%)] pointer-events-none z-0"></div>
+    
+    <!-- Floating Particles Container -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0" id="login-particles">
+      <div class="absolute w-24 h-24 rounded-full bg-primary/5 blur-xl animate-pulse duration-[6000ms]" style="top: 15%; left: 10%"></div>
+      <div class="absolute w-32 h-32 rounded-full bg-secondary/5 blur-xl animate-pulse duration-[8000ms]" style="bottom: 20%; right: 15%"></div>
+    </div>
+
+    <!-- MAIN SIGNIN CARD -->
+    <div id="login-card-signin" class="glass-card max-w-md w-full border border-outline-variant rounded-[32px] p-8 shadow-2xl space-y-6 relative overflow-hidden z-10 transition-all duration-500 scale-100">
+      <!-- Ambient light reflection -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none"></div>
       
       <div class="text-center space-y-2 z-10 relative">
-        <h2 class="font-headline-xl text-3xl text-primary font-bold">InsightAI Portal</h2>
-        <p class="text-xs text-on-surface-variant">Select your Enterprise Role & Credentials to login.</p>
+        <h2 class="font-headline-xl text-3xl text-primary font-bold tracking-tight">InsightAI Portal</h2>
+        <p class="text-xs text-on-surface-variant">Sign in to your Recruiter Operating System</p>
       </div>
 
-      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-5 z-10 relative">
-        <!-- Role Selection -->
-        <div class="space-y-2">
-          <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Select Role Persona</label>
-          <div class="grid grid-cols-2 gap-2 text-center text-xs">
-            <div id="role-pill-recruiter" class="cursor-pointer border-2 border-primary bg-primary/10 text-primary rounded-xl p-3 font-semibold transition-all" onclick="setLoginRole('recruiter')">
-              <span class="material-symbols-outlined block text-base mb-1">manage_accounts</span>
-              Recruiter
-            </div>
-            <div id="role-pill-hr" class="cursor-pointer border border-outline-variant hover:border-primary/50 text-on-surface-variant rounded-xl p-3 font-semibold transition-all" onclick="setLoginRole('hr')">
-              <span class="material-symbols-outlined block text-base mb-1">groups</span>
-              HR Manager
-            </div>
-            <div id="role-pill-admin" class="cursor-pointer border border-outline-variant hover:border-primary/50 text-on-surface-variant rounded-xl p-3 font-semibold transition-all" onclick="setLoginRole('admin')">
-              <span class="material-symbols-outlined block text-base mb-1">admin_panel_settings</span>
-              Admin
-            </div>
-            <div id="role-pill-candidate" class="cursor-pointer border border-outline-variant hover:border-primary/50 text-on-surface-variant rounded-xl p-3 font-semibold transition-all" onclick="setLoginRole('candidate')">
-              <span class="material-symbols-outlined block text-base mb-1">person</span>
-              Candidate
-            </div>
-          </div>
-        </div>
-
+      <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 z-10 relative">
         <!-- Username / Email -->
         <div class="space-y-1">
           <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Corporate Email</label>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant/50 text-base">mail</span>
-            <input type="email" id="login-email" required placeholder="e.g. recruiter@insightai.com" class="w-full bg-surface border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner text-on-surface" />
+            <input type="email" id="login-email" required placeholder="recruiter@insightai.com" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner transition-all duration-300 input-premium-focus" />
           </div>
         </div>
 
@@ -452,21 +607,253 @@
         <div class="space-y-1">
           <div class="flex justify-between items-center">
             <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Password</label>
-            <a href="#" onclick="alert('Demo reset instructions sent to mock mail server!')" class="text-[10px] font-bold text-primary hover:underline">Forgot?</a>
+            <a href="#" onclick="openForgotPasswordModal(event)" class="text-[10px] font-bold text-primary hover:underline">Forgot Password?</a>
           </div>
           <div class="relative">
             <span class="material-symbols-outlined absolute left-3 top-3 text-on-surface-variant/50 text-base">lock</span>
-            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-surface border border-outline-variant rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary shadow-inner text-on-surface" />
+            <input type="password" id="login-password" required placeholder="••••••••" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl pl-10 pr-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner transition-all duration-300 input-premium-focus" />
           </div>
         </div>
 
-        <button type="submit" class="w-full py-3 bg-primary text-on-primary rounded-xl hover:bg-opacity-90 active:scale-95 transition-all text-xs font-semibold shadow-md flex items-center justify-center gap-2">
-          <span class="material-symbols-outlined text-base">login</span>
-          Sign In
+        <!-- Remember Me Checkbox -->
+        <div class="flex items-center gap-2 pt-1">
+          <input type="checkbox" id="login-remember" class="form-checkbox h-3.5 w-3.5 text-primary bg-surface border-outline-variant rounded focus:ring-0 cursor-pointer" />
+          <label for="login-remember" class="text-[10px] font-medium text-on-surface-variant select-none cursor-pointer">Remember my device</label>
+        </div>
+
+        <button type="submit" id="btn-login-submit" class="w-full py-3 bg-primary text-on-primary rounded-xl hover:bg-opacity-90 active:scale-98 transition-all text-xs font-semibold shadow-md flex items-center justify-center gap-2 mt-2">
+          <span id="login-btn-icon" class="material-symbols-outlined text-base">login</span>
+          <span id="login-btn-text">Sign In</span>
         </button>
       </form>
+
+      <!-- Social Logins -->
+      <div class="space-y-3 pt-2 border-t border-outline-variant/20 z-10 relative">
+        <span class="text-[9px] font-bold text-on-surface-variant/50 uppercase tracking-wider block text-center">or continue with enterprise SSO</span>
+        <div class="grid grid-cols-2 gap-2">
+          <button onclick="handleSocialLogin('Google')" class="flex items-center justify-center gap-2 border border-outline-variant/60 hover:bg-surface-container-high/40 text-on-surface-variant text-[11px] font-medium py-2 rounded-xl transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12.24 10.285V13.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l2.427-2.334C17.955 2.192 15.34 1 12.24 1c-6.076 0-11 4.924-11 11s4.924 11 11 11c6.34 0 10.564-4.47 10.564-10.74 0-.723-.075-1.275-.175-1.985z"/></svg>
+            Google Workspace
+          </button>
+          <button onclick="handleSocialLogin('GitHub')" class="flex items-center justify-center gap-2 border border-outline-variant/60 hover:bg-surface-container-high/40 text-on-surface-variant text-[11px] font-medium py-2 rounded-xl transition-all">
+            <svg class="w-4 h-4" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2A10 10 0 0 0 2 12c0 4.42 2.87 8.17 6.84 9.5.5.08.66-.23.66-.5v-1.69c-2.77.6-3.36-1.34-3.36-1.34-.46-1.16-1.11-1.47-1.11-1.47-.9-.62.07-.6.07-.6 1 .07 1.53 1.03 1.53 1.03.9 1.52 2.34 1.07 2.91.83.09-.65.35-1.09.63-1.34-2.22-.25-4.55-1.11-4.55-4.92 0-1.11.38-2 1.03-2.71-.1-.25-.45-1.29.1-2.64 0 0 .84-.27 2.75 1.02.79-.22 1.65-.33 2.5-.33.85 0 1.71.11 2.5.33 1.91-1.29 2.75-1.02 2.75-1.02.55 1.35.2 2.39.1 2.64.65.71 1.03 1.6 1.03 2.71 0 3.82-2.34 4.66-4.57 4.91.36.31.69.92.69 1.85V21c0 .27.16.59.67.5C19.14 20.16 22 16.42 22 12A10 10 0 0 0 12 2z"/></svg>
+            GitHub Enterprise
+          </button>
+        </div>
+      </div>
+
+      <div class="text-center text-[11px] text-on-surface-variant/70 z-10 relative">
+        Don't have an enterprise account? 
+        <a href="#" onclick="toggleAuthMode('signup')" class="text-primary font-bold hover:underline">Register / Onboard</a>
+      </div>
+    </div>
+
+    <!-- MULTI-STEP SIGNUP & ONBOARDING WIZARD -->
+    <div id="login-card-signup" class="glass-card max-w-xl w-full border border-outline-variant rounded-[32px] p-8 shadow-2xl space-y-6 relative overflow-hidden z-10 hidden transition-all duration-500 scale-95 opacity-0">
+      <!-- Ambient light reflection -->
+      <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none"></div>
+
+      <!-- Header & Progress bar -->
+      <div class="space-y-3 z-10 relative">
+        <div class="flex justify-between items-center">
+          <h2 class="font-headline-md text-xl text-primary font-bold">Configure Recruiter OS</h2>
+          <span class="text-[10px] bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full font-bold uppercase tracking-wider" id="signup-step-badge">Step 1 of 4</span>
+        </div>
+        
+        <!-- Interactive Progress Dots & Line -->
+        <div class="relative w-full h-1 bg-surface-container rounded-full flex items-center justify-between mt-2">
+          <div id="signup-progress-bar" class="absolute left-0 top-0 h-full bg-primary rounded-full transition-all duration-500" style="width: 0%"></div>
+          <span id="signup-dot-1" class="w-2.5 h-2.5 rounded-full bg-primary relative z-10 transition-colors duration-300"></span>
+          <span id="signup-dot-2" class="w-2.5 h-2.5 rounded-full bg-surface-container relative z-10 transition-colors duration-300"></span>
+          <span id="signup-dot-3" class="w-2.5 h-2.5 rounded-full bg-surface-container relative z-10 transition-colors duration-300"></span>
+          <span id="signup-dot-4" class="w-2.5 h-2.5 rounded-full bg-surface-container relative z-10 transition-colors duration-300"></span>
+        </div>
+      </div>
+
+      <!-- Step Panels -->
+      <div class="min-h-[220px] z-10 relative">
+        
+        <!-- STEP 1: ROLE SELECTOR -->
+        <div id="signup-step-1-panel" class="space-y-4 animate-fade-in">
+          <span class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Select Enterprise Persona</span>
+          <div class="grid grid-cols-2 gap-3 text-xs">
+            <div id="signup-role-recruiter" class="cursor-pointer border-2 border-primary bg-primary/5 hover:border-primary text-on-surface rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5" onclick="setSignupRole('recruiter')">
+              <span class="material-symbols-outlined text-2xl text-primary">manage_accounts</span>
+              <div>
+                <span class="block text-xs font-bold text-primary">Recruiter</span>
+                <span class="block text-[9px] text-on-surface-variant font-normal mt-0.5">Manage pipelines & match scores</span>
+              </div>
+            </div>
+            <div id="signup-role-hr" class="cursor-pointer border border-outline-variant hover:border-primary text-on-surface rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5" onclick="setSignupRole('hr')">
+              <span class="material-symbols-outlined text-2xl text-primary">groups</span>
+              <div>
+                <span class="block text-xs font-bold">HR Manager</span>
+                <span class="block text-[9px] text-on-surface-variant font-normal mt-0.5">Oversee approvals & hiring pools</span>
+              </div>
+            </div>
+            <div id="signup-role-admin" class="cursor-pointer border border-outline-variant hover:border-primary text-on-surface rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5" onclick="setSignupRole('admin')">
+              <span class="material-symbols-outlined text-2xl text-primary">admin_panel_settings</span>
+              <div>
+                <span class="block text-xs font-bold">System Admin</span>
+                <span class="block text-[9px] text-on-surface-variant font-normal mt-0.5">Configure API Keys & LLMs</span>
+              </div>
+            </div>
+            <div id="signup-role-candidate" class="cursor-pointer border border-outline-variant hover:border-primary text-on-surface rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5" onclick="setSignupRole('candidate')">
+              <span class="material-symbols-outlined text-2xl text-primary">person</span>
+              <div>
+                <span class="block text-xs font-bold">Candidate</span>
+                <span class="block text-[9px] text-on-surface-variant font-normal mt-0.5">Submit resume & trace profile</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 2: PROFILE & CREDENTIALS -->
+        <div id="signup-step-2-panel" class="space-y-3 hidden animate-fade-in">
+          <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Full Name</label>
+            <input type="text" id="signup-name" required placeholder="Elena Rostova" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner" />
+          </div>
+          <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Corporate Email</label>
+            <input type="email" id="signup-email" required placeholder="elena@insightai.com" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner" />
+          </div>
+          <div class="space-y-1 relative">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Create Password</label>
+            <input type="password" id="signup-password" required placeholder="••••••••" oninput="checkPasswordStrength(this.value)" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner" />
+            <!-- Password Strength Indicator -->
+            <div class="mt-1.5 space-y-1">
+              <div class="flex justify-between items-center text-[9px] font-semibold text-on-surface-variant/80">
+                <span>Password Strength:</span>
+                <span id="strength-label">Very Weak</span>
+              </div>
+              <div class="w-full h-1 bg-surface-container rounded-full overflow-hidden">
+                <div id="strength-meter-bar" class="h-full bg-error transition-all duration-300" style="width: 10%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: COMPANY DETAILS & SPECIALIZATION -->
+        <div id="signup-step-3-panel" class="space-y-3 hidden animate-fade-in">
+          <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Enterprise Company / Organisation</label>
+            <input type="text" id="signup-company" required placeholder="InsightAI Corp" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner" />
+          </div>
+          <div class="space-y-2 pt-1">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Sourcing Spec / Focus Domains</label>
+            <div class="flex flex-wrap gap-1.5" id="signup-spec-container">
+              <span class="cursor-pointer px-2.5 py-1.5 bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none" onclick="toggleSignupSpec(this, 'AI/ML')"><span class="material-symbols-outlined text-xs">check</span> Machine Learning</span>
+              <span class="cursor-pointer px-2.5 py-1.5 bg-surface-container-high/40 border border-outline-variant text-on-surface-variant text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none" onclick="toggleSignupSpec(this, 'Cloud')"> Cloud Systems</span>
+              <span class="cursor-pointer px-2.5 py-1.5 bg-surface-container-high/40 border border-outline-variant text-on-surface-variant text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none" onclick="toggleSignupSpec(this, 'Backend')"> Backend Dev</span>
+              <span class="cursor-pointer px-2.5 py-1.5 bg-surface-container-high/40 border border-outline-variant text-on-surface-variant text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none" onclick="toggleSignupSpec(this, 'Frontend')"> Frontend UI</span>
+              <span class="cursor-pointer px-2.5 py-1.5 bg-surface-container-high/40 border border-outline-variant text-on-surface-variant text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none" onclick="toggleSignupSpec(this, 'Data')"> Big Data/SQL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 4: AI PERSONALIZATION -->
+        <div id="signup-step-4-panel" class="space-y-4 hidden animate-fade-in">
+          <div class="space-y-1">
+            <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Recruiter Copilot Tone</label>
+            <select id="signup-ai-tone" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-3 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-inner">
+              <option value="strict">Strict & Highly Analytical (Recommended)</option>
+              <option value="balanced">Balanced & Informative</option>
+              <option value="coach">Encouraging Tech Interview Coach</option>
+              <option value="concise">Direct & Bullet-Oriented</option>
+            </select>
+          </div>
+          <div class="space-y-2 pt-1">
+            <div class="flex justify-between items-center">
+              <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">ATS Filtering Strictness</label>
+              <span id="strictness-val-badge" class="text-[9px] bg-primary/15 text-primary border border-primary/20 px-2 py-0.5 rounded font-bold">Moderate (70%)</span>
+            </div>
+            <input type="range" id="signup-strictness" min="50" max="95" value="70" oninput="document.getElementById('strictness-val-badge').innerText = 'Level: ' + this.value + '%'" class="w-full h-1.5 bg-surface-container rounded-lg appearance-none cursor-pointer accent-primary" />
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="flex justify-between items-center pt-4 border-t border-outline-variant/20 z-10 relative">
+        <button id="btn-signup-back" onclick="navigateSignupStep(-1)" class="px-4 py-2 rounded-xl border border-outline-variant/60 hover:bg-surface-container-high/40 text-on-surface-variant font-semibold text-xs transition-all flex items-center gap-1.5">
+          <span class="material-symbols-outlined text-sm">chevron_left</span> Back
+        </button>
+        <button id="btn-signup-next" onclick="navigateSignupStep(1)" class="px-5 py-2.5 bg-primary text-on-primary rounded-xl hover:bg-opacity-90 active:scale-98 transition-all text-xs font-semibold shadow-md flex items-center gap-1.5">
+          <span>Next Step</span> <span class="material-symbols-outlined text-sm" id="btn-signup-next-icon">chevron_right</span>
+        </button>
+      </div>
     </div>
   </main>
+
+  <!-- FORGOT PASSWORD MODAL (GLASSMORPHIC) -->
+  <div id="forgot-password-modal" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/60 backdrop-blur-md animate-fade-in p-margin-mobile">
+    <div class="glass-card max-w-sm w-full border border-outline-variant p-6 rounded-[28px] shadow-2xl relative overflow-hidden space-y-4">
+      <div class="flex justify-between items-start">
+        <div class="flex items-center gap-2">
+          <span class="material-symbols-outlined text-primary text-xl">key</span>
+          <h3 class="font-headline-md text-base text-primary">Password Recovery</h3>
+        </div>
+        <button class="text-on-surface-variant hover:text-on-surface" onclick="closeForgotPasswordModal()"><span class="material-symbols-outlined">close</span></button>
+      </div>
+      <p class="text-xs text-on-surface-variant leading-relaxed">Enter your registered email address. We will route a recovery code to your corporate inbox.</p>
+      
+      <div class="space-y-1">
+        <label class="block text-[9px] font-bold text-on-surface-variant uppercase tracking-wider">Recruiter Email</label>
+        <input type="email" id="forgot-email" placeholder="e.g. recruiter@insightai.com" class="w-full bg-surface/50 border border-outline-variant/60 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary shadow-inner" />
+      </div>
+      
+      <button onclick="submitForgotPassword()" id="btn-forgot-submit" class="w-full py-2.5 bg-primary text-on-primary rounded-xl hover:bg-opacity-90 font-semibold text-xs transition-all shadow-md flex items-center justify-center gap-1.5">
+        <span class="material-symbols-outlined text-sm" id="forgot-btn-icon">send</span>
+        <span id="forgot-btn-text">Generate Recovery Link</span>
+      </button>
+    </div>
+  </div>
+
+  <!-- ONBOARDING WELCOME EXPERIENCE DRAWER / OVERLAY -->
+  <div id="onboarding-welcome-overlay" class="fixed inset-0 z-50 flex items-center justify-center hidden bg-black/75 backdrop-blur-xl animate-fade-in p-margin-mobile">
+    <div class="glass-card max-w-lg w-full border border-outline-variant p-8 rounded-[36px] shadow-2xl relative overflow-hidden space-y-6 text-center">
+      <div class="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,rgba(41,121,255,0.12)_0%,transparent_50%)] pointer-events-none"></div>
+      
+      <div class="w-16 h-16 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto shadow-inner animate-bounce">
+        <span class="material-symbols-outlined text-4xl">celebration</span>
+      </div>
+
+      <div class="space-y-2">
+        <h3 class="font-headline-xl text-2xl text-primary font-bold tracking-tight" id="welcome-title">Welcome to InsightAI Engine!</h3>
+        <p class="text-xs text-on-surface-variant leading-relaxed max-w-sm mx-auto">Your Recruiter Operating System profile has been configured successfully. Let's get you set up with your first screening checklist.</p>
+      </div>
+
+      <!-- Checklist -->
+      <div class="bg-surface/50 border border-outline-variant/40 rounded-2xl p-4 text-left max-w-sm mx-auto space-y-3 font-body-sm text-[11px]">
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>
+          <span class="text-on-surface-variant line-through decoration-on-surface-variant/40">Enterprise Recruiter Profile created</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-emerald-400 text-sm">check_circle</span>
+          <span class="text-on-surface-variant line-through decoration-on-surface-variant/40">Private screening workspace configured</span>
+        </div>
+        <div class="flex items-center gap-3">
+          <span class="material-symbols-outlined text-primary text-sm animate-pulse">radio_button_checked</span>
+          <span class="text-on-surface font-semibold flex items-center justify-between w-full">
+            Upload your first candidates
+            <button onclick="startOnboardingUpload()" class="bg-primary text-on-primary px-2.5 py-1 rounded-md text-[9px] hover:bg-opacity-90 font-bold transition-all shadow-sm">Go to Upload</button>
+          </span>
+        </div>
+        <div class="flex items-center gap-3 opacity-60">
+          <span class="material-symbols-outlined text-on-surface-variant/50 text-sm">radio_button_unchecked</span>
+          <span class="text-on-surface-variant">Review screening decision rationale metrics</span>
+        </div>
+      </div>
+
+      <div class="flex gap-2 justify-center pt-2">
+        <button onclick="closeOnboardingWelcome()" class="px-5 py-2.5 border border-outline-variant/60 rounded-xl hover:bg-surface-container-high/40 text-on-surface text-xs font-semibold transition-all">
+          Skip Onboarding
+        </button>
+      </div>
+    </div>
+  </div>
 
   <!-- ── TOP NAVIGATION BAR ── -->
   <nav id="top-nav" class="fixed top-0 left-0 right-0 z-50 flex justify-center w-full mt-4">
@@ -1117,6 +1504,46 @@
   <!-- ── VIEW 4: RESULTS ANALYTICS DASHBOARD ── -->
   <div id="view-dashboard" class="view-section hidden flex flex-col md:flex-row flex-grow pt-24 min-h-screen">
     
+    <!-- Print Only Cover Page -->
+    <div id="print-cover-page" class="hidden print:flex flex-col justify-between items-center h-[90vh] p-12 text-center border-4 border-double border-primary/40 rounded-[32px] my-8 w-full max-w-2xl mx-auto">
+      <div class="space-y-4 my-auto">
+        <h1 class="text-3xl font-extrabold text-primary tracking-tight">CANDIDATE SCREENING REPORT</h1>
+        <div class="h-1.5 w-32 bg-primary mx-auto rounded-full my-4"></div>
+        <p class="text-sm text-on-surface-variant font-medium uppercase tracking-wider">Enterprise Evaluation & Rationale</p>
+      </div>
+      <div class="space-y-6 w-full p-8 bg-surface-container rounded-3xl border border-outline-variant/60 text-left">
+        <div class="grid grid-cols-2 gap-6 text-xs">
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">Candidate Name</span>
+            <span id="print-candidate-name" class="font-bold text-sm text-primary block mt-0.5">Elena Rostova</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">Target Role</span>
+            <span id="print-candidate-role" class="font-bold text-sm text-primary block mt-0.5">ML Engineer</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">Evaluation Date</span>
+            <span id="print-candidate-date" class="font-bold text-sm text-primary block mt-0.5">May 24, 2026</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">SaaS Match Score</span>
+            <span id="print-candidate-score" class="font-bold text-sm text-primary block mt-0.5">92%</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">Assigned Recruiter</span>
+            <span id="print-recruiter-name" class="font-bold text-sm text-primary block mt-0.5">Enterprise Recruiter</span>
+          </div>
+          <div>
+            <span class="text-[9px] font-bold text-on-surface-variant/70 uppercase tracking-wider block">Verification Confidence</span>
+            <span id="print-confidence-level" class="font-bold text-sm text-primary block mt-0.5">High (95%)</span>
+          </div>
+        </div>
+      </div>
+      <div class="text-[10px] text-on-surface-variant/70 mt-auto">
+        Generated by InsightAI Recruiting Engine™ • Internal Use Only
+      </div>
+    </div>
+
     <aside class="w-full md:w-80 bg-surface-container-low border-r border-outline-variant p-6 flex flex-col gap-6 flex-shrink-0">
       <div class="flex justify-between items-center">
         <h2 class="font-headline-md text-lg text-primary">Candidate Queue</h2>
@@ -1425,7 +1852,7 @@
         </div>
         
         <!-- Experience heat map Table (col-span-8) -->
-        <div class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col justify-between">
+        <div class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col justify-between print-page-break">
           <div class="flex justify-between items-center mb-6">
             <h3 class="font-headline-md text-headline-md text-primary">Required Skills Heatmap</h3>
             <div class="flex items-center gap-2">
@@ -1707,10 +2134,30 @@
           </div>
           
           <!-- Parser Tab Content -->
-          <div id="resume-tab-parser" class="hidden flex-grow w-full h-[480px] bg-surface rounded-xl border border-outline-variant/60 p-5 overflow-y-auto font-mono text-[11px] leading-relaxed relative text-on-surface shadow-inner">
-            <!-- Floating tooltip widget inside interactive parser -->
-            <div id="parser-tooltip" class="absolute hidden bg-surface-container-high border border-outline-variant p-3 rounded-xl shadow-xl z-20 max-w-xs text-[10px] pointer-events-none"></div>
-            <div id="interactive-resume-text" class="whitespace-pre-wrap select-text selection:bg-primary/20"></div>
+          <div id="resume-tab-parser" class="hidden flex-grow w-full h-[480px] bg-surface rounded-xl border border-outline-variant/60 overflow-hidden relative flex flex-col shadow-inner">
+            <!-- Top toolbar for search and jumps -->
+            <div class="flex flex-wrap items-center justify-between gap-3 p-3 bg-surface-container-low border-b border-outline-variant/50 flex-shrink-0 text-[10px] z-20">
+              <!-- Search -->
+              <div class="relative flex-grow max-w-[200px]">
+                <span class="material-symbols-outlined absolute left-2.5 top-2 text-[12px] text-on-surface-variant/50">search</span>
+                <input type="text" id="resume-search-input" placeholder="Search keywords..." class="w-full bg-surface border border-outline-variant rounded-lg pl-7 pr-2.5 py-1 text-[10px] text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/35" oninput="highlightResumeSearch()" />
+              </div>
+              <!-- Section Jumps -->
+              <div class="flex items-center gap-1.5 font-semibold">
+                <span class="text-on-surface-variant/70">Jump to:</span>
+                <button class="hover:text-primary transition-colors bg-surface border border-outline-variant/60 px-2 py-0.5 rounded" onclick="jumpToResumeSection('education')">Education</button>
+                <button class="hover:text-primary transition-colors bg-surface border border-outline-variant/60 px-2 py-0.5 rounded" onclick="jumpToResumeSection('experience')">Experience</button>
+                <button class="hover:text-primary transition-colors bg-surface border border-outline-variant/60 px-2 py-0.5 rounded" onclick="jumpToResumeSection('project')">Projects</button>
+                <button class="hover:text-primary transition-colors bg-surface border border-outline-variant/60 px-2 py-0.5 rounded" onclick="jumpToResumeSection('skills')">Skills</button>
+              </div>
+            </div>
+            
+            <!-- Scrollable Content Area -->
+            <div class="flex-grow p-5 overflow-y-auto font-mono text-[11px] leading-relaxed relative text-on-surface select-text selection:bg-primary/20" id="resume-parser-scrollable">
+              <!-- Floating tooltip widget inside interactive parser -->
+              <div id="parser-tooltip" class="absolute hidden bg-surface-container-high border border-outline-variant p-3 rounded-xl shadow-xl z-20 max-w-xs text-[10px] pointer-events-none"></div>
+              <div id="interactive-resume-text" class="whitespace-pre-wrap"></div>
+            </div>
           </div>
         </div>
 
@@ -1747,7 +2194,7 @@
         </div>
 
         <!-- AI Narrative GPT Analysis (col-span-12) -->
-        <div class="lg:col-span-12 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+        <div class="lg:col-span-12 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient print-page-break">
           <div class="flex items-center gap-2 mb-4">
             <span class="material-symbols-outlined text-primary">psychology</span>
             <h3 class="font-headline-md text-headline-md text-primary">Detailed AI Analysis &amp; Narrative Report</h3>
@@ -2135,6 +2582,7 @@
     ];
 
     // Initialize Theme and Load Settings on load
+    // Initialize Theme, Particles and Load Settings on load
     document.addEventListener('DOMContentLoaded', () => {
       const savedTheme = localStorage.getItem('theme') || 'dark';
       const html = document.documentElement;
@@ -2146,6 +2594,18 @@
         html.classList.remove('light');
         html.classList.add('dark');
         document.getElementById('theme-icon').innerText = 'light_mode';
+      }
+      
+      initLoginParticles();
+
+      // Check remember device email prefill
+      const savedEmail = localStorage.getItem('savedEmail');
+      const rememberDevice = localStorage.getItem('rememberDevice') === 'true';
+      const emailField = document.getElementById('login-email');
+      const rememberBox = document.getElementById('login-remember');
+      if (rememberDevice && savedEmail && emailField) {
+        emailField.value = savedEmail;
+        if (rememberBox) rememberBox.checked = true;
       }
       
       // Check login state
@@ -2162,8 +2622,41 @@
       loadSettings();
     });
 
+    function initLoginParticles() {
+      const container = document.getElementById('login-particles');
+      if (!container) return;
+      
+      // Clear existing particles
+      container.querySelectorAll('.login-particle').forEach(p => p.remove());
+      
+      const particleCount = 25;
+      for (let i = 0; i < particleCount; i++) {
+        const p = document.createElement('div');
+        p.className = 'login-particle';
+        
+        const size = Math.random() * 5 + 3; // 3px to 8px
+        p.style.width = `${size}px`;
+        p.style.height = `${size}px`;
+        p.style.left = `${Math.random() * 100}%`;
+        
+        const duration = Math.random() * 12 + 8; // 8s to 20s
+        const delay = Math.random() * -20; // negative delay so they start pre-scattered
+        p.style.animationDuration = `${duration}s`;
+        p.style.animationDelay = `${delay}s`;
+        
+        const opacity = Math.random() * 0.3 + 0.15;
+        p.style.backgroundColor = `rgba(0, 90, 194, ${opacity})`;
+        p.style.boxShadow = `0 0 8px rgba(0, 90, 194, ${opacity * 0.4})`;
+        
+        container.appendChild(p);
+      }
+    }
+
     // View switcher
     function switchView(viewId) {
+      if (viewId === 'login') {
+        initLoginParticles();
+      }
       // Hide all sections
       ['view-login', 'view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings', 'view-admin-analytics'].forEach(id => {
         const el = document.getElementById(id);
@@ -2195,34 +2688,327 @@
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
-    function setLoginRole(role) {
-      currentRole = role;
-      // Update pills styles
+    let signupStep = 1;
+    let signupRole = 'recruiter';
+    let signupSpecs = ['AI/ML'];
+
+    function toggleAuthMode(mode) {
+      const signinCard = document.getElementById('login-card-signin');
+      const signupCard = document.getElementById('login-card-signup');
+      
+      if (mode === 'signup') {
+        signinCard.classList.add('hidden');
+        signupCard.classList.remove('hidden');
+        setTimeout(() => {
+          signupCard.classList.remove('scale-95', 'opacity-0');
+          signupCard.classList.add('scale-100', 'opacity-100');
+        }, 50);
+        signupStep = 1;
+        updateSignupStepUI();
+      } else {
+        signupCard.classList.add('hidden');
+        signinCard.classList.remove('hidden');
+        setTimeout(() => {
+          signinCard.classList.remove('scale-95', 'opacity-0');
+          signinCard.classList.add('scale-100', 'opacity-100');
+        }, 50);
+      }
+    }
+
+    function setSignupRole(role) {
+      signupRole = role;
       ['recruiter', 'hr', 'admin', 'candidate'].forEach(r => {
-        const pill = document.getElementById('role-pill-' + r);
-        if (pill) {
+        const el = document.getElementById('signup-role-' + r);
+        if (el) {
+          const icon = el.querySelector('.material-symbols-outlined');
           if (r === role) {
-            pill.className = "cursor-pointer border-2 border-primary bg-primary/10 text-primary rounded-xl p-3 font-semibold transition-all";
+            el.className = "cursor-pointer border-2 border-primary bg-primary/10 text-on-surface rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5 persona-card-active";
+            if (icon) icon.className = "material-symbols-outlined text-2xl text-primary scale-110 transition-transform duration-300";
           } else {
-            pill.className = "cursor-pointer border border-outline-variant hover:border-primary/50 text-on-surface-variant rounded-xl p-3 font-semibold transition-all";
+            el.className = "cursor-pointer border border-outline-variant hover:border-primary/50 text-on-surface-variant rounded-2xl p-4 font-semibold transition-all hover:translate-y-[-2px] hover:shadow-lg flex flex-col items-center text-center gap-1.5";
+            if (icon) icon.className = "material-symbols-outlined text-2xl text-primary scale-100 transition-transform duration-300";
           }
         }
       });
     }
 
+    function toggleSignupSpec(el, spec) {
+      if (signupSpecs.includes(spec)) {
+        signupSpecs = signupSpecs.filter(s => s !== spec);
+        el.className = "cursor-pointer px-2.5 py-1.5 bg-surface-container-high/40 border border-outline-variant text-on-surface-variant text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none";
+        el.innerHTML = spec;
+      } else {
+        signupSpecs.push(spec);
+        el.className = "cursor-pointer px-2.5 py-1.5 bg-primary/10 border border-primary/20 text-primary text-[10px] font-bold rounded-xl uppercase tracking-wider flex items-center gap-1 select-none animate-pulse";
+        el.innerHTML = `<span class="material-symbols-outlined text-xs">check</span> ${spec}`;
+      }
+    }
+
+    function checkPasswordStrength(pw) {
+      const bar = document.getElementById('strength-meter-bar');
+      const label = document.getElementById('strength-label');
+      if (!bar || !label) return;
+      
+      let strength = 0;
+      if (pw.length >= 6) strength++;
+      if (pw.length >= 10) strength++;
+      if (/[A-Z]/.test(pw)) strength++;
+      if (/[0-9]/.test(pw)) strength++;
+      if (/[^A-Za-z0-9]/.test(pw)) strength++;
+      
+      if (pw.length === 0) {
+        bar.style.width = '10%';
+        bar.className = 'h-full bg-error transition-all duration-300';
+        label.innerText = 'Empty';
+      } else if (strength <= 1) {
+        bar.style.width = '25%';
+        bar.className = 'h-full bg-error transition-all duration-300';
+        label.innerText = 'Weak';
+      } else if (strength <= 3) {
+        bar.style.width = '60%';
+        bar.className = 'h-full bg-amber-400 transition-all duration-300';
+        label.innerText = 'Medium';
+      } else {
+        bar.style.width = '100%';
+        bar.className = 'h-full bg-emerald-400 transition-all duration-300';
+        label.innerText = 'Strong';
+      }
+    }
+
+    function navigateSignupStep(dir) {
+      if (dir === 1) {
+        if (signupStep === 2) {
+          const name = document.getElementById('signup-name').value.trim();
+          const email = document.getElementById('signup-email').value.trim();
+          const pw = document.getElementById('signup-password').value;
+          if (!name || !email || !pw) {
+            showToast("⚠️ Please fill in all step credentials.");
+            return;
+          }
+        }
+        if (signupStep === 3) {
+          const company = document.getElementById('signup-company').value.trim();
+          if (!company) {
+            showToast("⚠️ Please specify your company / organisation.");
+            return;
+          }
+        }
+        
+        if (signupStep === 4) {
+          completeSignupFlow();
+          return;
+        }
+        
+        signupStep++;
+      } else {
+        if (signupStep === 1) {
+          toggleAuthMode('signin');
+          return;
+        }
+        signupStep--;
+      }
+      updateSignupStepUI();
+    }
+
+    function updateSignupStepUI() {
+      for (let i = 1; i <= 4; i++) {
+        const panel = document.getElementById(`signup-step-${i}-panel`);
+        if (panel) {
+          if (i === signupStep) panel.classList.remove('hidden');
+          else panel.classList.add('hidden');
+        }
+        
+        const dot = document.getElementById(`signup-dot-${i}`);
+        if (dot) {
+          if (i <= signupStep) {
+            dot.classList.remove('bg-surface-container');
+            dot.classList.add('bg-primary');
+          } else {
+            dot.classList.remove('bg-primary');
+            dot.classList.add('bg-surface-container');
+          }
+        }
+      }
+      
+      const bar = document.getElementById('signup-progress-bar');
+      if (bar) {
+        bar.style.width = `${((signupStep - 1) / 3) * 100}%`;
+      }
+      
+      document.getElementById('signup-step-badge').innerText = `Step ${signupStep} of 4`;
+      
+      const nextBtnSpan = document.querySelector('#btn-signup-next > span');
+      const nextBtnIcon = document.getElementById('btn-signup-next-icon');
+      if (nextBtnSpan) {
+        nextBtnSpan.innerText = signupStep === 4 ? 'Complete Onboarding' : 'Next Step';
+      }
+    }
+
+    function completeSignupFlow() {
+      const signupCard = document.getElementById('login-card-signup');
+      const nextBtn = document.getElementById('btn-signup-next');
+      
+      nextBtn.disabled = true;
+      nextBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">pending</span> Initializing AI Engine...`;
+      
+      const fullName = document.getElementById('signup-name').value.trim() || 'Enterprise Recruiter';
+      localStorage.setItem('recruiterName', fullName);
+
+      setTimeout(() => {
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = `Complete Onboarding <span class="material-symbols-outlined text-sm">check</span>`;
+        
+        signupCard.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          signupCard.classList.add('hidden');
+          
+          localStorage.setItem('isLoggedIn', 'true');
+          localStorage.setItem('userRole', signupRole);
+          setUserRoleUI(signupRole);
+          
+          const overlay = document.getElementById('onboarding-welcome-overlay');
+          overlay.classList.remove('hidden');
+          overlay.classList.add('flex');
+          
+          const username = fullName.split(' ')[0];
+          document.getElementById('welcome-title').innerText = `Welcome to InsightAI, ${username}!`;
+        }, 300);
+      }, 1500);
+    }
+
+    function closeOnboardingWelcome() {
+      const overlay = document.getElementById('onboarding-welcome-overlay');
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      switchView('landing');
+      showToast("🚀 Dashboard initialized. Welcome on board!");
+    }
+
+    function startOnboardingUpload() {
+      const overlay = document.getElementById('onboarding-welcome-overlay');
+      overlay.classList.add('hidden');
+      overlay.classList.remove('flex');
+      switchView('workspace');
+      showToast("📂 Welcome! Upload candidate resumes to start.");
+      
+      setTimeout(() => {
+        const dropzone = document.getElementById('file-dropzone');
+        if (dropzone) {
+          dropzone.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          dropzone.classList.add('animate-pulse');
+          setTimeout(() => dropzone.classList.remove('animate-pulse'), 3000);
+        }
+      }, 500);
+    }
+
+    function openForgotPasswordModal(e) {
+      if (e) e.preventDefault();
+      const modal = document.getElementById('forgot-password-modal');
+      modal.classList.remove('hidden');
+      modal.classList.add('flex');
+    }
+
+    function closeForgotPasswordModal() {
+      const modal = document.getElementById('forgot-password-modal');
+      modal.classList.add('hidden');
+      modal.classList.remove('flex');
+    }
+
+    function submitForgotPassword() {
+      const email = document.getElementById('forgot-email').value.trim();
+      if (!email) {
+        showToast("⚠️ Please enter your corporate email.");
+        return;
+      }
+      
+      const btn = document.getElementById('btn-forgot-submit');
+      const text = document.getElementById('forgot-btn-text');
+      const icon = document.getElementById('forgot-btn-icon');
+      
+      btn.disabled = true;
+      text.innerText = "Routing Recovery Directives...";
+      icon.innerText = "pending";
+      icon.classList.add("animate-spin");
+      
+      setTimeout(() => {
+        btn.disabled = false;
+        text.innerText = "Generate Recovery Link";
+        icon.innerText = "send";
+        icon.classList.remove("animate-spin");
+        
+        closeForgotPasswordModal();
+        showToast(`✉️ Password recovery link dispatched to ${email}`);
+      }, 1500);
+    }
+
+    function handleSocialLogin(provider) {
+      const submitBtn = document.getElementById('btn-login-submit');
+      submitBtn.disabled = true;
+      submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Syncing with ${provider} SSO...`;
+      
+      setTimeout(() => {
+        submitBtn.disabled = false;
+        submitBtn.innerHTML = `<span class="material-symbols-outlined text-base">login</span> Sign In`;
+        
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userRole', 'recruiter');
+        setUserRoleUI('recruiter');
+        
+        switchView('landing');
+        showToast(`🔑 SSO Sync Completed: Authenticated via ${provider}`);
+      }, 1200);
+    }
+
     function handleLogin(e) {
       e.preventDefault();
-      localStorage.setItem('isLoggedIn', 'true');
-      localStorage.setItem('userRole', currentRole);
+      const emailInput = document.getElementById('login-email').value;
+      const btn = document.getElementById('btn-login-submit');
+      const btnText = document.getElementById('login-btn-text');
+      const btnIcon = document.getElementById('login-btn-icon');
       
-      setUserRoleUI(currentRole);
-      switchView('landing');
-      showToast(`🔑 Logged in as: ${currentRole.toUpperCase()}`);
+      let inferredRole = 'recruiter';
+      if (emailInput.toLowerCase().includes('admin')) {
+        inferredRole = 'admin';
+      } else if (emailInput.toLowerCase().includes('hr')) {
+        inferredRole = 'hr';
+      } else if (emailInput.toLowerCase().includes('candidate')) {
+        inferredRole = 'candidate';
+      }
       
-      // Trigger onboarding tour for new sessions
+      currentRole = inferredRole;
+
+      // Remember me logic
+      const remember = document.getElementById('login-remember').checked;
+      if (remember) {
+        localStorage.setItem('savedEmail', emailInput);
+        localStorage.setItem('rememberDevice', 'true');
+      } else {
+        localStorage.removeItem('savedEmail');
+        localStorage.setItem('rememberDevice', 'false');
+      }
+
+      // Track recruiter name
+      const currentRecruiterName = localStorage.getItem('recruiterName') || (inferredRole.toUpperCase() + ' Specialist');
+      localStorage.setItem('recruiterName', currentRecruiterName);
+      
+      btn.disabled = true;
+      btnText.innerText = "Verifying Credentials...";
+      btnIcon.innerText = "pending";
+      btnIcon.classList.add("animate-spin");
+      
       setTimeout(() => {
-        openOnboarding();
-      }, 500);
+        btn.disabled = false;
+        btnText.innerText = "Sign In";
+        btnIcon.innerText = "login";
+        btnIcon.classList.remove("animate-spin");
+        
+        localStorage.setItem('isLoggedIn', 'true');
+        localStorage.setItem('userRole', currentRole);
+        
+        setUserRoleUI(currentRole);
+        switchView('landing');
+        showToast(`🔑 Welcome back! Logged in as: ${currentRole.toUpperCase()}`);
+      }, 1200);
     }
 
     function handleLogout() {
@@ -2753,13 +3539,36 @@ Requirements:
       } else {
         document.getElementById('candidate-full-name').innerText = "No Candidates Matched";
         document.getElementById('candidate-predicted-role').innerText = "Adjust filters to see results";
-        document.getElementById('heatmap-table-body').innerHTML = "";
-        document.getElementById('skill-gap-accordion').innerHTML = "";
-        document.getElementById('ai-suggestions-list').innerHTML = "";
-        document.getElementById('predicted-roles-box').innerHTML = "";
+        document.getElementById('heatmap-table-body').innerHTML = `
+          <tr>
+            <td colspan="3" class="py-8 text-center text-on-surface-variant italic">
+              <span class="material-symbols-outlined text-3xl block mb-2 text-on-surface-variant/40 animate-pulse">analytics</span>
+              No search results found. Adjust filters or upload new candidate resumes to trigger evaluations.
+            </td>
+          </tr>
+        `;
+        document.getElementById('skill-gap-accordion').innerHTML = `
+          <div class="text-center py-6 text-on-surface-variant italic">
+            No skill gaps analysis available. Please upload and match candidate resumes.
+          </div>
+        `;
+        document.getElementById('predicted-roles-box').innerHTML = `
+          <div class="text-center py-4 text-on-surface-variant italic">
+            No career data.
+          </div>
+        `;
         document.getElementById('pdf-preview').src = "";
-        document.getElementById('gpt-narrative').innerHTML = "";
-        document.getElementById('interview-questions').innerHTML = "";
+        document.getElementById('gpt-narrative').innerHTML = `
+          <div class="glass-card border border-outline-variant p-6 rounded-2xl text-center space-y-4">
+            <span class="material-symbols-outlined text-4xl text-primary animate-pulse block mx-auto">cloud_upload</span>
+            <h4 class="font-bold text-sm text-primary">No Active Candidate Screening Results</h4>
+            <p class="text-xs text-on-surface-variant max-w-xs mx-auto">Upload resumes in the workspace and execute the matching pipeline to view detailed AI intelligence reports, evidence mappings, and recruiter decision support.</p>
+            <button onclick="switchView('workspace')" class="bg-primary text-on-primary px-4 py-2 rounded-xl text-xs font-semibold hover:bg-opacity-90 transition-all shadow-sm">Go to Workspace</button>
+          </div>
+        `;
+        document.getElementById('interview-questions').innerHTML = `
+          <li class="text-on-surface-variant italic">No interview questions available.</li>
+        `;
         document.getElementById('gauge-score').innerText = "0%";
         document.getElementById('gauge-circle').style.strokeDashoffset = 282.7;
         document.getElementById('radar-shape').setAttribute('points', "50,50 50,50 50,50 50,50 50,50 50,50");
@@ -2921,6 +3730,38 @@ Requirements:
       }, 250);
     }
 
+    function animateNumberCounter(elementId, targetValue, suffix = '') {
+      const el = document.getElementById(elementId);
+      if (!el) return;
+      
+      let start = 0;
+      const end = Math.round(targetValue);
+      if (start === end) {
+        el.innerHTML = `${end}${suffix}`;
+        return;
+      }
+      
+      const duration = 800; // 800ms
+      const startTime = performance.now();
+      
+      function updateCounter(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        
+        // Ease out quad
+        const easeProgress = progress * (2 - progress);
+        const currentValue = Math.round(start + easeProgress * (end - start));
+        
+        el.innerHTML = `${currentValue}${suffix}`;
+        
+        if (progress < 1) {
+          requestAnimationFrame(updateCounter);
+        }
+      }
+      
+      requestAnimationFrame(updateCounter);
+    }
+
     function renderCandidateData(index) {
       const r = analysisResults[index];
 
@@ -2946,6 +3787,24 @@ Requirements:
       const displayName = isAnonymousMode ? `Candidate #${index + 1}` : r.name.replace('.pdf', '');
       document.getElementById('candidate-full-name').innerText = displayName;
       document.getElementById('candidate-predicted-role').innerText = r.role || 'Unspecified Candidate Role';
+
+      // Update print cover page info
+      const printName = document.getElementById('print-candidate-name');
+      const printRole = document.getElementById('print-candidate-role');
+      const printDate = document.getElementById('print-candidate-date');
+      const printScore = document.getElementById('print-candidate-score');
+      const printRecruiter = document.getElementById('print-recruiter-name');
+      const printConfidence = document.getElementById('print-confidence-level');
+
+      if (printName) printName.innerText = displayName;
+      if (printRole) printRole.innerText = r.role || 'Unspecified Candidate Role';
+      if (printDate) printDate.innerText = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
+      if (printScore) printScore.innerText = `${Math.round(r.score)}%`;
+      if (printRecruiter) printRecruiter.innerText = localStorage.getItem('recruiterName') || 'Enterprise Recruiter';
+      if (printConfidence) {
+        const credibility = r.risk_metrics ? r.risk_metrics.credibility_score : 90;
+        printConfidence.innerText = `${credibility}% (${credibility >= 85 ? 'High' : credibility >= 60 ? 'Medium' : 'Low'})`;
+      }
       
       // Populate dynamic Insight Chips
       const chipsContainer = document.getElementById('candidate-insight-chips');
@@ -3026,23 +3885,23 @@ Requirements:
       document.getElementById('candidate-executive-summary').innerText = r.summary || "Executive summary not available.";
 
       // Update Gauge Match Ring
-      document.getElementById('gauge-score').innerHTML = `${Math.round(r.score)}<span class="text-[20px] text-on-surface-variant">%</span>`;
+      animateNumberCounter('gauge-score', r.score, '<span class="text-[20px] text-on-surface-variant">%</span>');
       document.getElementById('gauge-rating').innerText = r.decision;
       
       const offset = 282.7 * (1 - r.score / 100);
       document.getElementById('gauge-circle').style.strokeDashoffset = offset;
 
       // Update Secondary Match Percentages
-      document.getElementById('score-keywords').innerText = `${Math.round(r.score * 1.05 > 100 ? 100 : r.score * 1.05)}%`;
-      document.getElementById('score-structure').innerText = `${Math.round(r.score * 0.95)}%`;
-      document.getElementById('score-readability').innerText = `${Math.round(r.score * 0.98)}%`;
+      animateNumberCounter('score-keywords', r.score * 1.05 > 100 ? 100 : r.score * 1.05, '%');
+      animateNumberCounter('score-structure', r.score * 0.95, '%');
+      animateNumberCounter('score-readability', r.score * 0.98, '%');
 
       // Update AI Confidence Scores
       const semConf = Math.round(r.score * 0.97 > 100 ? 100 : r.score * 0.97);
       const parseConf = Math.round(92 + (index % 3) * 2.5);
       const overallConf = (semConf + parseConf) / 2;
-      document.getElementById('ai-confidence-semantic').innerText = `${semConf}%`;
-      document.getElementById('ai-confidence-parsing').innerText = `${parseConf}%`;
+      animateNumberCounter('ai-confidence-semantic', semConf, '%');
+      animateNumberCounter('ai-confidence-parsing', parseConf, '%');
       
       const confBadge = document.getElementById('ai-confidence-strength');
       if (overallConf >= 85) {
@@ -3351,48 +4210,54 @@ Requirements:
       const reasonsList = document.getElementById('hiring-decision-reasons');
       if (!verdictBadge || !reasonsList) return;
       
-      const isHire = r.decision.toLowerCase().includes('hire');
-      const isConsider = r.decision.toLowerCase().includes('consider');
+      const score = Math.round(r.score);
+      let recommendation = "";
+      let reasonHtml = "";
+      let badgeClass = "";
+      let containerClass = "";
       
-      if (isHire) {
-        verdictBadge.innerText = "RECOMMENDED FOR INTERVIEW";
-        verdictBadge.className = "font-headline-md text-xs font-bold text-primary";
-        verdictBadge.parentElement.className = "bg-primary/10 border border-primary/20 rounded-2xl p-4 text-center";
-      } else if (isConsider) {
-        verdictBadge.innerText = "CONSIDER WITH CAUTION";
-        verdictBadge.className = "font-headline-md text-xs font-bold text-tertiary";
-        verdictBadge.parentElement.className = "bg-tertiary/10 border border-tertiary/20 rounded-2xl p-4 text-center";
+      if (score >= 75) {
+        recommendation = "Recommended for Advanced Interview";
+        badgeClass = "font-headline-md text-xs font-bold text-primary";
+        containerClass = "bg-primary/10 border border-primary/20 rounded-2xl p-4 text-center";
+        
+        reasonHtml = `
+          <li>Candidate shows strong technical alignment (${score}%) with key requirements: <strong>${r.matched_skills.slice(0, 3).join(', ') || 'core stack'}</strong>.</li>
+          <li>Possesses ${r.experience} years of industry experience, demonstrating maturity in the domain.</li>
+          <li>Recommendation details: Move directly to peer technical screen and architectural design round.</li>
+        `;
+      } else if (score >= 55) {
+        // Nuanced recommendation
+        const isMLRole = (r.role || '').toLowerCase().includes('ml') || (r.role || '').toLowerCase().includes('machine') || (r.role || '').toLowerCase().includes('data');
+        if (isMLRole) {
+          recommendation = "Hold for Junior ML / Support Engineer Roles";
+        } else {
+          recommendation = "Hold for Associate/Junior Engineer Roles";
+        }
+        badgeClass = "font-headline-md text-xs font-bold text-tertiary";
+        containerClass = "bg-tertiary/10 border border-tertiary/20 rounded-2xl p-4 text-center";
+        
+        reasonHtml = `
+          <li>Candidate demonstrates stable Python/SQL fundamentals but lacks production MLOps or enterprise scaling exposure.</li>
+          <li>Has moderate experience (${r.experience} years) matching the target stack; has key skill gaps in: <strong>${r.missing_skills.slice(0, 2).join(', ') || 'none'}</strong>.</li>
+          <li>Recommendation details: Consider for entry/junior role options where tooling mentoring can be provided.</li>
+        `;
       } else {
-        verdictBadge.innerText = "DO NOT RECOMMEND";
-        verdictBadge.className = "font-headline-md text-xs font-bold text-error";
-        verdictBadge.parentElement.className = "bg-error/10 border border-error/20 rounded-2xl p-4 text-center";
+        recommendation = "Archive & Flag for Future Junior Sourcing";
+        badgeClass = "font-headline-md text-xs font-bold text-error";
+        containerClass = "bg-error/10 border border-error/20 rounded-2xl p-4 text-center";
+        
+        reasonHtml = `
+          <li>ATS screening indicates match score of ${score}% (below 55% target threshold).</li>
+          <li>Missing critical role keywords and tool validation for: <strong>${r.missing_skills.slice(0, 3).join(', ') || 'core requirements'}</strong>.</li>
+          <li>Recommendation details: Archive for current role. Send a polite automated update and store profile for junior openings.</li>
+        `;
       }
       
-      reasonsList.innerHTML = '';
-      let reasons = [];
-      if (isHire) {
-        reasons = [
-          `Strong tech skills with ${r.matched_skills.slice(0, 2).join(', ')} matching JD requirements.`,
-          `Sufficient industry experience (${r.experience} years) matching the target profile.`,
-          "Structure check confirms verifiable projects and timeline credibility."
-        ];
-      } else if (isConsider) {
-        reasons = [
-          `Good partial alignment, but lacks critical skills: ${r.missing_skills.slice(0, 2).join(', ') || 'none'}.`,
-          `Marginal experience (${r.experience} years) relative to senior roles.`,
-          "Advise verifying missing qualifications in screening interview."
-        ];
-      } else {
-        reasons = [
-          `Critical skill gaps identified: ${r.missing_skills.slice(0, 2).join(', ')}.`,
-          `Low experience (${r.experience} years) for the target role requirement.`,
-          "Poor semantic correlation score with the candidate profile."
-        ];
-      }
-      
-      reasons.forEach(reason => {
-        reasonsList.innerHTML += `<li>${reason}</li>`;
-      });
+      verdictBadge.innerText = recommendation.toUpperCase();
+      verdictBadge.className = badgeClass;
+      verdictBadge.parentElement.className = containerClass;
+      reasonsList.innerHTML = reasonHtml;
     }
 
     let resumeFontSize = 11;
@@ -3471,6 +4336,74 @@ Requirements:
       if (pageIndicator) pageIndicator.innerText = `Page ${resumeCurrentPage} of ${resumeTotalPages}`;
     }
 
+    function highlightResumeSearch() {
+      const searchInput = document.getElementById('resume-search-input');
+      if (!searchInput) return;
+      const query = searchInput.value.trim();
+      
+      updateInteractiveResumeView();
+      
+      if (!query || query.length < 2) return;
+      
+      const textContainer = document.getElementById('interactive-resume-text');
+      let html = textContainer.innerHTML;
+      
+      const regex = new RegExp(`(${escapeRegExp(query)})`, 'gi');
+      html = html.replace(regex, `<mark class="bg-amber-400/30 text-amber-300 border-b border-amber-400 font-bold px-0.5 animate-pulse">$1</mark>`);
+      
+      textContainer.innerHTML = html;
+      
+      const firstMark = textContainer.querySelector('mark');
+      if (firstMark) {
+        firstMark.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+    }
+
+    function jumpToResumeSection(sectionName) {
+      const textContainer = document.getElementById('interactive-resume-text');
+      if (!textContainer) return;
+      
+      const lowerText = textContainer.innerText.toLowerCase();
+      let targetIndex = -1;
+      let matchedKeyword = '';
+      
+      const keywords = {
+        education: ['education', 'academic', 'degree', 'university', 'college'],
+        experience: ['experience', 'employment', 'work history', 'professional background', 'career'],
+        project: ['project', 'portfolio', 'achievements', 'selected work'],
+        skills: ['skills', 'technologies', 'expertise', 'technical competency', 'tools']
+      };
+      
+      const targets = keywords[sectionName] || [sectionName];
+      for (const kw of targets) {
+        const idx = lowerText.indexOf(kw);
+        if (idx !== -1) {
+          targetIndex = idx;
+          matchedKeyword = kw;
+          break;
+        }
+      }
+      
+      if (targetIndex === -1) {
+        showToast(`⚠️ Section "${sectionName.toUpperCase()}" not identified on this page.`);
+        return;
+      }
+      
+      updateInteractiveResumeView();
+      
+      let html = textContainer.innerHTML;
+      const regex = new RegExp(`\\b(${escapeRegExp(matchedKeyword)})\\b`, 'i');
+      html = html.replace(regex, `<span id="jump-scroll-target" class="bg-primary/30 border border-primary px-1.5 py-0.5 rounded font-bold animate-pulse">$1</span>`);
+      
+      textContainer.innerHTML = html;
+      
+      const targetEl = document.getElementById('jump-scroll-target');
+      if (targetEl) {
+        targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showToast(`📍 Jumped to: ${sectionName.toUpperCase()}`);
+      }
+    }
+
     function zoomResume(dir) {
       if (dir === 'in') {
         if (resumeFontSize < 18) resumeFontSize++;
@@ -3510,7 +4443,7 @@ Requirements:
         const trimmed = line.trim();
         if (!trimmed) continue;
         
-        const headerMatch = trimmed.match(/^(?:\d\.\s*|#+\s*|[-*]\s*)?(Executive Summary|Technical Strengths|Strengths|Missing Capabilities|Weaknesses \/ Gaps|Weaknesses|Gaps|Gaps & Concerns|Concerns|Recommendation|Hiring Verdict|Career Progression|Risk Indicators|Interview Focus Areas|Final Hiring Recommendation|ATS Compatibility|Technical Fit|Experience Relevance|Project Quality)(?:\s*:)?$/i);
+        const headerMatch = trimmed.match(/^(?:\d\.\s*|#+\s*|[-*]\s*)?(Executive Summary|Technical Strengths|Strengths|Strongest Evidence|Missing Capabilities|Weaknesses \/ Gaps|Weaknesses|Gaps|Missing Proof|Gaps & Concerns|Concerns|Hiring Risks|Recommendation|Hiring Verdict|Career Progression|Risk Indicators|Interview Focus Areas|Recommendation Reasoning|Final Hiring Recommendation|ATS Compatibility|Technical Fit|Experience Relevance|Project Quality)(?:\s*:)?$/i);
         
         if (headerMatch) {
           if (currentSection.content.length > 0 || currentSection.title !== "AI Insights") {
@@ -3539,14 +4472,18 @@ Requirements:
         "Executive Summary": "info",
         "Technical Strengths": "award_star",
         "Strengths": "check_circle",
+        "Strongest Evidence": "check_circle",
         "Missing Capabilities": "do_not_disturb_on",
+        "Missing Proof": "do_not_disturb_on",
         "Weaknesses / Gaps": "error",
         "Weaknesses": "error",
         "Gaps": "error",
         "Gaps & Concerns": "warning",
         "Concerns": "warning",
+        "Hiring Risks": "shield_alert",
         "Recommendation": "gavel",
         "Hiring Verdict": "gavel",
+        "Recommendation Reasoning": "gavel",
         "Final Hiring Recommendation": "gavel",
         "Career Progression": "trending_up",
         "Risk Indicators": "shield_alert",
@@ -3558,15 +4495,19 @@ Requirements:
         "Executive Summary": "border-primary/30 bg-primary/5 text-primary",
         "Technical Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
         "Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
+        "Strongest Evidence": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
         "Missing Capabilities": "border-rose-500/30 bg-rose-500/5 text-rose-400",
+        "Missing Proof": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Weaknesses / Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Weaknesses": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Gaps & Concerns": "border-amber-500/30 bg-amber-500/5 text-amber-400",
         "Concerns": "border-amber-500/30 bg-amber-500/5 text-amber-400",
+        "Hiring Risks": "border-amber-500/30 bg-amber-500/5 text-amber-400",
         "Risk Indicators": "border-amber-500/30 bg-amber-500/5 text-amber-400",
         "Recommendation": "border-primary/30 bg-primary/5 text-primary",
         "Hiring Verdict": "border-primary/30 bg-primary/5 text-primary",
+        "Recommendation Reasoning": "border-primary/30 bg-primary/5 text-primary",
         "Final Hiring Recommendation": "border-primary/30 bg-primary/5 text-primary",
         "Career Progression": "border-indigo-500/30 bg-indigo-500/5 text-indigo-400",
         "Interview Focus Areas": "border-teal-500/30 bg-teal-500/5 text-teal-400"
@@ -4241,7 +5182,7 @@ InsightAI Recruiting Dev`;
         }
 
         const data = await response.json();
-        appendChatMessage('assistant', data.reply);
+        appendChatMessage('assistant', data.reply, true);
       } catch (e) {
         console.error(e);
         removeChatLoader(loaderId);
@@ -4266,7 +5207,7 @@ InsightAI Recruiting Dev`;
         }
 
         const data = await response.json();
-        appendChatMessage('assistant', data.reply);
+        appendChatMessage('assistant', data.reply, true);
       } catch (e) {
         console.error(e);
         removeChatLoader(loaderId);
@@ -4364,7 +5305,7 @@ InsightAI Recruiting Dev`;
       }
     }
 
-    function appendChatMessage(sender, text) {
+    function appendChatMessage(sender, text, shouldStream = false) {
       const container = document.getElementById('copilot-chat-messages');
       const msg = document.createElement('div');
       
@@ -4375,6 +5316,8 @@ InsightAI Recruiting Dev`;
       if (sender === 'user') {
         msg.className = "self-end bg-primary text-on-primary rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] text-xs ml-auto shadow-md border border-primary/10 transition-all duration-200 animate-fade-in";
         msg.innerText = text;
+        container.appendChild(msg);
+        container.scrollTop = container.scrollHeight;
       } else {
         msg.className = "self-start bg-surface border border-outline-variant/60 text-on-surface rounded-2xl rounded-tl-none p-4 max-w-[90%] text-xs mr-auto shadow-sm transition-all duration-200 animate-fade-in flex flex-col gap-2 relative group";
         
@@ -4401,7 +5344,6 @@ InsightAI Recruiting Dev`;
 
         const contentDiv = document.createElement('div');
         contentDiv.className = "chat-card-content overflow-hidden transition-all duration-300";
-        contentDiv.innerHTML = parseMarkdownToHTML(text);
         msg.appendChild(contentDiv);
         
         collapseBtn.onclick = (e) => {
@@ -4414,9 +5356,42 @@ InsightAI Recruiting Dev`;
             collapseBtn.innerHTML = '<span class="material-symbols-outlined text-[14px] rotate-180 transition-transform duration-200">unfold_more</span>';
           }
         };
+
+        container.appendChild(msg);
+
+        if (shouldStream) {
+          let currentLength = 0;
+          const totalLength = text.length;
+          const speed = Math.max(2, Math.min(15, 400 / totalLength));
+          
+          let stagingInfo = document.createElement('div');
+          stagingInfo.className = "text-[10px] text-primary flex items-center gap-1.5 mb-2 font-semibold animate-pulse";
+          stagingInfo.innerHTML = `<span class="material-symbols-outlined text-xs animate-spin">sync</span> Staging AI reasoning...`;
+          msg.insertBefore(stagingInfo, contentDiv);
+          
+          setTimeout(() => {
+            stagingInfo.innerHTML = `<span class="material-symbols-outlined text-xs text-emerald-400">check_circle</span> Formulating decision rationale...`;
+            
+            setTimeout(() => {
+              stagingInfo.remove();
+              
+              const interval = setInterval(() => {
+                currentLength += 8;
+                if (currentLength >= totalLength) {
+                  contentDiv.innerHTML = parseMarkdownToHTML(text);
+                  clearInterval(interval);
+                } else {
+                  contentDiv.innerHTML = parseMarkdownToHTML(text.substring(0, currentLength) + ' ▌');
+                }
+                container.scrollTop = container.scrollHeight;
+              }, speed);
+            }, 500);
+          }, 400);
+        } else {
+          contentDiv.innerHTML = parseMarkdownToHTML(text);
+          container.scrollTop = container.scrollHeight;
+        }
       }
-      container.appendChild(msg);
-      container.scrollTop = container.scrollHeight;
     }
 
     let loaderCounter = 0;
@@ -4816,9 +5791,9 @@ InsightAI Recruiting Dev`;
       } else {
         jdKeywords.forEach(skill => {
           const matched = r.matched_skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
-          const mode = matched ? 'Exact Match' : 'Missing';
-          const confidence = matched ? Math.round(75 + Math.random() * 25) : 0;
-          const modeClass = matched ? 'text-primary font-semibold' : 'text-error font-semibold';
+          const mode = matched ? '✓ Found' : '✗ Missing';
+          const confidence = matched ? Math.round(80 + Math.random() * 20) : 0;
+          const modeClass = matched ? 'text-emerald-400 font-semibold' : 'text-rose-400 font-semibold';
           skillsTable.innerHTML += `
             <tr class="border-b border-outline-variant/30 hover:bg-surface-container-low/20">
               <td class="p-3 font-medium text-on-surface">${skill}</td>

@@ -590,14 +590,13 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
                 "You are an expert technical recruiter and talent-acquisition specialist. "
                 "Analyze the candidate's resume against the provided job description. "
                 "Be concise, professional, and recruiter-focused. Do NOT use boilerplate introductions or pleasantries. "
-                "Return your analysis in plain text with exactly these seven labeled sections:\n"
+                "Return your analysis in plain text with exactly these six labeled sections:\n"
                 "1. Executive Summary: Concisely summarize candidate fit, background alignment, and overall suitability.\n"
-                "2. Technical Strengths: Bullet points identifying key technical match items and domains.\n"
-                "3. Missing Capabilities: Bullet points listing technical requirements not found in the resume.\n"
-                "4. Career Progression: Professional trajectory progression, stability, and growth path.\n"
-                "5. Risk Indicators: Red flags, timeline inconsistencies, keyword stuffing density, or training gaps.\n"
-                "6. Interview Focus Areas: 3 custom topics/questions to verify missing or weak capabilities.\n"
-                "7. Final Hiring Recommendation: Actionable hiring decision ([Strong Hire], [Hire], [Consider], or [Reject]) and a one-sentence justification."
+                "2. Strongest Evidence: Key matched skills and proof of their usage in projects.\n"
+                "3. Missing Proof: Key job description requirements where no evidence was found in the resume.\n"
+                "4. Hiring Risks: Timeline inconsistencies, keyword stuffing density, or skills gaps.\n"
+                "5. Interview Focus Areas: 3 tailored interview questions to probe weak spots.\n"
+                "6. Recommendation Reasoning: Actionable hiring recommendation (e.g. [Hold for Junior Roles], [Consider], or [Recommended for Advanced Interview]) and detailed justification."
             )
             gpt_analysis = get_ai_response(prompt=user_prompt, system_instruction=system_prompt)
         except Exception as exc:
@@ -621,45 +620,49 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
             strengths_desc = f"Strong core software engineering fundamentals, database query design, and API optimization using {matched_skills_str}."
             mismatch_desc = f"Lacks documented experience with distributed systems architectures, performance optimization at scale, or {missing_skills_str}."
 
+        # Compute nuanced fallback decision
+        score_pct = int(result.score)
+        if score_pct >= 75:
+            rec_text = f"[Recommended for Advanced Interview] (Score: {score_pct}%). Candidate has solid hands-on experience in PyTorch/Python, matching {matched_skills_str} perfectly."
+        elif score_pct >= 55:
+            rec_text = f"[Hold for Junior ML / Support Roles] (Score: {score_pct}%). Candidate demonstrates strong Python/SQL fundamentals but lacks production ML deployment exposure and enterprise MLOps tooling experience."
+        else:
+            rec_text = f"[Archive & Flag for Future Sourcing] (Score: {score_pct}%). Candidate is a low match for the target role requirement due to critical skill gaps in {missing_skills_str}."
+
         gpt_analysis = (
             f"1. Executive Summary\n"
             f"Candidate demonstrates {result.experience} years of professional engineering experience with key specialisation in {domain}. "
             f"Shows alignment on core stack: {matched_skills_str}. "
             f"While the candidate possesses a stable professional background, there are key technical alignment gaps in: {missing_skills_str}. "
-            f"Overall, the screening pipeline confirms a solid capability foundation with an ATS match score of {int(result.score)}%.\n\n"
+            f"Overall, the screening pipeline confirms a solid capability foundation with an ATS match score of {score_pct}%.\n\n"
             
-            f"2. Technical Strengths\n"
+            f"2. Strongest Evidence\n"
             f"- {strengths_desc}\n"
-            f"- Strong background and matching experience as a {cand_role}.\n"
-            f"- Good professional timeline consistency and quantifiable achievement density.\n\n"
+            f"- Stable professional trajectory over {result.experience} years matching the role of {cand_role}.\n\n"
             
-            f"3. Missing Capabilities\n"
+            f"3. Missing Proof\n"
             f"- {mismatch_desc}\n"
-            f"- Lacks documented exposure or keyword validation for: {missing_skills_str}.\n\n"
+            f"- No direct verification for critical keyword matches: {missing_skills_str}.\n\n"
             
-            f"4. Career Progression\n"
-            f"The candidate has shown steady progression over {result.experience} years. "
-            f"Their career path shows readiness for a {cand_role} role, but will require early mentoring to bridge gaps in {missing_skills_str}.\n\n"
+            f"4. Hiring Risks\n"
+            f"- Technical stack mismatch: missing direct project validation for critical tools: {missing_skills_str}.\n"
+            f"- Risk coefficient remains low to moderate depending on immediate project scale requirements.\n\n"
             
-            f"5. Risk Indicators\n"
-            f"- Technical Stack mismatch: missing direct verification for critical role keywords: {missing_skills_str}.\n"
-            f"- Low to moderate execution risk if immediate scale deployment is expected without prior onboarding.\n\n"
+            f"5. Interview Focus Areas\n"
+            f"1. Technology adopting: Probe how they plan to onboard and adopt missing tools like {missing_skills_str}.\n"
+            f"2. Core architecture: Assess candidate's ability to design systems integrating {matched_skills_str}.\n"
+            f"3. Production deployment: Ask how they containerize backend services and handle CI/CD pipeline automation.\n\n"
             
-            f"6. Interview Focus Areas\n"
-            f"1. Core system architecture: Assess candidate's ability to design systems integrating {matched_skills_str}.\n"
-            f"2. Technology transition: Query how they plan to onboard and adopt missing tools like {missing_skills_str}.\n"
-            f"3. Engineering lifecycle: Probe their testing, deployment, and operational ownership patterns.\n\n"
-            
-            f"7. Final Hiring Recommendation\n"
-            f"Recommendation: {decision_plain} (Score: {int(result.score)}%). The candidate is a viable option for {cand_role} and matches key role criteria; verify missing capabilities in subsequent screening rounds."
+            f"6. Recommendation Reasoning\n"
+            f"Recommendation: {rec_text}"
         )
 
     import re
-    m = re.search(r"Executive Summary:(.*?)(?=Strengths|Weaknesses|Recommendation|\d\.)", gpt_analysis, re.DOTALL | re.IGNORECASE)
+    m = re.search(r"Executive Summary:(.*?)(?=Strongest|Missing|Hiring|Interview|Recommendation|\d\.)", gpt_analysis, re.DOTALL | re.IGNORECASE)
     if m:
         summary = m.group(1).strip()
     else:
-        m = re.search(r"1\.\s*Executive Summary(.*?)(?=2\.|Strengths|Weaknesses|Recommendation)", gpt_analysis, re.DOTALL | re.IGNORECASE)
+        m = re.search(r"1\.\s*Executive Summary(.*?)(?=2\.|Strongest|Missing|Hiring|Interview|Recommendation)", gpt_analysis, re.DOTALL | re.IGNORECASE)
         if m:
             summary = m.group(1).strip()
 
