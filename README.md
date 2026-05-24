@@ -7,6 +7,42 @@
 
 ---
 
+## 📸 Platform Screenshots
+
+<div align="center">
+  <h3>Recruiter Command Console</h3>
+  <img src="assets/screenshots/home.png" alt="Recruiter Command Console" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+
+  <h3>Candidate Ingestion Workspace</h3>
+  <img src="assets/screenshots/upload.png" alt="Candidate Ingestion Workspace" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+
+  <h3>Interactive Match Analytics & Radar Chart</h3>
+  <img src="assets/screenshots/result.png" alt="Interactive Match Analytics" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+</div>
+
+---
+
+## 🎨 Latest UI/UX & Realism Audit Upgrades
+
+We have upgraded the platform to production-grade SaaS standards, resolving visual polish, trust, interaction quality, and UX consistency:
+
+* **Premium Login Portal**: Dynamic, performance-safe background particle engine (`initLoginParticles()`), smoother card shadows, premium input focus glows, credentials caching (Remember Me), and refined enterprise SSO buttons.
+* **Onboarding Welcome Experience**: A multi-step onboarding wizard (Role Persona -> Corporate Credentials -> Sourcing Specialization -> AI Personalization Tuning) feeding into a Welcome Checklist showing setup progress with direct redirection to the file dropzone.
+* **High-Fidelity AI Narrative**: Detailed evaluation narrative divided into 6 distinct sections:
+  1. *Executive Summary*: Suitability and alignment overview.
+  2. *Strongest Evidence*: Concrete proof found in projects.
+  3. *Missing Proof*: Key requirements not verified in candidate text.
+  4. *Hiring Risks*: Timeline inconsistencies, stuffing density, and gaps.
+  5. *Interview Focus Areas*: Custom screening questions to verify weak spots.
+  6. *Recommendation Reasoning*: Nuanced recommendations.
+* **Nuanced Recruiter Decision Support**: Replaced binary match scores with realistic hold and sourcing recommendations (e.g., *"Hold for Junior ML / Support Engineer Roles"* or *"Archive & Flag for Future Junior Sourcing"*), including candidate-specific reasoning lists.
+* **Enterprise PDF & Print Formatting**: Printable cover sheets containing candidate name, target role, evaluation date, assigned recruiter name, match score, and confidence rating. Logical page breaks split sections cleanly, with header and footer branding.
+* **Staged Copilot Reasoning & Streaming**: Chatbot responses feature dynamic typewriter streaming effects prefaced by active reasoning state logs (*"Staging AI reasoning..."* and *"Formulating decision rationale..."*).
+* **Resume Navigation Upgrade**: Matched skill highlighter search bar, clickable evidence mapping table, and scroll jump buttons targeting *Education*, *Experience*, *Projects*, and *Skills*.
+* **Mobile Responsiveness**: Stacked columns on narrow screens, wrapped overflow tables, and full-screen configurations for chatbot and intelligence panels on screens <= 640px.
+
+---
+
 ## ✨ Enterprise Features
 
 | Feature | Description |
@@ -34,6 +70,9 @@ AI-Resume-Job-Match-System/
 ├── api/
 │   └── main.py             # FastAPI REST API, AI Modes Router & Static Server
 │
+├── assets/
+│   └── screenshots/        # Application UI screenshots (home, upload, result)
+│
 ├── src/
 │   ├── __init__.py
 │   ├── preprocess.py       # Text cleaning & normalisation
@@ -43,15 +82,13 @@ AI-Resume-Job-Match-System/
 │   ├── job_predictor.py    # ML role classifier model
 │   ├── experience_extractor.py
 │   ├── education_parser.py
-│   ├── pipeline.py         # End-to-end pipeline orchestrator
-│   └── train.py            # Model training & vectorizer
+│   └── pipeline.py         # End-to-end pipeline orchestrator
 │
 ├── data/
 │   ├── skills.txt          # Weighted skills dictionary
 │   └── job_roles.csv       # Training data: text, label
 │
 ├── index.html              # Upgraded responsive SPA UI Dashboard
-├── styles.css              # Custom styled definitions
 ├── requirements.txt        # Python dependencies
 ├── README.md
 ├── LICENSE
@@ -65,8 +102,8 @@ AI-Resume-Job-Match-System/
 ### 1. Clone the repository
 
 ```bash
-git clone https://github.com/your-username/AI-Resume-Job-Match-System.git
-cd AI-Resume-Job-Match-System
+git clone https://github.com/DurgaPavan0923/AI-Resume-Screening-Job-Match-System.git
+cd AI-Resume-Screening-Job-Match-System
 ```
 
 ### 2. Create and activate a virtual environment
@@ -97,7 +134,7 @@ Open your browser and navigate to:
 ```
 http://localhost:8000/
 ```
-The FastAPI backend serves the premium HTML5 SPA dashboard directly at the root URL.
+The FastAPI backend serves the HTML5 SPA dashboard directly at the root URL.
 
 ---
 

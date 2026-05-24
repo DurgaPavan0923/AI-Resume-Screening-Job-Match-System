@@ -15,7 +15,6 @@ JOB_ROLES_PATH  = os.path.join(DATA_DIR, "job_roles.csv")
 
 # ── Asset paths ────────────────────────────────────────────────
 ASSETS_DIR = os.path.join(BASE_DIR, "assets")
-CSS_PATH   = os.path.join(ASSETS_DIR, "styles.css")
 
 # ── Scoring weights (must sum to 1.0) ──────────────────────────
 WEIGHT_SIMILARITY  = 0.50
