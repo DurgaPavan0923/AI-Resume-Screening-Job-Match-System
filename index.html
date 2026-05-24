@@ -1355,6 +1355,14 @@
               <span>Parsing Integrity</span>
               <span id="ai-confidence-parsing" class="font-semibold text-primary">96%</span>
             </div>
+            <div class="flex justify-between items-center pt-1 border-t border-outline-variant/30">
+              <span>Primary Mismatch</span>
+              <span id="ai-confidence-mismatch" class="font-semibold text-rose-400">MLOps stack</span>
+            </div>
+            <div class="flex justify-between items-center">
+              <span>Strongest Domain</span>
+              <span id="ai-confidence-domain" class="font-semibold text-emerald-400">Data Engineering</span>
+            </div>
           </div>
 
           <!-- Explainability Breakdown Progress Bars -->
@@ -1644,11 +1652,25 @@
         <!-- Resume Viewer Tabs Container (col-span-8) -->
         <div class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
-            <h3 class="font-headline-md text-headline-md text-primary">📄 Resume Viewer</h3>
+            <div class="flex items-center gap-4">
+              <h3 class="font-headline-md text-headline-md text-primary">📄 Resume Viewer</h3>
+              <!-- Zoom & Page controls -->
+              <div id="resume-viewer-controls" class="hidden flex items-center gap-1.5 bg-surface-container-high/60 border border-outline-variant/40 px-2.5 py-1 rounded-xl text-[10px] font-semibold">
+                <button class="hover:text-primary transition-colors flex items-center" onclick="zoomResume('out')" title="Zoom Out"><span class="material-symbols-outlined text-[14px]">zoom_out</span></button>
+                <button class="hover:text-primary transition-colors flex items-center" onclick="zoomResume('in')" title="Zoom In"><span class="material-symbols-outlined text-[14px]">zoom_in</span></button>
+                <span class="w-px h-3 bg-outline-variant mx-1"></span>
+                <button class="hover:text-primary transition-colors flex items-center" onclick="navigateResumePage('prev')" title="Previous Page"><span class="material-symbols-outlined text-[14px]">chevron_left</span></button>
+                <span id="resume-page-indicator" class="text-[9px] text-on-surface-variant/80 min-w-[60px] text-center">Page 1 of 1</span>
+                <button class="hover:text-primary transition-colors flex items-center" onclick="navigateResumePage('next')" title="Next Page"><span class="material-symbols-outlined text-[14px]">chevron_right</span></button>
+              </div>
+            </div>
             <!-- Tabs -->
-            <div class="flex bg-surface-container rounded-lg p-0.5 border border-outline-variant/40 text-[10px] font-semibold">
-              <button id="tab-btn-docview" class="px-3 py-1 rounded bg-surface text-primary shadow-sm" onclick="switchResumeTab('docview')">Document View</button>
-              <button id="tab-btn-parser" class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface" onclick="switchResumeTab('parser')">Interactive ATS Parser</button>
+            <div class="flex items-center gap-2">
+              <button class="px-2.5 py-1 rounded bg-surface-container-high border border-outline-variant/40 text-on-surface hover:text-primary font-semibold text-[10px] flex items-center gap-1 shadow-sm transition-all" onclick="openCompareModal()" title="Open JD comparison"><span class="material-symbols-outlined text-[14px]">compare</span> Compare</button>
+              <div class="flex bg-surface-container rounded-lg p-0.5 border border-outline-variant/40 text-[10px] font-semibold">
+                <button id="tab-btn-docview" class="px-3 py-1 rounded bg-surface text-primary shadow-sm" onclick="switchResumeTab('docview')">Document View</button>
+                <button id="tab-btn-parser" class="px-3 py-1 rounded text-on-surface-variant hover:text-on-surface" onclick="switchResumeTab('parser')">Interactive ATS Parser</button>
+              </div>
             </div>
           </div>
           
@@ -1703,7 +1725,7 @@
             <span class="material-symbols-outlined text-primary">psychology</span>
             <h3 class="font-headline-md text-headline-md text-primary">Detailed AI Analysis &amp; Narrative Report</h3>
           </div>
-          <div class="bg-surface p-6 rounded-xl border border-outline-variant text-on-surface-variant leading-relaxed whitespace-pre-wrap" id="gpt-narrative"></div>
+          <div class="space-y-4" id="gpt-narrative"></div>
         </div>
 
         <!-- Tailored Interview Questions (col-span-12) -->
@@ -2805,6 +2827,20 @@ Requirements:
       // Reset Resume Tab View to default Document View
       switchResumeTab('docview');
 
+      // Chunk candidate raw text for page navigation
+      const rawText = r.raw_text || '';
+      if (rawText.includes('\f')) {
+        resumeTextChunks = rawText.split('\f');
+      } else {
+        resumeTextChunks = [];
+        const chunkSize = 1500;
+        for (let i = 0; i < rawText.length; i += chunkSize) {
+          resumeTextChunks.push(rawText.substring(i, i + chunkSize));
+        }
+      }
+      resumeTotalPages = Math.max(1, resumeTextChunks.length);
+      resumeCurrentPage = 1;
+
       // Update Header
       document.getElementById('candidate-rank-badge').innerText = `Candidate Rank #${index + 1}`;
       const displayName = isAnonymousMode ? `Candidate #${index + 1}` : r.name.replace('.pdf', '');
@@ -2815,6 +2851,9 @@ Requirements:
       const chipsContainer = document.getElementById('candidate-insight-chips');
       if (chipsContainer) {
         chipsContainer.innerHTML = '';
+        
+        const persona = getCandidatePersona(r.score, r.experience, r.matched_skills, r.role);
+        chipsContainer.innerHTML += `<span class="${persona.color} px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold flex items-center gap-1 shadow-sm" title="${persona.desc}"><span class="material-symbols-outlined text-[11px]">${persona.icon}</span>${persona.title}</span>`;
         
         if (r.score >= 75) {
           chipsContainer.innerHTML += `<span class="bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold shadow-[0_0_8px_rgba(52,211,153,0.1)]">Strong Fit</span>`;
@@ -2880,6 +2919,16 @@ Requirements:
       } else {
         confBadge.innerText = "Low";
         confBadge.className = "text-error font-bold bg-error/10 px-2 py-0.5 rounded text-[9px] uppercase tracking-wider";
+      }
+
+      const mismatchEl = document.getElementById('ai-confidence-mismatch');
+      if (mismatchEl) {
+        mismatchEl.innerText = r.missing_skills && r.missing_skills.length > 0 ? r.missing_skills[0] : 'None';
+      }
+      
+      const domainEl = document.getElementById('ai-confidence-domain');
+      if (domainEl) {
+        domainEl.innerText = r.role || 'Unspecified';
       }
 
       // Update Explainability Breakdown Progress Bars
@@ -3008,7 +3057,7 @@ Requirements:
 
       // GPT Narrative Analysis
       const gptNarrative = document.getElementById('gpt-narrative');
-      gptNarrative.innerHTML = r.gpt_analysis.replace(/\n/g, '<br>');
+      gptNarrative.innerHTML = renderAIAnalysisReport(r.gpt_analysis);
 
       // Tailored Interview Questions
       const questionsList = document.getElementById('interview-questions');
@@ -3181,58 +3230,253 @@ Requirements:
       });
     }
 
-    function switchResumeTab(tab) {
-      activeResumeTab = tab;
-      const tabDoc = document.getElementById('resume-tab-docview');
-      const tabParser = document.getElementById('resume-tab-parser');
-      const btnDoc = document.getElementById('tab-btn-docview');
-      const btnParser = document.getElementById('tab-btn-parser');
+    let resumeFontSize = 11;
+    let resumeCurrentPage = 1;
+    let resumeTotalPages = 1;
+    let resumeTextChunks = [];
+
+    function getCandidatePersona(score, experience, skills, role) {
+      const skillsStr = (skills || []).join(' ').toLowerCase();
+      const roleStr = (role || '').toLowerCase();
       
-      if (tab === 'docview') {
-        if (tabDoc) tabDoc.classList.remove('hidden');
-        if (tabParser) tabParser.classList.add('hidden');
-        if (btnDoc) btnDoc.className = "px-3 py-1 rounded bg-surface text-primary shadow-sm";
-        if (btnParser) btnParser.className = "px-3 py-1 rounded text-on-surface-variant hover:text-on-surface";
-      } else {
-        if (tabDoc) tabDoc.classList.add('hidden');
-        if (tabParser) tabParser.classList.remove('hidden');
-        if (btnDoc) btnDoc.className = "px-3 py-1 rounded text-on-surface-variant hover:text-on-surface";
-        if (btnParser) btnParser.className = "px-3 py-1 rounded bg-surface text-primary shadow-sm";
-        
-        if (currentCandidateIndex !== null && analysisResults[currentCandidateIndex]) {
-          populateInteractiveParser(analysisResults[currentCandidateIndex]);
-        }
+      if (experience >= 8 || skillsStr.includes('lead') || skillsStr.includes('manage') || skillsStr.includes('architect')) {
+        return {
+          title: "Leadership Potential",
+          icon: "supervisor_account",
+          color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
+          desc: "Demonstrates senior seniority, system architecture exposure, or management indicators."
+        };
       }
+      
+      if (skillsStr.includes('research') || skillsStr.includes('thesis') || skillsStr.includes('tensor') || skillsStr.includes('pytorch') || skillsStr.includes('science') || skillsStr.includes('phd') || skillsStr.includes('paper')) {
+        return {
+          title: "Research-Oriented",
+          icon: "biotech",
+          color: "bg-teal-500/10 text-teal-400 border-teal-500/25",
+          desc: "Shows alignment with advanced algorithms, scientific stacks, or data methodologies."
+        };
+      }
+      
+      if (experience <= 3 && score >= 75) {
+        return {
+          title: "Startup Ready",
+          icon: "bolt",
+          color: "bg-amber-500/10 text-amber-400 border-amber-500/25",
+          desc: "High velocity, high capability match early in career. Ideal for fast-paced growth."
+        };
+      }
+      
+      return {
+        title: "Technical Builder",
+        icon: "construction",
+        color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
+        desc: "Hands-on builder with strong alignment on engineering practices and implementation tools."
+      };
     }
 
-    function populateInteractiveParser(r) {
-      const container = document.getElementById('interactive-resume-text');
-      if (!container) return;
-      container.innerHTML = '';
+    function updateInteractiveResumeView() {
+      const textContainer = document.getElementById('interactive-resume-text');
+      const pageIndicator = document.getElementById('resume-page-indicator');
+      if (!textContainer) return;
       
-      if (!r.raw_text) {
-        container.innerHTML = `
-          <div class="text-on-surface-variant italic text-center py-24 flex flex-col items-center gap-2">
-            <span class="material-symbols-outlined text-3xl text-on-surface-variant/45">find_in_page</span>
-            <span>Extracted text not available for this candidate. Run screening first.</span>
-          </div>
-        `;
+      textContainer.style.fontSize = `${resumeFontSize}px`;
+      
+      if (resumeTextChunks.length === 0) {
+        textContainer.innerHTML = '<span class="text-on-surface-variant italic">No parsed text available.</span>';
+        if (pageIndicator) pageIndicator.innerText = 'Page 1 of 1';
         return;
       }
       
-      let text = r.raw_text;
-      // HTML Escape
+      if (resumeCurrentPage < 1) resumeCurrentPage = 1;
+      if (resumeCurrentPage > resumeTotalPages) resumeCurrentPage = resumeTotalPages;
+      
+      let text = resumeTextChunks[resumeCurrentPage - 1] || '';
+      
       text = text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
       
-      // Highlight matched skills
-      if (r.matched_skills) {
+      const r = analysisResults[currentCandidateIndex];
+      if (r && r.matched_skills) {
         r.matched_skills.forEach(skill => {
           const regex = new RegExp(`\\b(${escapeRegExp(skill)})\\b`, 'gi');
           text = text.replace(regex, `<span class="bg-primary/20 text-primary border border-primary/45 rounded px-1.5 py-0.5 font-bold cursor-pointer hover:bg-primary/30 transition-colors" onclick="showParserSkillTooltip(event, '${skill}', true)">$1</span>`);
         });
       }
       
-      container.innerHTML = text;
+      textContainer.innerHTML = text;
+      if (pageIndicator) pageIndicator.innerText = `Page ${resumeCurrentPage} of ${resumeTotalPages}`;
+    }
+
+    function zoomResume(dir) {
+      if (dir === 'in') {
+        if (resumeFontSize < 18) resumeFontSize++;
+      } else {
+        if (resumeFontSize > 9) resumeFontSize--;
+      }
+      updateInteractiveResumeView();
+    }
+
+    function navigateResumePage(dir) {
+      if (dir === 'prev') {
+        if (resumeCurrentPage > 1) {
+          resumeCurrentPage--;
+          updateInteractiveResumeView();
+        }
+      } else if (dir === 'next') {
+        if (resumeCurrentPage < resumeTotalPages) {
+          resumeCurrentPage++;
+          updateInteractiveResumeView();
+        }
+      }
+    }
+
+    function renderAIAnalysisReport(text) {
+      if (!text) return '<span class="text-on-surface-variant italic">No AI Analysis available.</span>';
+      
+      let cleaned = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+        
+      const sections = [];
+      let currentSection = { title: "AI Insights", content: [] };
+      
+      const lines = cleaned.split('\n');
+      for (let line of lines) {
+        const trimmed = line.trim();
+        if (!trimmed) continue;
+        
+        const headerMatch = trimmed.match(/^(?:\d\.\s*|#+\s*|[-*]\s*)?(Executive Summary|Technical Strengths|Strengths|Weaknesses \/ Gaps|Weaknesses|Gaps|Gaps & Concerns|Concerns|Recommendation|Hiring Verdict|Career Progression|Risk Indicators|Interview Focus Areas|Final Hiring Recommendation|ATS Compatibility|Technical Fit|Experience Relevance|Project Quality)(?:\s*:)?$/i);
+        
+        if (headerMatch) {
+          if (currentSection.content.length > 0 || currentSection.title !== "AI Insights") {
+            sections.push(currentSection);
+          }
+          currentSection = { title: headerMatch[1], content: [] };
+        } else {
+          if (trimmed.startsWith('*') || trimmed.startsWith('-')) {
+            currentSection.content.push({ type: 'bullet', text: trimmed.substring(1).trim() });
+          } else {
+            currentSection.content.push({ type: 'text', text: trimmed });
+          }
+        }
+      }
+      if (currentSection.content.length > 0 || currentSection.title !== "AI Insights") {
+        sections.push(currentSection);
+      }
+      
+      if (sections.length === 0) {
+        return `<p class="leading-relaxed text-on-surface-variant/90">${cleaned.replace(/\n/g, '<br>')}</p>`;
+      }
+      
+      let html = '<div class="space-y-4">';
+      
+      const iconMap = {
+        "Executive Summary": "info",
+        "Technical Strengths": "award_star",
+        "Strengths": "check_circle",
+        "Weaknesses / Gaps": "error",
+        "Weaknesses": "error",
+        "Gaps": "error",
+        "Gaps & Concerns": "warning",
+        "Concerns": "warning",
+        "Recommendation": "gavel",
+        "Hiring Verdict": "gavel",
+        "Final Hiring Recommendation": "gavel",
+        "Career Progression": "trending_up",
+        "Risk Indicators": "shield_alert",
+        "Interview Focus Areas": "question_answer",
+        "ATS Compatibility": "analytics"
+      };
+
+      const colorMap = {
+        "Executive Summary": "border-primary/30 bg-primary/5 text-primary",
+        "Technical Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
+        "Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
+        "Weaknesses / Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",
+        "Weaknesses": "border-rose-500/30 bg-rose-500/5 text-rose-400",
+        "Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",
+        "Gaps & Concerns": "border-amber-500/30 bg-amber-500/5 text-amber-400",
+        "Concerns": "border-amber-500/30 bg-amber-500/5 text-amber-400",
+        "Risk Indicators": "border-amber-500/30 bg-amber-500/5 text-amber-400",
+        "Recommendation": "border-primary/30 bg-primary/5 text-primary",
+        "Hiring Verdict": "border-primary/30 bg-primary/5 text-primary",
+        "Final Hiring Recommendation": "border-primary/30 bg-primary/5 text-primary",
+        "Career Progression": "border-indigo-500/30 bg-indigo-500/5 text-indigo-400",
+        "Interview Focus Areas": "border-teal-500/30 bg-teal-500/5 text-teal-400"
+      };
+      
+      for (let sec of sections) {
+        const icon = iconMap[sec.title] || "arrow_forward";
+        const colorClasses = colorMap[sec.title] || "border-outline-variant/60 bg-surface-container/20 text-on-surface";
+        
+        html += `
+          <div class="border rounded-2xl p-4 shadow-sm backdrop-blur-md transition-all duration-200 hover:shadow-md ${colorClasses}">
+            <h4 class="text-xs font-bold uppercase tracking-wider mb-2.5 flex items-center gap-1.5 font-headline">
+              <span class="material-symbols-outlined text-sm">${icon}</span>
+              <span>${sec.title}</span>
+            </h4>
+            <div class="text-xs leading-relaxed space-y-2 text-on-surface/90">
+        `;
+        
+        let inList = false;
+        for (let item of sec.content) {
+          if (item.type === 'bullet') {
+            if (!inList) {
+              html += '<ul class="list-disc pl-4 space-y-1 mt-1">';
+              inList = true;
+            }
+            html += `<li>${item.text}</li>`;
+          } else {
+            if (inList) {
+              html += '</ul>';
+              inList = false;
+            }
+            let parsedText = item.text
+              .replace(/\[Strong Hire\]/gi, '<span class="px-1.5 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-bold border border-emerald-500/30">Strong Hire</span>')
+              .replace(/\[Hire\]/gi, '<span class="px-1.5 py-0.5 rounded bg-teal-500/20 text-teal-400 font-bold border border-teal-500/30">Hire</span>')
+              .replace(/\[Consider\]/gi, '<span class="px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-400 font-bold border border-amber-500/30">Consider</span>')
+              .replace(/\[Reject\]/gi, '<span class="px-1.5 py-0.5 rounded bg-rose-500/20 text-rose-400 font-bold border border-rose-500/30">Reject</span>');
+            
+            html += `<p>${parsedText}</p>`;
+          }
+        }
+        if (inList) {
+          html += '</ul>';
+        }
+        
+        html += `
+            </div>
+          </div>
+        `;
+      }
+      
+      html += '</div>';
+      return html;
+    }
+
+    function switchResumeTab(tab) {
+      activeResumeTab = tab;
+      const tabDoc = document.getElementById('resume-tab-docview');
+      const tabParser = document.getElementById('resume-tab-parser');
+      const btnDoc = document.getElementById('tab-btn-docview');
+      const btnParser = document.getElementById('tab-btn-parser');
+      const controls = document.getElementById('resume-viewer-controls');
+      
+      if (tab === 'docview') {
+        if (tabDoc) tabDoc.classList.remove('hidden');
+        if (tabParser) tabParser.classList.add('hidden');
+        if (controls) controls.classList.add('hidden');
+        if (btnDoc) btnDoc.className = "px-3 py-1 rounded bg-surface text-primary shadow-sm";
+        if (btnParser) btnParser.className = "px-3 py-1 rounded text-on-surface-variant hover:text-on-surface";
+      } else {
+        if (tabDoc) tabDoc.classList.add('hidden');
+        if (tabParser) tabParser.classList.remove('hidden');
+        if (controls) controls.classList.remove('hidden');
+        if (btnDoc) btnDoc.className = "px-3 py-1 rounded text-on-surface-variant hover:text-on-surface";
+        if (btnParser) btnParser.className = "px-3 py-1 rounded bg-surface text-primary shadow-sm";
+        
+        updateInteractiveResumeView();
+      }
     }
 
     function showParserSkillTooltip(event, skill, isMatched) {
