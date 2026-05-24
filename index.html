@@ -3705,8 +3705,68 @@ InsightAI Recruiting Dev`;
     }
 
     let copilotChatMode = 'single';
+    let currentAIMode = 'recruiter';
+    let lastChatEndpoint = '';
+    let lastChatPayload = null;
 
-    async function sendCopilotChat() {
+    function parseMarkdownToHTML(text) {
+      let html = text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;");
+
+      html = html.replace(/^### (.*?)$/gm, '<h5 class="text-xs font-bold text-primary mt-3 mb-1.5 flex items-center gap-1"><span class="w-1.5 h-1.5 bg-primary rounded-full"></span>$1</h5>');
+      html = html.replace(/^## (.*?)$/gm, '<h4 class="text-sm font-bold text-primary mt-4 mb-2">$1</h4>');
+      html = html.replace(/^# (.*?)$/gm, '<h3 class="text-base font-bold text-primary mt-5 mb-3 border-b border-outline-variant/40 pb-1">$1</h3>');
+
+      html = html.replace(/^\s*[\*\-]\s+(.*?)$/gm, '<li class="ml-4 list-disc my-1 text-on-surface-variant/90">$1</li>');
+      
+      html = html.replace(/\*\*(.*?)\*\*/g, '<strong class="font-bold text-on-surface">$1</strong>');
+      html = html.replace(/\*(.*?)\*/g, '<em class="italic">$1</em>');
+
+      html = html.replace(/\[Strong Hire\]/gi, '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/25">Strong Hire</span>');
+      html = html.replace(/\[Hire\]/gi, '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-teal-500/10 text-teal-400 border border-teal-500/25">Hire</span>');
+      html = html.replace(/\[Consider\]/gi, '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/25">Consider</span>');
+      html = html.replace(/\[Reject\]/gi, '<span class="px-2 py-0.5 rounded-full text-[10px] font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/25">Reject</span>');
+
+      html = html.replace(/⚠️/g, '<span class="text-amber-500">⚠️</span>');
+      html = html.replace(/🟢/g, '<span class="text-emerald-500">🟢</span>');
+      html = html.replace(/🟡/g, '<span class="text-amber-500">🟡</span>');
+      html = html.replace(/🔴/g, '<span class="text-rose-500">🔴</span>');
+
+      const lines = html.split('\n');
+      let result = '';
+      let inList = false;
+      
+      for (let line of lines) {
+        if (line.trim().startsWith('<li')) {
+          if (!inList) {
+            result += '<ul class="space-y-1 mb-2.5">';
+            inList = true;
+          }
+          result += line;
+        } else {
+          if (inList) {
+            result += '</ul>';
+            inList = false;
+          }
+          if (line.trim()) {
+            if (!line.trim().startsWith('<h') && !line.trim().startsWith('<ul') && !line.trim().startsWith('<li') && !line.trim().startsWith('<div')) {
+              result += `<p class="leading-relaxed mb-2.5 text-on-surface-variant/90">${line}</p>`;
+            } else {
+              result += line;
+            }
+          }
+        }
+      }
+      if (inList) {
+        result += '</ul>';
+      }
+
+      return result;
+    }
+
+    async function sendCopilotChat(chatType) {
       const input = document.getElementById('copilot-chat-input');
       const message = input.value.trim();
       if (!message) return;
@@ -3742,8 +3802,10 @@ InsightAI Recruiting Dev`;
             return;
           }
           const r = analysisResults[currentCandidateIndex];
+          const typeToSend = chatType || (currentAIMode + '-chat');
           payload = {
             message: message,
+            chat_type: typeToSend,
             candidate_name: isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', ''),
             candidate_score: r.score,
             candidate_role: r.role || 'Unspecified',
@@ -3751,6 +3813,9 @@ InsightAI Recruiting Dev`;
             matched_skills: r.matched_skills || []
           };
         }
+
+        lastChatEndpoint = endpoint;
+        lastChatPayload = payload;
 
         const response = await fetch(endpoint, {
           method: 'POST',
@@ -3773,9 +3838,34 @@ InsightAI Recruiting Dev`;
       }
     }
 
-    function sendSuggestedChat(text) {
+    async function regenerateLastChat() {
+      if (!lastChatPayload || !lastChatEndpoint) return;
+      const loaderId = appendChatLoader();
+      try {
+        const response = await fetch(lastChatEndpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(lastChatPayload)
+        });
+
+        removeChatLoader(loaderId);
+
+        if (!response.ok) {
+          throw new Error(`Server status ${response.status}`);
+        }
+
+        const data = await response.json();
+        appendChatMessage('assistant', data.reply);
+      } catch (e) {
+        console.error(e);
+        removeChatLoader(loaderId);
+        appendChatMessage('assistant', "⚠️ Error: Failed to contact Recruitment Co-pilot server. Please try again.");
+      }
+    }
+
+    function sendSuggestedChat(text, chatType) {
       document.getElementById('copilot-chat-input').value = text;
-      sendCopilotChat();
+      sendCopilotChat(chatType);
     }
 
     function setChatTargetMode(mode) {
@@ -3789,24 +3879,77 @@ InsightAI Recruiting Dev`;
         singleBtn.className = "px-2.5 py-1 rounded-lg bg-surface text-primary shadow-sm transition-all";
         poolBtn.className = "px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all";
         chatInput.placeholder = "Ask about this candidate...";
-        
-        document.getElementById('suggested-btn-1').innerHTML = "🔍 Missing Skills";
-        document.getElementById('suggested-btn-1').onclick = () => sendSuggestedChat("What are the candidate's top missing skills?");
-        document.getElementById('suggested-btn-2').innerHTML = "💬 Tailored Questions";
-        document.getElementById('suggested-btn-2').onclick = () => sendSuggestedChat("Suggest 3 custom technical interview questions.");
-        document.getElementById('suggested-btn-3').innerHTML = "📋 Evaluation";
-        document.getElementById('suggested-btn-3').onclick = () => sendSuggestedChat("Summarize candidate's overall fit for this role.");
       } else {
         singleBtn.className = "px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all";
         poolBtn.className = "px-2.5 py-1 rounded-lg bg-surface text-primary shadow-sm transition-all";
         chatInput.placeholder = "Ask about all candidates in the queue...";
-        
-        document.getElementById('suggested-btn-1').innerHTML = "🏆 Strongest Fit";
-        document.getElementById('suggested-btn-1').onclick = () => sendSuggestedChat("Who is the strongest overall candidate for this role?");
-        document.getElementById('suggested-btn-2').innerHTML = "⏳ Most Experience";
-        document.getElementById('suggested-btn-2').onclick = () => sendSuggestedChat("Who has the most years of experience in the candidate pool?");
-        document.getElementById('suggested-btn-3').innerHTML = "❓ Skill Gaps Comparison";
-        document.getElementById('suggested-btn-3').onclick = () => sendSuggestedChat("What are the most common skill gaps across the candidates?");
+      }
+      refreshSuggestedButtons();
+    }
+
+    function setAIMode(mode) {
+      currentAIMode = mode;
+      
+      const modes = ['recruiter', 'ats', 'interviewer', 'optimizer'];
+      modes.forEach(m => {
+        const btn = document.getElementById(`ai-mode-${m}`);
+        if (btn) {
+          if (m === mode) {
+            btn.className = "py-1 rounded-lg bg-surface text-primary shadow-sm transition-all font-medium";
+          } else {
+            btn.className = "py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all font-medium";
+          }
+        }
+      });
+      
+      refreshSuggestedButtons();
+    }
+
+    function refreshSuggestedButtons() {
+      const btn1 = document.getElementById('suggested-btn-1');
+      const btn2 = document.getElementById('suggested-btn-2');
+      const btn3 = document.getElementById('suggested-btn-3');
+      
+      if (!btn1 || !btn2 || !btn3) return;
+
+      if (copilotChatMode === 'pool') {
+        btn1.innerHTML = "🏆 Strongest Fit";
+        btn1.onclick = () => sendSuggestedChat("Who is the strongest overall candidate for this role?", "chat");
+        btn2.innerHTML = "⏳ Most Experience";
+        btn2.onclick = () => sendSuggestedChat("Who has the most years of experience in the candidate pool?", "chat");
+        btn3.innerHTML = "❓ Skill Gaps Comparison";
+        btn3.onclick = () => sendSuggestedChat("What are the most common skill gaps across the candidates?", "chat");
+        return;
+      }
+      
+      if (currentAIMode === 'recruiter') {
+        btn1.innerHTML = "📋 Match Evaluation";
+        btn1.onclick = () => sendSuggestedChat("Summarize candidate's overall fit for this role.", "evaluation");
+        btn2.innerHTML = "⚡ Quick Strengths";
+        btn2.onclick = () => sendSuggestedChat("What are the candidate's top 3 core strengths?", "chat");
+        btn3.innerHTML = "💼 Experience Fit";
+        btn3.onclick = () => sendSuggestedChat("Does the candidate have relevant professional project experience?", "chat");
+      } else if (currentAIMode === 'ats') {
+        btn1.innerHTML = "🔍 Missing Skills";
+        btn1.onclick = () => sendSuggestedChat("What are the candidate's top missing skills?", "missing-skills");
+        btn2.innerHTML = "🔥 Skill Heatmap";
+        btn2.onclick = () => sendSuggestedChat("Provide a breakdown of matched skills vs missing skills.", "chat");
+        btn3.innerHTML = "📋 Keyword Alignment";
+        btn3.onclick = () => sendSuggestedChat("Analyze candidate's resume keywords alignment against the job description.", "chat");
+      } else if (currentAIMode === 'interviewer') {
+        btn1.innerHTML = "💬 Tailored Questions";
+        btn1.onclick = () => sendSuggestedChat("Suggest 3 custom technical interview questions.", "questions");
+        btn2.innerHTML = "💻 Tech Quiz";
+        btn2.onclick = () => sendSuggestedChat("Generate 3 challenging coding questions targeting their matching stack.", "chat");
+        btn3.innerHTML = "🧠 Follow-ups";
+        btn3.onclick = () => sendSuggestedChat("Suggest 2 advanced system design or architecture follow-up questions.", "questions");
+      } else if (currentAIMode === 'optimizer') {
+        btn1.innerHTML = "📝 Improvement Plan";
+        btn1.onclick = () => sendSuggestedChat("Provide actionable recommendations for resume improvement.", "missing-skills");
+        btn2.innerHTML = "🔄 Rewrite Suggestions";
+        btn2.onclick = () => sendSuggestedChat("Suggest bullet point optimization for their project experience.", "chat");
+        btn3.innerHTML = "📊 ATS Optimization";
+        btn3.onclick = () => sendSuggestedChat("How can this candidate optimize their resume layout/formatting?", "chat");
       }
     }
 
@@ -3820,10 +3963,47 @@ InsightAI Recruiting Dev`;
 
       if (sender === 'user') {
         msg.className = "self-end bg-primary text-on-primary rounded-2xl rounded-tr-none px-4 py-2.5 max-w-[85%] text-xs ml-auto shadow-md border border-primary/10 transition-all duration-200 animate-fade-in";
+        msg.innerText = text;
       } else {
-        msg.className = "self-start bg-surface border border-outline-variant/60 text-on-surface rounded-2xl rounded-tl-none px-4 py-2.5 max-w-[85%] text-xs mr-auto shadow-sm transition-all duration-200 animate-fade-in";
+        msg.className = "self-start bg-surface border border-outline-variant/60 text-on-surface rounded-2xl rounded-tl-none p-4 max-w-[90%] text-xs mr-auto shadow-sm transition-all duration-200 animate-fade-in flex flex-col gap-2 relative group";
+        
+        const actionsDiv = document.createElement('div');
+        actionsDiv.className = "absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity flex gap-1.5 bg-surface-container-high/90 backdrop-blur-sm p-1 rounded-lg border border-outline-variant/40 shadow-xs z-10";
+        
+        const regenBtn = document.createElement('button');
+        regenBtn.className = "text-[10px] text-on-surface-variant hover:text-primary flex items-center justify-center transition-colors cursor-pointer p-0.5 hover:bg-surface-container rounded";
+        regenBtn.title = "Regenerate answer";
+        regenBtn.innerHTML = '<span class="material-symbols-outlined text-[14px]">refresh</span>';
+        regenBtn.onclick = (e) => {
+          e.stopPropagation();
+          regenerateLastChat();
+        };
+        actionsDiv.appendChild(regenBtn);
+
+        const collapseBtn = document.createElement('button');
+        collapseBtn.className = "text-[10px] text-on-surface-variant hover:text-primary flex items-center justify-center transition-colors cursor-pointer p-0.5 hover:bg-surface-container rounded";
+        collapseBtn.title = "Toggle collapse";
+        collapseBtn.innerHTML = '<span class="material-symbols-outlined text-[14px] rotate-0 transition-transform duration-200" id="toggle-icon">unfold_less</span>';
+        
+        actionsDiv.appendChild(collapseBtn);
+        msg.appendChild(actionsDiv);
+
+        const contentDiv = document.createElement('div');
+        contentDiv.className = "chat-card-content overflow-hidden transition-all duration-300";
+        contentDiv.innerHTML = parseMarkdownToHTML(text);
+        msg.appendChild(contentDiv);
+        
+        collapseBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (contentDiv.classList.contains('max-h-14')) {
+            contentDiv.classList.remove('max-h-14');
+            collapseBtn.innerHTML = '<span class="material-symbols-outlined text-[14px] rotate-0 transition-transform duration-200">unfold_less</span>';
+          } else {
+            contentDiv.classList.add('max-h-14');
+            collapseBtn.innerHTML = '<span class="material-symbols-outlined text-[14px] rotate-180 transition-transform duration-200">unfold_more</span>';
+          }
+        };
       }
-      msg.innerText = text;
       container.appendChild(msg);
       container.scrollTop = container.scrollHeight;
     }
@@ -4540,18 +4720,29 @@ InsightAI Recruiting Dev`;
           </div>
         </div>
 
+        <!-- AI Modes Switcher -->
+        <div class="flex flex-col gap-1.5">
+          <span class="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">AI Mode:</span>
+          <div class="grid grid-cols-4 bg-surface-container rounded-xl p-0.5 border border-outline-variant/30 text-[9px] font-semibold text-center select-none">
+            <button id="ai-mode-recruiter" class="py-1 rounded-lg bg-surface text-primary shadow-sm transition-all font-medium" onclick="setAIMode('recruiter')">Recruiter</button>
+            <button id="ai-mode-ats" class="py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all font-medium" onclick="setAIMode('ats')">ATS</button>
+            <button id="ai-mode-interviewer" class="py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all font-medium" onclick="setAIMode('interviewer')">Interview</button>
+            <button id="ai-mode-optimizer" class="py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all font-medium" onclick="setAIMode('optimizer')">Optimize</button>
+          </div>
+        </div>
+
         <!-- Suggested prompts -->
         <div class="space-y-2">
           <span class="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">Suggested Questions:</span>
           <div class="flex flex-wrap gap-1.5" id="suggested-prompts-box">
-            <button id="suggested-btn-1" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
-              🔍 Missing Skills
+            <button id="suggested-btn-1" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.', 'evaluation')">
+              📋 Match Evaluation
             </button>
-            <button id="suggested-btn-2" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
-              💬 Tailored Questions
+            <button id="suggested-btn-2" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('What are the candidate\'s top 3 core strengths?', 'chat')">
+              ⚡ Quick Strengths
             </button>
-            <button id="suggested-btn-3" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
-              📋 Evaluation
+            <button id="suggested-btn-3" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Does the candidate have relevant professional project experience?', 'chat')">
+              💼 Experience Fit
             </button>
           </div>
         </div>

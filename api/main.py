@@ -334,6 +334,7 @@ class ChatRequest(BaseModel):
     candidate_role: str
     missing_skills: list[str]
     matched_skills: list[str]
+    chat_type: str | None = None
 
 
 class CandidateSummaryItem(BaseModel):
@@ -924,33 +925,134 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
     check_rate_limit(request.client.host)
     reply = ""
     
-    if AIConfig.openai_key or AIConfig.gemini_key:
-        try:
-            prompt = (
-                f"You are a helpful recruitment co-pilot assistant. Answer the recruiter's question about the candidate. "
-                f"Candidate Name: {req.candidate_name}\n"
-                f"Match Score: {req.candidate_score}%\n"
-                f"Predicted Role: {req.candidate_role}\n"
-                f"Matched Skills: {', '.join(req.matched_skills)}\n"
-                f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
-                f"Recruiter's Question: {req.message}"
+    t = req.chat_type or "chat"
+    system_instruction = (
+        "You are an intelligent AI recruitment co-pilot. Be concise, professional, and analytical. "
+        "Never repeat introductions or greeting statements. Directly answer the recruiter's request with structured, actionable insights."
+    )
+    
+    if t == "missing-skills":
+        system_instruction = (
+            "You are an expert recruitment coordinator. Do not use boilerplate introductions. "
+            "Directly provide a structured, bulleted list of missing skills, weak areas, and actionable recommendations to bridge gaps."
+        )
+        prompt = (
+            f"Analyze candidate resume against job requirements.\n"
+            f"Candidate: {req.candidate_name}\n"
+            f"Predicted Role: {req.candidate_role}\n"
+            f"Match Score: {req.candidate_score}%\n"
+            f"Matched Skills: {', '.join(req.matched_skills)}\n"
+            f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
+            f"Please return: \n- A structured list of missing skills\n- Weak areas identified\n- Improvement recommendations for the candidate."
+        )
+    elif t == "questions":
+        system_instruction = (
+            "You are a technical interviewer co-pilot. Never introduce yourself or add filler greeting phrases. "
+            "Directly generate the technical, behavioral, and advanced follow-up questions."
+        )
+        prompt = (
+            f"Generate technical interview questions adapted to candidate's skills.\n"
+            f"Candidate: {req.candidate_name}\n"
+            f"Target Role: {req.candidate_role}\n"
+            f"Matched Skills: {', '.join(req.matched_skills)}\n"
+            f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
+            f"Please return:\n- 5 technical questions targeting their matched and missing stack\n- 3 HR/behavioral questions\n- 2 advanced follow-up system design questions."
+        )
+    elif t == "evaluation":
+        system_instruction = (
+            "You are a senior hiring partner. Avoid introductory text or pleasantries. "
+            "Directly return a high-fidelity evaluation assessment report."
+        )
+        prompt = (
+            f"Evaluate the candidate's alignment.\n"
+            f"Candidate: {req.candidate_name}\n"
+            f"Role: {req.candidate_role}\n"
+            f"Match Score: {req.candidate_score}%\n"
+            f"Matched Skills: {', '.join(req.matched_skills)}\n"
+            f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
+            f"Please return:\n- Candidate Core Strengths\n- Concerns & Weaknesses\n- A clear Hiring Verdict (Strong Hire / Hire / Consider / Reject) with a short rationale\n- Overall summary."
+        )
+    else:
+        if t == "recruiter-chat":
+            system_instruction = (
+                "You are an intelligent AI recruiter co-pilot in Recruiter Mode. Be concise, professional, and analytical. "
+                "Focus on general recruitment, match qualifications, candidate suitability, and professional demeanor. "
+                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+            )
+        elif t == "ats-chat":
+            system_instruction = (
+                "You are an intelligent AI recruiter co-pilot in ATS Analyzer Mode. Focus on keyword matching, resume screening, "
+                "skill gaps, parsing accuracy, and optimization tips. "
+                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+            )
+        elif t == "interviewer-chat":
+            system_instruction = (
+                "You are an intelligent AI recruiter co-pilot in Interview Generator Mode. Focus on framing challenging technical questions, "
+                "behavioral questions, coding exercises, and system design follow-ups. "
+                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+            )
+        elif t == "optimizer-chat":
+            system_instruction = (
+                "You are an intelligent AI recruiter co-pilot in Resume Optimizer Mode. Focus on resume rewriting, dynamic impact phrasing, "
+                "suggesting layout, format, and section improvements. "
+                "Never repeat introductions or greetings. Directly answer the recruiter's question."
             )
             
+        prompt = (
+            f"Candidate Name: {req.candidate_name}\n"
+            f"Match Score: {req.candidate_score}%\n"
+            f"Predicted Role: {req.candidate_role}\n"
+            f"Matched Skills: {', '.join(req.matched_skills)}\n"
+            f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
+            f"Recruiter's Question: {req.message}"
+        )
+        
+    if AIConfig.openai_key or AIConfig.gemini_key:
+        try:
             reply = get_ai_response(
                 prompt = prompt,
-                system_instruction = "You are a professional recruitment co-pilot. Give brief, insightful, and constructive recruiter feedback."
+                system_instruction = system_instruction
             )
         except Exception as exc:
             logger.error("AI chat assistant failed: %s", exc)
             
     if not reply:
-        msg = req.message.lower()
-        if "missing" in msg or "skill" in msg:
-            reply = f"The candidate {req.candidate_name} is missing critical keywords: {', '.join(req.missing_skills or ['None identified'])}."
-        elif "why" in msg or "score" in msg or "rank" in msg:
-            reply = f"{req.candidate_name} matches the target role as a {req.candidate_role} with a score of {req.candidate_score}%. The rating is influenced by their matched skills ({len(req.matched_skills)}) vs missing skills ({len(req.missing_skills)})."
+        if t == "missing-skills":
+            reply = f"### Missing Skills & Recommendations\n\n* **Missing Skills**: {', '.join(req.missing_skills) if req.missing_skills else 'None'}\n* **Weak Areas**: Missing direct experience with {', '.join(req.missing_skills[:2]) if req.missing_skills else 'core requirements'}.\n* **Recommendations**: Add hands-on project details leveraging these missing technical frameworks to align with target role."
+        elif t == "questions":
+            reply = (
+                f"### Tailored Interview Questions\n\n"
+                f"#### Technical Questions\n"
+                f"1. Explain how you implement systems using {', '.join(req.matched_skills[:2]) if req.matched_skills else 'industry best practices'}.\n"
+                f"2. How would you handle a distributed data inconsistency or bottleneck?\n"
+                f"3. What projects have you built using {', '.join(req.matched_skills[-2:]) if req.matched_skills else 'modern stacks'}?\n"
+                f"4. How do you design and optimize database queries for read-heavy workloads?\n"
+                f"5. What tools do you use for CI/CD pipeline automation and testing?\n\n"
+                f"#### HR & Behavioral\n"
+                f"1. How do you manage technical disagreements in agile teams?\n"
+                f"2. Describe a time you had to learn a new tool under tight deadlines.\n"
+                f"3. What is your career goal as a {req.candidate_role}?\n\n"
+                f"#### Advanced System Design\n"
+                f"1. Design a resilient queue/pub-sub architecture for a notification system.\n"
+                f"2. How would you optimize the network latency for global API users?"
+            )
+        elif t == "evaluation" or "why" in req.message.lower() or "score" in req.message.lower():
+            reply = (
+                f"### High-Fidelity Recruiter Evaluation\n\n"
+                f"* **Candidate Fit**: Strong alignment on {', '.join(req.matched_skills[:3]) if req.matched_skills else 'core features'}.\n"
+                f"* **ATS Compatibility**: Matched {req.candidate_score}% match score.\n"
+                f"* **Hiring Verdict**: [Consider] / [Hire] pending verification of {', '.join(req.missing_skills[:2]) if req.missing_skills else 'gaps'}.\n"
+                f"* **Strengths**: Solid experience with {', '.join(req.matched_skills[:2]) if req.matched_skills else 'required stack'}.\n"
+                f"* **Summary**: Candidate has strong potential for {req.candidate_role} but has minor skill gaps that should be assessed."
+            )
+        elif t == "ats-chat":
+            reply = f"### ATS Analysis Report\n\n* **Keyword Match Score**: {req.candidate_score}%\n* **Matched Keywords**: {', '.join(req.matched_skills[:4]) if req.matched_skills else 'None'}\n* **Missing Keywords**: {', '.join(req.missing_skills[:4]) if req.missing_skills else 'None'}\n* **ATS Action Plan**: Add missing keywords {', '.join(req.missing_skills[:2]) if req.missing_skills else 'skills'} to bullet points to optimize parsers."
+        elif t == "interviewer-chat":
+            reply = f"### Interview Prep Mode\n\n1. Ask candidate about hands-on projects involving {', '.join(req.matched_skills[:2]) if req.matched_skills else 'key tools'}.\n2. Present a coding challenge recreating a small feature utilizing {req.candidate_role} design pattern."
+        elif t == "optimizer-chat":
+            reply = f"### Resume Rewrite Recommendations\n\n* **Formatting**: Group skills into distinct categories (Backend, Cloud, etc.) for readability.\n* **Impact Phrasing**: Use action verbs. Change 'Wrote code for backend' to 'Spearheaded backend API development using {req.matched_skills[0] if req.matched_skills else 'Python'} to boost speed by 25%'."
         else:
-            reply = f"Hello! As a recruitment co-pilot, I see {req.candidate_name} has a match score of {req.candidate_score}%. Let me know if you need specific interview questions or details on their skill gaps."
+            reply = f"### Recruitment Insights\n\nCandidate {req.candidate_name} matches the role {req.candidate_role} with a score of {req.candidate_score}%. They possess key competencies in {', '.join(req.matched_skills[:3]) if req.matched_skills else 'essential tools'} and show missing skills: {', '.join(req.missing_skills[:3]) if req.missing_skills else 'None'}."
             
     return ChatResponse(reply=reply)
 
