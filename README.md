@@ -1,26 +1,28 @@
-# 🤖 AI Resume Screening & Job Match System
+# 🤖 InsightAI — AI-Native Recruiting Operating System
 
 > A premium, enterprise-grade AI-powered ATS (Applicant Tracking System) and Resume Screening Platform.  
-> Serve the single-page application locally or on serverless Vercel, matching candidate resumes against job descriptions with dual-provider AI support (Google Gemini + OpenAI GPT).
+> Serve the single-page application locally or deploy serverless to Vercel, matching candidate resumes against job descriptions with dual-provider AI support (Google Gemini + OpenAI GPT).
+
+**Live Deployment URL:** [https://ai-resume-screening-job-match-syste-one.vercel.app](https://ai-resume-screening-job-match-syste-one.vercel.app)
 
 ---
 
-## ✨ Features
+## ✨ Enterprise Features
 
 | Feature | Description |
 |---|---|
-| 📄 Interactive Resume tabs | Switch between visual Document PDF view and an **Interactive ATS Text Parser** highlighting matched and missing skills with live tooltips. |
-| 🆚 Side-by-Side Compare | Split-screen visual overlay showing Job Description (left), Match Insights & Gaps (center), and Highlighted Resume Text (right). |
-| 🛡️ Multi-Role Auth Portal | Secure login panel supporting tailored dashboard interfaces for **Recruiters**, **HR Managers**, **Admins**, and **Candidates**. |
-| 🧭 Guided Onboarding Tour | Fully interactive step-by-step onboarding walkthrough guide explaining system features to new users. |
-| 📈 Candidate Strength Meter | 5-bar animated profile capability analytics (Technical, Projects, Experience Depth, Leadership, and ATS Readiness). |
-| 🗺️ AI Career Roadmap | Actionable learning pathways and study path links to Coursera/Udemy to help candidates bridge identified skill gaps. |
-| 👥 Backup Recommendations | Dynamic candidate pool recommendations suggesting backup and alternative candidates matching similar profiles. |
-| ⚖️ Fairness & Bias Monitor | Objective blind evaluation monitor redacting PII names, genders, and locations to ensure bias-free skill-based screenings. |
-| 📅 Interview Scheduling | Coordinate technical interviews via mock Google Calendar sync, generating invitation templates and Zoom meeting links. |
-| 🤖 Pool-Wide AI Assistant | Recruiters can ask the co-pilot questions across the entire candidates pool (e.g. *"Who has the strongest Python skills?"*). |
-| 📊 Admin Analytics | Aggregate screenings dashboard, average match scores, API error ratios, average processing times, and recruiting funnel metrics. |
-| 🛡️ Enterprise Security | Server-side API key management, sliding-window rate limits, client PII masking, and strict CORS configuration switches. |
+| 🤖 **AI Co-pilot Switcher** | 4 specialized chatbot modes: **Recruiter Mode** (fit & qualifications), **ATS Analyzer** (keywords & gaps), **Interview Generator** (custom technical/HR questions), and **Resume Optimizer** (impact rewrites). |
+| 🔄 **Regenerate & Collapse UI** | Assistant responses feature an action toolbar with **Regenerate Answer** (fetch retry) and **Collapse Toggle** (compress long card logs down to `max-h-14` dynamically). |
+| 📄 **Interactive Match Highlights** | Switch between visual Document PDF view and an **Interactive ATS Text Parser** highlighting matched and missing skills with live tooltips. |
+| 🆚 **Split Screen Compare** | Split-screen visual overlay showing Job Description (left), Match Insights & Gaps (center), and Highlighted Resume Text (right). |
+| 🛡️ **Multi-Role Auth Portal** | Secure login panel supporting tailored dashboard interfaces for **Recruiters**, **HR Managers**, **Admins**, and **Candidates**. |
+| 🗺️ **Skills Knowledge Graph** | Beautiful SVG-based interactive dependency tree depicting candidate skills, clusters, and overlap maps. |
+| 🎙️ **Voice AI Interview Modal** | Select focus areas and start a behavioral or technical mock interview with pulsing soundwaves, live transcripts, and speech fluency audits (WPM, sentiment). |
+| 🛡️ **Resume Fraud signals** | Scans for keyword stuffing index, candidate experience anomalies, and displays a mock GitHub contribution matrix. |
+| ⏳ **Multi-Agent Pipeline** | Loading interface detailing real-time agent statuses (Ingestion, Scoring, Trajectory, Verification, Verdict). |
+| 📈 **Candidate Radar Analytics** | Dynamic 6-axis polygon mapping candidate alignment across semantic similarity, experience, keywords, and structural baselines. |
+| ⚖️ **GDPR & PII Blind Masking** | GDPR data purging, PII redactor (anonymizing names/emails), and local Offline AI simulator switches. |
+| 🤝 **Collaboration Board** | Star ratings, reviewer feedback comments log, approvals history, and automated shortlisted candidates follow-up email generator. |
 
 ---
 
@@ -30,7 +32,7 @@
 AI-Resume-Job-Match-System/
 │
 ├── api/
-│   └── main.py             # FastAPI REST API & Static Page Router
+│   └── main.py             # FastAPI REST API, AI Modes Router & Static Server
 │
 ├── src/
 │   ├── __init__.py
@@ -118,8 +120,10 @@ The system uses **Google Gemini** (`gemini-2.5-flash`) as the default active AI 
 | `POST` | `/api/settings` | Save active AI provider and server-side credentials |
 | `POST` | `/api/settings/test`| Run a lightweight check to Gemini/OpenAI credentials |
 | `POST` | `/api/rewrite` | ATS optimization helper for resume bullet points |
-| `POST` | `/api/chat` | Chat request handler for a single candidate profile |
+| `POST` | `/api/chat` | Chat request handler for single candidates supporting AI Modes and explicit prompt actions |
 | `POST` | `/api/chat-all` | Comparative pool chat assistant handler for all active candidates |
+| `POST` | `/api/generate-jd` | Auto-generate and optimize job descriptions for ATS compliance and keyword alignment |
+| `POST` | `/api/mock-interview` | Start or resume a simulated voice AI technical or behavioral interview, returning fluency & speech metrics |
 
 ---
 
