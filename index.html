@@ -238,15 +238,23 @@
     }
     .glass-card {
       background: var(--glass-bg);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
+      backdrop-filter: blur(16px) saturate(140%);
+      -webkit-backdrop-filter: blur(16px) saturate(140%);
+      border: 1px solid rgba(255, 255, 255, 0.06);
       transform: translateZ(0);
       -webkit-transform: translateZ(0);
       backface-visibility: hidden;
       -webkit-backface-visibility: hidden;
+      box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+    .dark .glass-card {
+      background: rgba(13, 17, 28, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+      box-shadow: 0 12px 40px 0 rgba(0, 0, 0, 0.4);
     }
     .ambient-shadow {
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
     }
     .input-glow:focus-within {
       border-color: var(--color-primary);
@@ -267,9 +275,50 @@
     }
     .file-drop-active {
       border-color: var(--color-primary) !important;
-      background-color: rgba(173, 198, 255, 0.05) !important;
+      box-shadow: 0 0 25px rgba(0, 90, 194, 0.2) !important;
+      background-color: rgba(173, 198, 255, 0.03) !important;
     }
-    /* Simple hide/show transition */
+    /* Skeleton Shimmering Loader */
+    .skeleton-box {
+      background: linear-gradient(90deg, var(--color-surface-container) 25%, var(--color-surface-container-high) 50%, var(--color-surface-container) 75%);
+      background-size: 200% 100%;
+      animation: skeleton-shimmer 1.5s infinite linear;
+    }
+    @keyframes skeleton-shimmer {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+    /* Focus Mode Overlay */
+    .focus-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(8, 10, 15, 0.85);
+      backdrop-filter: blur(12px);
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    body.focus-active .focus-overlay {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    body.focus-active #dashboard-content-panel {
+      z-index: 1001;
+      position: relative;
+      box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
+      border-color: var(--color-primary) !important;
+    }
+    /* Hover Lift utility */
+    .hover-lift {
+      transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.2s ease, border-color 0.2s ease;
+    }
+    .hover-lift:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.15);
+      border-color: var(--color-primary-fixed-dim) !important;
+    }
+    /* View switcher transitions */
     .view-section {
       transition: opacity 0.25s ease-in-out;
     }
@@ -332,6 +381,7 @@
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col">
+  <div class="focus-overlay" id="focus-mode-backdrop" onclick="toggleFocusMode()"></div>
 
   <!-- ── VIEW 0: LOGIN & ONBOARDING PORTAL ── -->
   <main id="view-login" class="view-section flex-grow flex items-center justify-center pt-32 pb-24 px-margin-mobile">
@@ -1004,6 +1054,28 @@
             <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-3">Running similarity engines and generating GPT narrative feedback.</p>
           </div>
         </div>
+
+        <!-- Step 4 -->
+        <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-fraud">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-4">
+            <span class="material-symbols-outlined text-[16px]">pending</span>
+          </div>
+          <div class="flex-grow">
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-4">ATS Validation &amp; Integrity Analysis</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-4">Detecting keyword stuffing, timeline consistency, and project duplicates.</p>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-verdict">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-5">
+            <span class="material-symbols-outlined text-[16px]">pending</span>
+          </div>
+          <div class="flex-grow">
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-5">Recruiter Decision Engine</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-5">Generating fit recommendations, custom interview queries, and learning paths.</p>
+          </div>
+        </div>
       </div>
 
       <!-- Real-Time Logging Console -->
@@ -1131,7 +1203,7 @@
     </aside>
     
     <!-- Main Bento Grid Workspace -->
-    <main class="flex-grow p-6 md:p-8 max-w-7xl mx-auto overflow-y-auto w-full">
+    <main id="dashboard-content-panel" class="flex-grow p-6 md:p-8 max-w-7xl mx-auto overflow-y-auto w-full transition-all duration-300">
       
       <!-- Candidate Overview Header -->
       <header class="flex flex-col md:flex-row justify-between items-start md:items-end mb-6 gap-4 border-b border-outline-variant pb-6">
@@ -1144,6 +1216,7 @@
           </div>
           <h2 class="font-headline-lg text-primary tracking-tight" id="candidate-full-name">Elena Rostova</h2>
           <p class="font-body-lg text-on-surface-variant mt-1" id="candidate-predicted-role">Senior Machine Learning Engineer</p>
+          <div class="flex flex-wrap gap-2 mt-2" id="candidate-insight-chips"></div>
         </div>
         <div class="flex gap-3 items-center">
           <div class="flex items-center gap-2 bg-surface-container-high px-3.5 py-2 rounded-full border border-outline-variant shadow-sm text-xs">
@@ -1152,6 +1225,9 @@
           </div>
           <button class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-sm text-body-sm hover:border-primary hover:text-primary transition-colors bg-surface-container-low shadow-sm flex items-center gap-2" onclick="window.print()">
             <span class="material-symbols-outlined text-lg">print</span> Print Report
+          </button>
+          <button id="btn-focus-mode" class="px-4 py-2 rounded-full border border-outline-variant text-on-surface font-body-sm text-body-sm hover:border-primary hover:text-primary transition-colors bg-surface-container-low shadow-sm flex items-center gap-2" onclick="toggleFocusMode()">
+            <span class="material-symbols-outlined text-lg" id="focus-icon">visibility</span> Focus Mode
           </button>
           <button class="px-4 py-2 rounded-full border border-primary text-primary font-body-sm text-body-sm hover:bg-primary/10 transition-colors bg-transparent shadow-sm flex items-center gap-1.5 font-semibold" onclick="openCandidateDrawer()">
             <span class="material-symbols-outlined text-base">psychology</span> Detailed Intelligence
@@ -2220,23 +2296,35 @@ Requirements:
       validateInputs();
     }
 
+    const fileProgressStates = {};
+
     function renderFileList() {
       fileListContainer.innerHTML = '';
       uploadedFiles.forEach((file, index) => {
         const sizeKB = (file.size / 1024).toFixed(1);
+        const fileId = (file.name + '-' + file.size).replace(/[^a-zA-Z0-9]/g, '');
+        
+        if (fileProgressStates[fileId] === undefined) {
+          fileProgressStates[fileId] = 0;
+          simulateFileProgress(fileId);
+        }
+        
+        const currentProgress = fileProgressStates[fileId];
         const fileItem = document.createElement('div');
-        fileItem.className = "bg-surface-container-low p-4 rounded-lg border border-outline-variant flex items-center gap-4";
+        fileItem.className = "bg-surface-container-low p-4 rounded-lg border border-outline-variant flex items-center gap-4 hover-lift";
         fileItem.innerHTML = `
           <div class="w-10 h-10 rounded bg-surface border border-outline-variant flex items-center justify-center text-primary">
-            <span class="material-symbols-outlined">description</span>
+            <span class="material-symbols-outlined ${currentProgress < 100 ? 'animate-spin' : ''}">
+              ${currentProgress < 100 ? 'sync' : 'description'}
+            </span>
           </div>
           <div class="flex-grow">
             <div class="flex justify-between items-center">
               <span class="font-body-sm text-body-sm text-primary font-medium truncate max-w-[240px]">${file.name}</span>
-              <span class="text-xs text-on-surface-variant font-semibold">${sizeKB} KB</span>
+              <span class="text-xs text-on-surface-variant font-semibold">${currentProgress < 100 ? currentProgress + '%' : sizeKB + ' KB'}</span>
             </div>
-            <div class="w-full bg-surface-variant rounded-full h-1.5 mt-1.5">
-              <div class="bg-primary h-1.5 rounded-full" style="width: 100%"></div>
+            <div class="w-full bg-surface-variant rounded-full h-1.5 mt-1.5 overflow-hidden">
+              <div class="bg-primary h-1.5 rounded-full transition-all duration-100" id="progress-${fileId}" style="width: ${currentProgress}%"></div>
             </div>
           </div>
           <button class="text-on-surface-variant hover:text-error transition-colors" onclick="removeFile(${index})">
@@ -2245,6 +2333,22 @@ Requirements:
         `;
         fileListContainer.appendChild(fileItem);
       });
+    }
+
+    function simulateFileProgress(fileId) {
+      let current = 0;
+      const interval = setInterval(() => {
+        current += 10;
+        if (current >= 100) {
+          clearInterval(interval);
+          fileProgressStates[fileId] = 100;
+          renderFileList();
+        } else {
+          fileProgressStates[fileId] = current;
+          const bar = document.getElementById(`progress-${fileId}`);
+          if (bar) bar.style.width = current + '%';
+        }
+      }, 40);
     }
 
     function validateInputs() {
@@ -2266,9 +2370,13 @@ Requirements:
       const stepIcon1 = document.getElementById('step-icon-1');
       const stepIcon2 = document.getElementById('step-icon-2');
       const stepIcon3 = document.getElementById('step-icon-3');
+      const stepIcon4 = document.getElementById('step-icon-4');
+      const stepIcon5 = document.getElementById('step-icon-5');
       const step1 = document.getElementById('step-parsing');
       const step2 = document.getElementById('step-skills');
       const step3 = document.getElementById('step-scoring');
+      const step4 = document.getElementById('step-fraud');
+      const step5 = document.getElementById('step-verdict');
 
       // Clear and reset the scrolling console log
       const consoleLog = document.getElementById('engine-console-log');
@@ -2284,8 +2392,15 @@ Requirements:
       stepIcon2.classList.remove('animate-spin');
       stepIcon3.innerHTML = 'pending';
       stepIcon3.classList.remove('animate-spin');
+      stepIcon4.innerHTML = 'pending';
+      stepIcon4.classList.remove('animate-spin');
+      stepIcon5.innerHTML = 'pending';
+      stepIcon5.classList.remove('animate-spin');
+      
       step2.classList.add('opacity-50');
       step3.classList.add('opacity-50');
+      step4.classList.add('opacity-50');
+      step5.classList.add('opacity-50');
 
       analysisResults = [];
       let currentFileIndex = 0;
@@ -2305,7 +2420,7 @@ Requirements:
           stepIcon2.innerHTML = 'sync';
           stepIcon2.classList.add('animate-spin');
           addConsoleLog(`Phase 2: Running skill extraction matching against database features...`, "text-green-400");
-        }, 800);
+        }, 500);
 
         setTimeout(() => {
           stepIcon2.innerHTML = 'check';
@@ -2315,7 +2430,27 @@ Requirements:
           stepIcon3.innerHTML = 'sync';
           stepIcon3.classList.add('animate-spin');
           addConsoleLog(`Phase 3: Calculating similarity centroids and invoking provider generation...`, "text-secondary");
+        }, 1100);
+
+        setTimeout(() => {
+          stepIcon3.innerHTML = 'check';
+          stepIcon3.classList.remove('animate-spin');
+          stepIcon3.classList.replace('text-on-surface-variant', 'text-primary');
+          step4.classList.remove('opacity-50');
+          stepIcon4.innerHTML = 'sync';
+          stepIcon4.classList.add('animate-spin');
+          addConsoleLog(`Phase 4: Running integrity models and verifying project timelines...`, "text-secondary");
         }, 1800);
+
+        setTimeout(() => {
+          stepIcon4.innerHTML = 'check';
+          stepIcon4.classList.remove('animate-spin');
+          stepIcon4.classList.replace('text-on-surface-variant', 'text-primary');
+          step5.classList.remove('opacity-50');
+          stepIcon5.innerHTML = 'sync';
+          stepIcon5.classList.add('animate-spin');
+          addConsoleLog(`Phase 5: Mapping compatibility coefficients and structuring custom metrics...`, "text-primary");
+        }, 2400);
 
         const formData = new FormData();
         formData.append('job_description', jd);
@@ -2374,6 +2509,13 @@ Requirements:
       // Finalize stepper indicators
       stepIcon3.innerHTML = 'check';
       stepIcon3.classList.remove('animate-spin');
+      stepIcon3.classList.replace('text-on-surface-variant', 'text-primary');
+      stepIcon4.innerHTML = 'check';
+      stepIcon4.classList.remove('animate-spin');
+      stepIcon4.classList.replace('text-on-surface-variant', 'text-primary');
+      stepIcon5.innerHTML = 'check';
+      stepIcon5.classList.remove('animate-spin');
+      stepIcon5.classList.replace('text-on-surface-variant', 'text-primary');
       addConsoleLog(`Analysis complete. Screened ${analysisResults.length} candidates.`, "text-primary font-bold");
       
       setTimeout(() => {
@@ -2550,6 +2692,26 @@ Requirements:
       }
     }
 
+    let isFocusMode = false;
+    function toggleFocusMode() {
+      isFocusMode = !isFocusMode;
+      const body = document.body;
+      const btn = document.getElementById('btn-focus-mode');
+      const icon = document.getElementById('focus-icon');
+      
+      if (isFocusMode) {
+        body.classList.add('focus-active');
+        btn.classList.remove('border-outline-variant', 'bg-surface-container-low');
+        btn.classList.add('border-primary', 'bg-primary/10', 'text-primary');
+        icon.innerText = 'visibility_off';
+      } else {
+        body.classList.remove('focus-active');
+        btn.classList.add('border-outline-variant', 'bg-surface-container-low');
+        btn.classList.remove('border-primary', 'bg-primary/10', 'text-primary');
+        icon.innerText = 'visibility';
+      }
+    }
+
     function toggleAnonymousMode() {
       isAnonymousMode = document.getElementById('anonymous-toggle').checked;
       
@@ -2607,7 +2769,7 @@ Requirements:
     function selectCandidate(index) {
       currentCandidateIndex = index;
       
-      // Update highlights in sidebar list
+      // Update highlights in sidebar list immediately
       analysisResults.forEach((_, idx) => {
         const item = document.getElementById(`candidate-pill-${idx}`);
         if (item) {
@@ -2621,6 +2783,23 @@ Requirements:
         }
       });
 
+      // Shimmer skeletons
+      const summaryBox = document.getElementById('candidate-executive-summary');
+      const gptNarrative = document.getElementById('gpt-narrative');
+      const explanationText = document.getElementById('match-explanation-text');
+      const heatmapTable = document.getElementById('heatmap-table-body');
+      
+      if (summaryBox) summaryBox.innerHTML = '<div class="skeleton-box h-12 w-full rounded-xl opacity-40"></div>';
+      if (gptNarrative) gptNarrative.innerHTML = '<div class="skeleton-box h-32 w-full rounded-xl opacity-40"></div>';
+      if (explanationText) explanationText.innerHTML = '<div class="skeleton-box h-6 w-2/3 rounded-xl opacity-40 mx-auto"></div>';
+      if (heatmapTable) heatmapTable.innerHTML = '<tr><td colspan="3" class="py-4"><div class="skeleton-box h-20 w-full rounded-xl opacity-40"></div></td></tr>';
+
+      setTimeout(() => {
+        renderCandidateData(index);
+      }, 250);
+    }
+
+    function renderCandidateData(index) {
       const r = analysisResults[index];
 
       // Reset Resume Tab View to default Document View
@@ -2631,6 +2810,37 @@ Requirements:
       const displayName = isAnonymousMode ? `Candidate #${index + 1}` : r.name.replace('.pdf', '');
       document.getElementById('candidate-full-name').innerText = displayName;
       document.getElementById('candidate-predicted-role').innerText = r.role || 'Unspecified Candidate Role';
+      
+      // Populate dynamic Insight Chips
+      const chipsContainer = document.getElementById('candidate-insight-chips');
+      if (chipsContainer) {
+        chipsContainer.innerHTML = '';
+        
+        if (r.score >= 75) {
+          chipsContainer.innerHTML += `<span class="bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold shadow-[0_0_8px_rgba(52,211,153,0.1)]">Strong Fit</span>`;
+        } else if (r.score >= 55) {
+          chipsContainer.innerHTML += `<span class="bg-primary/10 text-primary border border-primary/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Consider fit</span>`;
+        } else {
+          chipsContainer.innerHTML += `<span class="bg-error/10 text-error border border-error/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Low Fit</span>`;
+        }
+        
+        if (r.experience >= 5) {
+          chipsContainer.innerHTML += `<span class="bg-blue-400/10 text-blue-400 border border-blue-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Senior track</span>`;
+        } else {
+          chipsContainer.innerHTML += `<span class="bg-on-surface-variant/10 text-on-surface-variant border border-outline-variant/30 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Junior/Mid Track</span>`;
+        }
+        
+        if (r.missing_skills && r.missing_skills.length > 2) {
+          chipsContainer.innerHTML += `<span class="bg-amber-400/10 text-amber-400 border border-amber-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold shadow-[0_0_8px_rgba(251,191,36,0.1)]">Skills Gaps</span>`;
+        } else {
+          chipsContainer.innerHTML += `<span class="bg-emerald-400/10 text-emerald-400 border border-emerald-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Matched Stack</span>`;
+        }
+
+        const trustScore = r.risk_metrics ? r.risk_metrics.credibility_score : 90;
+        if (trustScore >= 80) {
+          chipsContainer.innerHTML += `<span class="bg-purple-400/10 text-purple-400 border border-purple-400/20 px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-semibold">Verified Profile</span>`;
+        }
+      }
       
       if (index === 0) {
         document.getElementById('top-candidate-badge').classList.remove('hidden');
@@ -3494,6 +3704,8 @@ InsightAI Recruiting Dev`;
       }
     }
 
+    let copilotChatMode = 'single';
+
     async function sendCopilotChat() {
       const input = document.getElementById('copilot-chat-input');
       const message = input.value.trim();
@@ -3504,7 +3716,7 @@ InsightAI Recruiting Dev`;
       const loaderId = appendChatLoader();
 
       const msgLower = message.toLowerCase();
-      const isPoolQuery = msgLower.includes('best') || msgLower.includes('strongest') || msgLower.includes('compare') || msgLower.includes('who') || msgLower.includes('pool') || msgLower.includes('candidates') || msgLower.includes('lack');
+      const isPoolQuery = copilotChatMode === 'pool' || msgLower.includes('best') || msgLower.includes('strongest') || msgLower.includes('compare') || msgLower.includes('who') || msgLower.includes('pool') || msgLower.includes('candidates') || msgLower.includes('lack');
       
       try {
         let endpoint = '/api/chat';
@@ -3564,6 +3776,38 @@ InsightAI Recruiting Dev`;
     function sendSuggestedChat(text) {
       document.getElementById('copilot-chat-input').value = text;
       sendCopilotChat();
+    }
+
+    function setChatTargetMode(mode) {
+      copilotChatMode = mode;
+      
+      const singleBtn = document.getElementById('chat-mode-single');
+      const poolBtn = document.getElementById('chat-mode-pool');
+      const chatInput = document.getElementById('copilot-chat-input');
+      
+      if (mode === 'single') {
+        singleBtn.className = "px-2.5 py-1 rounded-lg bg-surface text-primary shadow-sm transition-all";
+        poolBtn.className = "px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all";
+        chatInput.placeholder = "Ask about this candidate...";
+        
+        document.getElementById('suggested-btn-1').innerHTML = "🔍 Missing Skills";
+        document.getElementById('suggested-btn-1').onclick = () => sendSuggestedChat("What are the candidate's top missing skills?");
+        document.getElementById('suggested-btn-2').innerHTML = "💬 Tailored Questions";
+        document.getElementById('suggested-btn-2').onclick = () => sendSuggestedChat("Suggest 3 custom technical interview questions.");
+        document.getElementById('suggested-btn-3').innerHTML = "📋 Evaluation";
+        document.getElementById('suggested-btn-3').onclick = () => sendSuggestedChat("Summarize candidate's overall fit for this role.");
+      } else {
+        singleBtn.className = "px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all";
+        poolBtn.className = "px-2.5 py-1 rounded-lg bg-surface text-primary shadow-sm transition-all";
+        chatInput.placeholder = "Ask about all candidates in the queue...";
+        
+        document.getElementById('suggested-btn-1').innerHTML = "🏆 Strongest Fit";
+        document.getElementById('suggested-btn-1').onclick = () => sendSuggestedChat("Who is the strongest overall candidate for this role?");
+        document.getElementById('suggested-btn-2').innerHTML = "⏳ Most Experience";
+        document.getElementById('suggested-btn-2').onclick = () => sendSuggestedChat("Who has the most years of experience in the candidate pool?");
+        document.getElementById('suggested-btn-3').innerHTML = "❓ Skill Gaps Comparison";
+        document.getElementById('suggested-btn-3').onclick = () => sendSuggestedChat("What are the most common skill gaps across the candidates?");
+      }
     }
 
     function appendChatMessage(sender, text) {
@@ -4287,17 +4531,26 @@ InsightAI Recruiting Dev`;
     <div class="flex-grow overflow-y-auto p-5 flex flex-col min-h-0 bg-surface-container-lowest/40">
       <!-- Chat Tab -->
       <div id="copilot-tab-chat" class="flex-grow flex flex-col gap-4 min-h-0">
+        <!-- Chat Target Mode Switcher -->
+        <div class="flex bg-surface-container rounded-xl p-1 border border-outline-variant/30 text-[10px] font-semibold items-center justify-between">
+          <span class="text-on-surface-variant/80 pl-2">Co-pilot Scope:</span>
+          <div class="flex gap-1">
+            <button id="chat-mode-single" class="px-2.5 py-1 rounded-lg bg-surface text-primary shadow-sm transition-all" onclick="setChatTargetMode('single')">Selected Candidate</button>
+            <button id="chat-mode-pool" class="px-2.5 py-1 rounded-lg text-on-surface-variant hover:text-on-surface transition-all" onclick="setChatTargetMode('pool')">Entire Pool</button>
+          </div>
+        </div>
+
         <!-- Suggested prompts -->
         <div class="space-y-2">
           <span class="text-[9px] font-bold text-on-surface-variant/80 uppercase tracking-wider block">Suggested Questions:</span>
-          <div class="flex flex-wrap gap-1.5">
-            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
+          <div class="flex flex-wrap gap-1.5" id="suggested-prompts-box">
+            <button id="suggested-btn-1" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('What are the candidate\'s top missing skills?')">
               🔍 Missing Skills
             </button>
-            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
+            <button id="suggested-btn-2" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Suggest 3 custom technical interview questions.')">
               💬 Tailored Questions
             </button>
-            <button class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
+            <button id="suggested-btn-3" class="px-2.5 py-1.5 bg-surface border border-outline-variant/60 rounded-xl text-[10px] text-on-surface-variant hover:text-primary hover:border-primary transition-all text-left flex items-center gap-1 shadow-sm hover:translate-y-[-1px]" onclick="sendSuggestedChat('Summarize candidate\'s overall fit for this role.')">
               📋 Evaluation
             </button>
           </div>
