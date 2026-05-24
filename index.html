@@ -308,6 +308,27 @@
       position: relative;
       box-shadow: 0 24px 64px rgba(0, 0, 0, 0.6);
       border-color: var(--color-primary) !important;
+      width: 100% !important;
+      max-width: 95vw !important;
+      padding-top: 1.5rem !important;
+    }
+    body.focus-active #top-nav,
+    body.focus-active #view-dashboard > aside,
+    body.focus-active #dashboard-content-panel > :not(#focus-split-container) {
+      display: none !important;
+    }
+    body.focus-active #view-dashboard {
+      padding-top: 1rem !important;
+    }
+    body.focus-active #focus-split-container {
+      height: 82vh !important;
+    }
+    body.focus-active #resume-viewer-container {
+      height: 100% !important;
+    }
+    body.focus-active #resume-tab-parser,
+    body.focus-active #resume-tab-docview {
+      height: calc(82vh - 120px) !important;
     }
     /* Hover Lift utility */
     .hover-lift {
@@ -1365,6 +1386,9 @@
             </div>
           </div>
 
+          <!-- AI Persona Card Box -->
+          <div id="ai-persona-card-box" class="w-full mt-3 p-3.5 rounded-xl border flex items-center gap-3 transition-all duration-300"></div>
+
           <!-- Explainability Breakdown Progress Bars -->
           <div class="w-full mt-6 pt-4 border-t border-outline-variant space-y-3 z-10 text-[11px]">
             <h4 class="font-label-caps text-label-caps text-on-surface-variant font-bold text-left mb-1">Score Breakdown</h4>
@@ -1632,6 +1656,9 @@
               </div>
             </div>
 
+            <!-- Collaboration Tags -->
+            <div class="space-y-1 mb-4" id="collaboration-candidate-tags"></div>
+
             <div class="space-y-2 mb-3">
               <span class="text-on-surface-variant font-bold uppercase tracking-wider block text-[9px]">Recruiter Notes</span>
               <div class="max-h-24 overflow-y-auto space-y-1.5 pr-1 font-body-sm text-[11px]" id="candidate-notes-list">
@@ -1650,7 +1677,7 @@
         </div>
 
         <!-- Resume Viewer Tabs Container (col-span-8) -->
-        <div class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col">
+        <div id="resume-viewer-container" class="lg:col-span-8 bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-2">
             <div class="flex items-center gap-4">
               <h3 class="font-headline-md text-headline-md text-primary">📄 Resume Viewer</h3>
@@ -1726,6 +1753,25 @@
             <h3 class="font-headline-md text-headline-md text-primary">Detailed AI Analysis &amp; Narrative Report</h3>
           </div>
           <div class="space-y-4" id="gpt-narrative"></div>
+          
+          <!-- Resume vs JD Evidence Mapping Table -->
+          <div class="mt-6 pt-6 border-t border-outline-variant/30 space-y-3">
+            <span class="text-[10px] font-bold text-primary uppercase tracking-wider block">Requirement Evidence Mapping (Explainability matrix)</span>
+            <div class="overflow-x-auto w-full">
+              <table class="w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="border-b border-outline-variant/40">
+                    <th class="pb-2 font-bold text-on-surface-variant w-1/4">JD Requirement</th>
+                    <th class="pb-2 font-bold text-on-surface-variant w-2/3">Resume Evidence</th>
+                    <th class="pb-2 font-bold text-on-surface-variant text-center">Confidence</th>
+                  </tr>
+                </thead>
+                <tbody id="evidence-mapping-table-body" class="divide-y divide-outline-variant/20">
+                  <!-- Dynamic rows go here -->
+                </tbody>
+              </table>
+            </div>
+          </div>
         </div>
 
         <!-- Tailored Interview Questions (col-span-12) -->
@@ -2522,7 +2568,13 @@ Requirements:
             pipelineStage: 1,
             isBookmarked: false,
             ratings: { technical: 3, culture: 3 },
-            notes: []
+            notes: [],
+            evidence_map: [
+              { jd_requirement: "Python", resume_evidence: "Developed backend scripts and web API logic using Python.", confidence: "High" },
+              { jd_requirement: "Git", resume_evidence: "Maintained repository version integrity and branches using Git commands.", confidence: "High" },
+              { jd_requirement: "PyTorch", resume_evidence: "No direct keyword match or structural project validation found.", confidence: "Low" },
+              { jd_requirement: "Kubernetes", resume_evidence: "No direct keyword match or structural project validation found.", confidence: "Low" }
+            ]
           };
           analysisResults.push(fallback);
         }
@@ -2721,16 +2773,64 @@ Requirements:
       const btn = document.getElementById('btn-focus-mode');
       const icon = document.getElementById('focus-icon');
       
+      let splitContainer = document.getElementById('focus-split-container');
+      if (!splitContainer) {
+        splitContainer = document.createElement('div');
+        splitContainer.id = 'focus-split-container';
+        splitContainer.className = 'hidden grid grid-cols-1 lg:grid-cols-2 gap-6 w-full mt-4';
+        document.getElementById('dashboard-content-panel').appendChild(splitContainer);
+      }
+      
       if (isFocusMode) {
         body.classList.add('focus-active');
         btn.classList.remove('border-outline-variant', 'bg-surface-container-low');
         btn.classList.add('border-primary', 'bg-primary/10', 'text-primary');
         icon.innerText = 'visibility_off';
+        
+        let focusJdCard = document.getElementById('focus-jd-card');
+        if (!focusJdCard) {
+          focusJdCard = document.createElement('div');
+          focusJdCard.id = 'focus-jd-card';
+          focusJdCard.className = 'bg-surface-container-low border border-outline-variant rounded-[24px] p-6 shadow-ambient flex flex-col h-full';
+          focusJdCard.innerHTML = `
+            <div class="flex items-center justify-between mb-4 flex-shrink-0">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-primary">work</span>
+                <h3 class="font-headline-md text-headline-md text-primary">Job Description Context</h3>
+              </div>
+            </div>
+            <div class="flex-grow bg-surface rounded-xl border border-outline-variant/60 p-5 overflow-y-auto font-body-sm text-xs leading-relaxed text-on-surface-variant/90 shadow-inner" id="focus-jd-content">
+            </div>
+          `;
+        }
+        
+        splitContainer.appendChild(focusJdCard);
+        document.getElementById('focus-jd-content').innerText = document.getElementById('jd-textarea').value || "No job description text loaded.";
+        
+        const resumeViewer = document.getElementById('resume-viewer-container');
+        if (resumeViewer) {
+          resumeViewer._originalParent = resumeViewer.parentNode;
+          resumeViewer._originalNextSibling = resumeViewer.nextSibling;
+          splitContainer.appendChild(resumeViewer);
+          
+          switchResumeTab('parser');
+        }
+        
+        splitContainer.classList.remove('hidden');
+        splitContainer.classList.add('grid');
       } else {
         body.classList.remove('focus-active');
         btn.classList.add('border-outline-variant', 'bg-surface-container-low');
         btn.classList.remove('border-primary', 'bg-primary/10', 'text-primary');
         icon.innerText = 'visibility';
+        
+        splitContainer.classList.add('hidden');
+        splitContainer.classList.remove('grid');
+        
+        const resumeViewer = document.getElementById('resume-viewer-container');
+        if (resumeViewer && resumeViewer._originalParent) {
+          resumeViewer._originalParent.insertBefore(resumeViewer, resumeViewer._originalNextSibling);
+        }
       }
     }
 
@@ -2887,6 +2987,41 @@ Requirements:
         document.getElementById('top-candidate-badge').classList.add('hidden');
       }
 
+      // Populate AI Persona Card Box
+      const personaBox = document.getElementById('ai-persona-card-box');
+      if (personaBox) {
+        const persona = getCandidatePersona(r.score, r.experience, r.matched_skills, r.role);
+        personaBox.className = `w-full mt-3 p-3.5 rounded-xl border flex items-center gap-3 transition-all duration-300 ${persona.color}`;
+        personaBox.innerHTML = `
+          <span class="material-symbols-outlined text-2xl">${persona.icon}</span>
+          <div class="text-left">
+            <span class="text-[9px] font-bold uppercase tracking-wider block">Candidate Persona</span>
+            <span class="font-semibold text-xs block mt-0.5">${persona.title}</span>
+            <span class="text-[10px] text-on-surface-variant/90 block mt-0.5 leading-normal">${persona.desc}</span>
+          </div>
+        `;
+      }
+
+      // Populate Collaboration Tags
+      const collabTags = document.getElementById('collaboration-candidate-tags');
+      if (collabTags) {
+        collabTags.innerHTML = '';
+        const persona = getCandidatePersona(r.score, r.experience, r.matched_skills, r.role);
+        collabTags.innerHTML = `
+          <div class="flex flex-wrap gap-1.5 mt-2">
+            <span class="px-2 py-1 rounded bg-primary/10 border border-primary/20 text-[9px] font-bold text-primary uppercase tracking-wider flex items-center gap-1 shadow-sm">
+              <span class="material-symbols-outlined text-[11px]">${persona.icon}</span> ${persona.title}
+            </span>
+            <span class="px-2 py-1 rounded bg-secondary/10 border border-secondary/20 text-[9px] font-bold text-secondary uppercase tracking-wider">
+              Score: ${Math.round(r.score)}%
+            </span>
+            <span class="px-2 py-1 rounded bg-tertiary/10 border border-tertiary/20 text-[9px] font-bold text-tertiary uppercase tracking-wider">
+              Exp: ${r.experience} Yrs
+            </span>
+          </div>
+        `;
+      }
+
       // Update AI Recruiter Summary
       document.getElementById('candidate-executive-summary').innerText = r.summary || "Executive summary not available.";
 
@@ -2961,15 +3096,15 @@ Requirements:
       } else {
         jdKeywords.forEach(skill => {
           const matched = r.matched_skills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
-          const colorClass = matched ? 'bg-primary' : 'bg-surface-variant';
-          const textClass = matched ? 'text-primary font-medium' : 'text-on-surface-variant';
+          const colorClass = matched ? 'bg-emerald-400/10 border border-emerald-400/20 text-emerald-400' : 'bg-rose-400/10 border border-rose-400/20 text-rose-400';
+          const textClass = matched ? 'text-emerald-400 font-medium animate-fade-in' : 'text-rose-400 animate-fade-in';
           const matchLabel = matched ? '✓ Found' : '✗ Missing';
           
           heatmapBody.innerHTML += `
             <tr class="border-b border-outline-variant group">
               <td class="py-3 font-medium text-primary">${skill}</td>
               <td class="py-3 text-center ${textClass}">${matchLabel}</td>
-              <td class="py-3"><div class="mx-auto w-12 h-6 rounded-md ${colorClass} transition-transform group-hover:scale-105" title="${matchLabel}"></div></td>
+              <td class="py-3"><div class="mx-auto w-16 h-6 rounded-md ${colorClass} transition-transform group-hover:scale-105 flex items-center justify-center text-[9px] font-bold" title="${matchLabel}">${matchLabel}</div></td>
             </tr>
           `;
         });
@@ -3058,6 +3193,36 @@ Requirements:
       // GPT Narrative Analysis
       const gptNarrative = document.getElementById('gpt-narrative');
       gptNarrative.innerHTML = renderAIAnalysisReport(r.gpt_analysis);
+
+      // Populate Evidence Mapping Table
+      const evidenceBody = document.getElementById('evidence-mapping-table-body');
+      if (evidenceBody) {
+        evidenceBody.innerHTML = '';
+        if (r.evidence_map && r.evidence_map.length > 0) {
+          r.evidence_map.forEach(item => {
+            const confClass = item.confidence.toLowerCase() === 'high' 
+              ? 'bg-emerald-400/10 text-emerald-400 border border-emerald-400/20' 
+              : 'bg-rose-400/10 text-rose-400 border border-rose-400/20';
+            evidenceBody.innerHTML += `
+              <tr class="border-b border-outline-variant/20 group hover:bg-surface-container-high/40 transition-colors">
+                <td class="py-3 font-semibold text-primary pr-4">${item.jd_requirement}</td>
+                <td class="py-3 text-on-surface-variant leading-relaxed pr-4 font-body-sm">${item.resume_evidence}</td>
+                <td class="py-3 text-center">
+                  <span class="inline-block px-2 py-0.5 rounded-full text-[9px] uppercase tracking-wider font-bold ${confClass}">
+                    ${item.confidence}
+                  </span>
+                </td>
+              </tr>
+            `;
+          });
+        } else {
+          evidenceBody.innerHTML = `
+            <tr>
+              <td colspan="3" class="py-4 text-center text-on-surface-variant italic">No evidence mapping available for this candidate.</td>
+            </tr>
+          `;
+        }
+      }
 
       // Tailored Interview Questions
       const questionsList = document.getElementById('interview-questions');
@@ -3345,7 +3510,7 @@ Requirements:
         const trimmed = line.trim();
         if (!trimmed) continue;
         
-        const headerMatch = trimmed.match(/^(?:\d\.\s*|#+\s*|[-*]\s*)?(Executive Summary|Technical Strengths|Strengths|Weaknesses \/ Gaps|Weaknesses|Gaps|Gaps & Concerns|Concerns|Recommendation|Hiring Verdict|Career Progression|Risk Indicators|Interview Focus Areas|Final Hiring Recommendation|ATS Compatibility|Technical Fit|Experience Relevance|Project Quality)(?:\s*:)?$/i);
+        const headerMatch = trimmed.match(/^(?:\d\.\s*|#+\s*|[-*]\s*)?(Executive Summary|Technical Strengths|Strengths|Missing Capabilities|Weaknesses \/ Gaps|Weaknesses|Gaps|Gaps & Concerns|Concerns|Recommendation|Hiring Verdict|Career Progression|Risk Indicators|Interview Focus Areas|Final Hiring Recommendation|ATS Compatibility|Technical Fit|Experience Relevance|Project Quality)(?:\s*:)?$/i);
         
         if (headerMatch) {
           if (currentSection.content.length > 0 || currentSection.title !== "AI Insights") {
@@ -3374,6 +3539,7 @@ Requirements:
         "Executive Summary": "info",
         "Technical Strengths": "award_star",
         "Strengths": "check_circle",
+        "Missing Capabilities": "do_not_disturb_on",
         "Weaknesses / Gaps": "error",
         "Weaknesses": "error",
         "Gaps": "error",
@@ -3392,6 +3558,7 @@ Requirements:
         "Executive Summary": "border-primary/30 bg-primary/5 text-primary",
         "Technical Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
         "Strengths": "border-emerald-500/30 bg-emerald-500/5 text-emerald-400",
+        "Missing Capabilities": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Weaknesses / Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Weaknesses": "border-rose-500/30 bg-rose-500/5 text-rose-400",
         "Gaps": "border-rose-500/30 bg-rose-500/5 text-rose-400",

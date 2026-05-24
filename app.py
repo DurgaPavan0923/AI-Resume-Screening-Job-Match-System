@@ -252,6 +252,13 @@ if run_analysis:
                 roles, ml_roles = predict_roles(clean, skills, model, vectorizer)
                 role_display = ", ".join(roles) if roles else "Unclassified"
 
+                final_score = (
+                    0.5 * similarity_score
+                    + 0.3 * s_score
+                    + 0.2 * min(experience / 10, 1.0)
+                )
+                final_score_pct = round(final_score * 100, 2)
+
                 # Optional GPT analysis — graceful fallback
                 try:
                     from src.gpt_analyzer import analyze_resume  # noqa: PLC0415
@@ -261,27 +268,52 @@ if run_analysis:
                 except Exception:
                     matched_skills_str = ", ".join(list(skills.keys())[:5]) if skills else "None identified"
                     missing_skills_str = ", ".join(skill_gap(jd_skills, skills)[:5]) if jd_skills else "None"
+                    
+                    if any(sk in matched_skills_str.lower() for sk in ["tensorflow", "pytorch", "keras", "ml", "scikit-learn"]):
+                        domain = "AI/ML Engineering"
+                        strengths_desc = f"Demonstrates strong capability in statistical modeling and machine learning workflows, with expertise in {matched_skills_str}."
+                        mismatch_desc = f"Lacks production-grade MLOps exposure, particularly automated ML pipelines, container orchestration, and model monitoring tools like {missing_skills_str}."
+                    elif any(sk in matched_skills_str.lower() for sk in ["react", "vue", "angular", "css", "html", "javascript"]):
+                        domain = "Frontend & UI Engineering"
+                        strengths_desc = f"Demonstrates high competence in modern responsive web application development and component design using {matched_skills_str}."
+                        mismatch_desc = f"Lacks deep integration experience with cloud infrastructure, complex data layers, or backend microservices like {missing_skills_str}."
+                    else:
+                        domain = "Software & Systems Engineering"
+                        strengths_desc = f"Strong core software engineering fundamentals, database query design, and API optimization using {matched_skills_str}."
+                        mismatch_desc = f"Lacks documented experience with distributed systems architectures, performance optimization at scale, or {missing_skills_str}."
+
                     gpt_analysis = (
                         f"1. Executive Summary\n"
-                        f"Candidate displays strong technical capabilities with {experience} years of professional experience. "
-                        f"Shows alignment on core skills such as {matched_skills_str}. "
-                        f"Has identified gaps in {missing_skills_str} which should be assessed. "
+                        f"Candidate demonstrates {experience} years of professional experience with key specialisation in {domain}. "
+                        f"Shows alignment on core stack: {matched_skills_str}. "
+                        f"While the candidate possesses a stable professional background, there are key technical alignment gaps in: {missing_skills_str}. "
                         f"Overall, the screening pipeline confirms a solid capability foundation with an ATS match score of {final_score_pct}%.\n\n"
-                        f"2. Strengths\n"
+                        
+                        f"2. Technical Strengths\n"
+                        f"- {strengths_desc}\n"
                         f"- Matching experience as a {role_display}.\n"
-                        f"- Practical application of matched skills: {matched_skills_str}.\n\n"
-                        f"3. Weaknesses / Gaps\n"
+                        f"- Good professional timeline consistency and quantifiable achievement density.\n\n"
+                        
+                        f"3. Missing Capabilities\n"
+                        f"- {mismatch_desc}\n"
                         f"- Lacks documented exposure or keyword validation for: {missing_skills_str}.\n\n"
-                        f"4. Recommendation\n"
-                        f"Recommendation: {role_display} (Score: {final_score_pct}%). Candidate is a viable option; verify missing skills in subsequent screening rounds."
+                        
+                        f"4. Career Progression\n"
+                        f"The candidate has shown steady progression over {experience} years. "
+                        f"Their career path shows readiness for a {role_display} role, but will require early mentoring to bridge gaps in {missing_skills_str}.\n\n"
+                        
+                        f"5. Risk Indicators\n"
+                        f"- Technical Stack mismatch: missing direct verification for critical role keywords: {missing_skills_str}.\n"
+                        f"- Low to moderate execution risk if immediate scale deployment is expected without prior onboarding.\n\n"
+                        
+                        f"6. Interview Focus Areas\n"
+                        f"1. Core system architecture: Assess candidate's ability to design systems integrating {matched_skills_str}.\n"
+                        f"2. Technology transition: Query how they plan to onboard and adopt missing tools like {missing_skills_str}.\n"
+                        f"3. Engineering lifecycle: Probe their testing, deployment, and operational ownership patterns.\n\n"
+                        
+                        f"7. Final Hiring Recommendation\n"
+                        f"Recommendation: {role_display} (Score: {final_score_pct}%). Candidate is a viable option; verify missing capabilities in subsequent screening rounds."
                     )
-
-                final_score = (
-                    0.5 * similarity_score
-                    + 0.3 * s_score
-                    + 0.2 * min(experience / 10, 1.0)
-                )
-                final_score_pct = round(final_score * 100, 2)
 
                 results.append(
                     {

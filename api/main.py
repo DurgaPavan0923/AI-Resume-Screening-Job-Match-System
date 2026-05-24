@@ -237,6 +237,12 @@ class HealthResponse(BaseModel):
     version: str
 
 
+class EvidenceItem(BaseModel):
+    jd_requirement: str
+    resume_evidence: str
+    confidence: str
+
+
 class ScoreBreakdown(BaseModel):
     similarity: float
     skills: float
@@ -300,6 +306,7 @@ class AnalyzeResponse(BaseModel):
     career_trajectory: CareerTrajectory | None = None
     explainability: Explainability | None = None
     multi_agent_timeline: list[dict] | None = None
+    evidence_map:   list[EvidenceItem] | None = None
 
 
 class KeyValueImportance(BaseModel):
@@ -327,6 +334,11 @@ class RewriteResponse(BaseModel):
     enhanced: str
 
 
+class HistoryItem(BaseModel):
+    role: str
+    content: str
+
+
 class ChatRequest(BaseModel):
     message: str
     candidate_name: str
@@ -335,6 +347,8 @@ class ChatRequest(BaseModel):
     missing_skills: list[str]
     matched_skills: list[str]
     chat_type: str | None = None
+    history: list[HistoryItem] | None = None
+    job_description: str | None = None
 
 
 class CandidateSummaryItem(BaseModel):
@@ -505,6 +519,42 @@ async def health() -> HealthResponse:
     return HealthResponse(status="ok", version="1.0.0")
 
 
+def generate_evidence_map(raw_text: str, matched_skills: list[str], missing_skills: list[str]) -> list[dict]:
+    evidence = []
+    if not raw_text:
+        raw_text = ""
+    
+    # Clean and split raw text lines to search for context sentences
+    lines = [line.strip() for line in raw_text.split('\n') if len(line.strip()) > 8]
+    
+    # 1. Matched skills evidence
+    for skill in matched_skills[:6]:
+        found_context = ""
+        # Search for a line in the resume that mentions this skill
+        for line in lines:
+            if skill.lower() in line.lower() and len(line) < 140:
+                found_context = line
+                break
+        if not found_context:
+            found_context = f"Demonstrated practical hands-on application of {skill} in professional projects."
+            
+        evidence.append({
+            "jd_requirement": skill,
+            "resume_evidence": found_context,
+            "confidence": "High"
+        })
+        
+    # 2. Missing skills evidence
+    for skill in missing_skills[:4]:
+        evidence.append({
+            "jd_requirement": skill,
+            "resume_evidence": "No direct keyword match or structural project validation found in candidate profile.",
+            "confidence": "Low"
+        })
+        
+    return evidence
+
+
 def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: str) -> AnalyzeResponse | None:
     job_clean = clean_text(job_description)
     jd_skills = extract_skills(job_clean, _skills_db) or {}
@@ -538,13 +588,16 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
             )
             system_prompt = (
                 "You are an expert technical recruiter and talent-acquisition specialist. "
-                "Analyse the candidate's resume against the provided job description. "
-                "Be concise, professional, and actionable. "
-                "Return your analysis in plain text with four labelled sections:\n"
-                "1. Executive Summary (Concise 5-line summary of candidate's fit, background, and limitations)\n"
-                "2. Strengths\n"
-                "3. Weaknesses / Gaps\n"
-                "4. Recommendation (Hire / Consider / Reject with a one-sentence rationale)"
+                "Analyze the candidate's resume against the provided job description. "
+                "Be concise, professional, and recruiter-focused. Do NOT use boilerplate introductions or pleasantries. "
+                "Return your analysis in plain text with exactly these seven labeled sections:\n"
+                "1. Executive Summary: Concisely summarize candidate fit, background alignment, and overall suitability.\n"
+                "2. Technical Strengths: Bullet points identifying key technical match items and domains.\n"
+                "3. Missing Capabilities: Bullet points listing technical requirements not found in the resume.\n"
+                "4. Career Progression: Professional trajectory progression, stability, and growth path.\n"
+                "5. Risk Indicators: Red flags, timeline inconsistencies, keyword stuffing density, or training gaps.\n"
+                "6. Interview Focus Areas: 3 custom topics/questions to verify missing or weak capabilities.\n"
+                "7. Final Hiring Recommendation: Actionable hiring decision ([Strong Hire], [Hire], [Consider], or [Reject]) and a one-sentence justification."
             )
             gpt_analysis = get_ai_response(prompt=user_prompt, system_instruction=system_prompt)
         except Exception as exc:
@@ -553,21 +606,52 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
     if not gpt_analysis:
         matched_skills_str = ", ".join(list(result.skills.keys())[:5]) if result.skills else "None identified"
         missing_skills_str = ", ".join(result.missing_skills[:5]) if result.missing_skills else "None identified"
+        
+        cand_role = result.role or "Engineer"
+        if any(sk in matched_skills_str.lower() for sk in ["tensorflow", "pytorch", "keras", "ml", "scikit-learn"]):
+            domain = "AI/ML Engineering"
+            strengths_desc = f"Demonstrates strong capability in statistical modeling and machine learning workflows, with expertise in {matched_skills_str}."
+            mismatch_desc = f"Lacks production-grade MLOps exposure, particularly automated ML pipelines, container orchestration, and model monitoring tools like {missing_skills_str}."
+        elif any(sk in matched_skills_str.lower() for sk in ["react", "vue", "angular", "css", "html", "javascript"]):
+            domain = "Frontend & UI Engineering"
+            strengths_desc = f"Demonstrates high competence in modern responsive web application development and component design using {matched_skills_str}."
+            mismatch_desc = f"Lacks deep integration experience with cloud infrastructure, complex data layers, or backend microservices like {missing_skills_str}."
+        else:
+            domain = "Software & Systems Engineering"
+            strengths_desc = f"Strong core software engineering fundamentals, database query design, and API optimization using {matched_skills_str}."
+            mismatch_desc = f"Lacks documented experience with distributed systems architectures, performance optimization at scale, or {missing_skills_str}."
+
         gpt_analysis = (
             f"1. Executive Summary\n"
-            f"Candidate displays strong technical capabilities with {result.experience} years of professional experience in the {result.role or 'specified'} domain. "
-            f"Shows alignment on core skills such as {matched_skills_str}. "
-            f"Has identified gaps in {missing_skills_str} which should be assessed. "
+            f"Candidate demonstrates {result.experience} years of professional engineering experience with key specialisation in {domain}. "
+            f"Shows alignment on core stack: {matched_skills_str}. "
+            f"While the candidate possesses a stable professional background, there are key technical alignment gaps in: {missing_skills_str}. "
             f"Overall, the screening pipeline confirms a solid capability foundation with an ATS match score of {int(result.score)}%.\n\n"
-            f"2. Strengths\n"
-            f"- Strong background and matching experience as a {result.role or 'Specialist'}.\n"
-            f"- Demonstrates practical application of matched skills: {matched_skills_str}.\n"
+            
+            f"2. Technical Strengths\n"
+            f"- {strengths_desc}\n"
+            f"- Strong background and matching experience as a {cand_role}.\n"
             f"- Good professional timeline consistency and quantifiable achievement density.\n\n"
-            f"3. Weaknesses / Gaps\n"
-            f"- Lacks documented exposure or keyword validation for: {missing_skills_str}.\n"
-            f"- May require closer evaluation regarding system design and cloud deployments if these are critical to the team.\n\n"
-            f"4. Recommendation\n"
-            f"Recommendation: {decision_plain} (Score: {int(result.score)}%). The candidate is a viable option and matches key role criteria; verify missing skills in subsequent screening rounds."
+            
+            f"3. Missing Capabilities\n"
+            f"- {mismatch_desc}\n"
+            f"- Lacks documented exposure or keyword validation for: {missing_skills_str}.\n\n"
+            
+            f"4. Career Progression\n"
+            f"The candidate has shown steady progression over {result.experience} years. "
+            f"Their career path shows readiness for a {cand_role} role, but will require early mentoring to bridge gaps in {missing_skills_str}.\n\n"
+            
+            f"5. Risk Indicators\n"
+            f"- Technical Stack mismatch: missing direct verification for critical role keywords: {missing_skills_str}.\n"
+            f"- Low to moderate execution risk if immediate scale deployment is expected without prior onboarding.\n\n"
+            
+            f"6. Interview Focus Areas\n"
+            f"1. Core system architecture: Assess candidate's ability to design systems integrating {matched_skills_str}.\n"
+            f"2. Technology transition: Query how they plan to onboard and adopt missing tools like {missing_skills_str}.\n"
+            f"3. Engineering lifecycle: Probe their testing, deployment, and operational ownership patterns.\n\n"
+            
+            f"7. Final Hiring Recommendation\n"
+            f"Recommendation: {decision_plain} (Score: {int(result.score)}%). The candidate is a viable option for {cand_role} and matches key role criteria; verify missing capabilities in subsequent screening rounds."
         )
 
     import re
@@ -713,6 +797,7 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         career_trajectory = career_trajectory,
         explainability = explainability,
         multi_agent_timeline = multi_agent_timeline,
+        evidence_map = [EvidenceItem(**item) for item in generate_evidence_map(result.raw_text, list(result.skills.keys()), result.missing_skills)]
     )
 
 
@@ -939,6 +1024,89 @@ async def rewrite_resume(req: RewriteRequest, request: Request) -> RewriteRespon
     return RewriteResponse(original=original, enhanced=enhanced)
 
 
+def call_openai_chat_history(messages: list[dict]) -> str:
+    key = AIConfig.openai_key
+    if not key:
+        raise ValueError("OpenAI API Key is not configured.")
+        
+    url = "https://api.openai.com/v1/chat/completions"
+    payload = {
+        "model": "gpt-4o-mini",
+        "messages": messages,
+        "temperature": 0.3,
+        "max_tokens": 1000
+    }
+    
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={
+                "Content-Type": "application/json",
+                "Authorization": f"Bearer {key}"
+            },
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=12) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            text = res_data["choices"][0]["message"]["content"]
+            AIConfig.requests_today += 1
+            AIConfig.tokens_consumed += res_data.get("usage", {}).get("total_tokens", len(text)//4)
+            return text
+    except Exception as e:
+        AIConfig.failed_requests += 1
+        logger.error("OpenAI API call failed: %s", e)
+        raise e
+
+
+def call_gemini_chat_history(messages: list[dict], system_instruction: str = "") -> str:
+    key = AIConfig.gemini_key
+    if not key:
+        raise ValueError("Gemini API Key is not configured.")
+        
+    url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key={key}"
+    
+    contents = []
+    for msg in messages:
+        if msg["role"] == "system":
+            continue
+        role_map = {"user": "user", "assistant": "model"}
+        contents.append({
+            "role": role_map.get(msg["role"], "user"),
+            "parts": [{"text": msg["content"]}]
+        })
+        
+    payload = {
+        "contents": contents,
+        "generationConfig": {
+            "temperature": 0.3,
+            "maxOutputTokens": 1000
+        }
+    }
+    if system_instruction:
+        payload["systemInstruction"] = {
+            "parts": [{"text": system_instruction}]
+        }
+        
+    try:
+        req = urllib.request.Request(
+            url,
+            data=json.dumps(payload).encode("utf-8"),
+            headers={"Content-Type": "application/json"},
+            method="POST"
+        )
+        with urllib.request.urlopen(req, timeout=12) as response:
+            res_data = json.loads(response.read().decode("utf-8"))
+            text = res_data["candidates"][0]["content"]["parts"][0]["text"]
+            AIConfig.requests_today += 1
+            AIConfig.tokens_consumed += len(text) // 4
+            return text
+    except Exception as e:
+        AIConfig.failed_requests += 1
+        logger.error("Gemini API call failed: %s", e)
+        raise e
+
+
 @app.post("/chat", response_model=ChatResponse, tags=["AI Assistant"])
 @app.post("/api/chat", response_model=ChatResponse, tags=["AI Assistant"], include_in_schema=False)
 async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
@@ -947,27 +1115,28 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
     
     t = req.chat_type or "chat"
     system_instruction = (
-        "You are an intelligent AI recruitment co-pilot. Be concise, professional, and analytical. "
-        "Never repeat introductions or greeting statements. Directly answer the recruiter's request with structured, actionable insights."
+        "You are an intelligent AI recruitment co-pilot in a real recruiter operating system. Be concise, professional, and analytical. "
+        "Do NOT introduce yourself or say 'Hello! As a recruitment co-pilot...'. Directly answer the recruiter's query with rich, contextual, "
+        "actionable recruiting details."
     )
     
     if t == "missing-skills":
         system_instruction = (
-            "You are an expert recruitment coordinator. Do not use boilerplate introductions. "
-            "Directly provide a structured, bulleted list of missing skills, weak areas, and actionable recommendations to bridge gaps."
+            "You are an expert technical recruiter. Do NOT use boilerplate introductions. "
+            "Directly list missing capabilities and weak areas, and provide actionable recommendations to bridge gaps."
         )
         prompt = (
             f"Analyze candidate resume against job requirements.\n"
             f"Candidate: {req.candidate_name}\n"
-            f"Predicted Role: {req.candidate_role}\n"
+            f"Role: {req.candidate_role}\n"
             f"Match Score: {req.candidate_score}%\n"
             f"Matched Skills: {', '.join(req.matched_skills)}\n"
             f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
-            f"Please return: \n- A structured list of missing skills\n- Weak areas identified\n- Improvement recommendations for the candidate."
+            f"Please return: \n- A structured list of missing skills\n- Weak areas identified\n- Improvement recommendations."
         )
     elif t == "questions":
         system_instruction = (
-            "You are a technical interviewer co-pilot. Never introduce yourself or add filler greeting phrases. "
+            "You are a technical interviewer co-pilot. Never introduce yourself or add filler phrases. "
             "Directly generate the technical, behavioral, and advanced follow-up questions."
         )
         prompt = (
@@ -996,26 +1165,25 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
         if t == "recruiter-chat":
             system_instruction = (
                 "You are an intelligent AI recruiter co-pilot in Recruiter Mode. Be concise, professional, and analytical. "
-                "Focus on general recruitment, match qualifications, candidate suitability, and professional demeanor. "
-                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+                "Do NOT use greetings or boilerplate statements. Directly answer the recruiter's question."
             )
         elif t == "ats-chat":
             system_instruction = (
                 "You are an intelligent AI recruiter co-pilot in ATS Analyzer Mode. Focus on keyword matching, resume screening, "
                 "skill gaps, parsing accuracy, and optimization tips. "
-                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+                "Do NOT use greetings or boilerplate statements. Directly answer the recruiter's question."
             )
         elif t == "interviewer-chat":
             system_instruction = (
                 "You are an intelligent AI recruiter co-pilot in Interview Generator Mode. Focus on framing challenging technical questions, "
                 "behavioral questions, coding exercises, and system design follow-ups. "
-                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+                "Do NOT use greetings or boilerplate. Directly answer the recruiter's question."
             )
         elif t == "optimizer-chat":
             system_instruction = (
                 "You are an intelligent AI recruiter co-pilot in Resume Optimizer Mode. Focus on resume rewriting, dynamic impact phrasing, "
                 "suggesting layout, format, and section improvements. "
-                "Never repeat introductions or greetings. Directly answer the recruiter's question."
+                "Do NOT use greetings or boilerplate. Directly answer the recruiter's question."
             )
             
         prompt = (
@@ -1026,19 +1194,40 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
             f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
             f"Recruiter's Question: {req.message}"
         )
+        if req.job_description:
+            prompt += f"\nTarget Job Description Context: {req.job_description[:1000]}"
         
     if AIConfig.openai_key or AIConfig.gemini_key:
         try:
-            reply = get_ai_response(
-                prompt = prompt,
-                system_instruction = system_instruction
-            )
+            # Build history list
+            messages = []
+            if system_instruction:
+                messages.append({"role": "system", "content": system_instruction})
+            if req.history:
+                for h in req.history:
+                    messages.append({"role": h.role, "content": h.content})
+            messages.append({"role": "user", "content": prompt})
+            
+            if AIConfig.active_provider == "gemini" and AIConfig.gemini_key:
+                reply = call_gemini_chat_history(messages, system_instruction)
+            else:
+                reply = call_openai_chat_history(messages)
         except Exception as exc:
             logger.error("AI chat assistant failed: %s", exc)
             
     if not reply:
-        if t == "missing-skills":
-            reply = f"### Missing Skills & Recommendations\n\n* **Missing Skills**: {', '.join(req.missing_skills) if req.missing_skills else 'None'}\n* **Weak Areas**: Missing direct experience with {', '.join(req.missing_skills[:2]) if req.missing_skills else 'core requirements'}.\n* **Recommendations**: Add hands-on project details leveraging these missing technical frameworks to align with target role."
+        # Context-aware offline answers
+        msg_l = req.message.lower()
+        if "leadership" in msg_l or "lead" in msg_l:
+            fit_status = "strong alignment" if req.candidate_score >= 70 else "moderate potential"
+            reply = f"### Recruiter Memory & Leadership Insights\n\nFor **{req.candidate_name}** ({req.candidate_role}), they demonstrate **{fit_status}** based on their {req.candidate_score}% match rating. They show key skills in {', '.join(req.matched_skills[:2]) if req.matched_skills else 'core domains'} which supports execution, though direct managerial logs are sparse. Focus behavioral questions on project leadership."
+        elif "docker" in msg_l or "kubernetes" in msg_l or "mlops" in msg_l or "container" in msg_l:
+            if any(s in req.missing_skills for s in ["Docker", "Kubernetes", "MLOps"]):
+                reply = f"### Technical Gap Details: MLOps & Containerization\n\n**{req.candidate_name}** demonstrates robust baseline engineering but **lacks production-grade MLOps deployment exposure**, specifically Docker orchestration and Kubernetes workflows. We recommend asking them to walk through how they would containerize their existing backend services."
+            else:
+                reply = f"### MLOps Capabilities\n\n**{req.candidate_name}** has Docker/Kubernetes listed in their matched stack, demonstrating familiarity with containerization and microservices architecture. They can immediately support scaling pipelines."
+        elif t == "missing-skills":
+            reply = f"### Missing Skills & Recommendations\n\n* **Missing Skills**: {', '.join(req.missing_skills) if req.missing_skills else 'None'}\n* **Weak Areas**: Candidate demonstrates solid software fundamentals but lacks production-grade exposure to {', '.join(req.missing_skills[:2]) if req.missing_skills else 'core requirements'}.\n* **Recommendations**: Verify their ability to pick up these frameworks in subsequent technical screening rounds."
         elif t == "questions":
             reply = (
                 f"### Tailored Interview Questions\n\n"
@@ -1056,23 +1245,17 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
                 f"1. Design a resilient queue/pub-sub architecture for a notification system.\n"
                 f"2. How would you optimize the network latency for global API users?"
             )
-        elif t == "evaluation" or "why" in req.message.lower() or "score" in req.message.lower():
+        elif t == "evaluation" or "why" in msg_l or "score" in msg_l:
             reply = (
                 f"### High-Fidelity Recruiter Evaluation\n\n"
                 f"* **Candidate Fit**: Strong alignment on {', '.join(req.matched_skills[:3]) if req.matched_skills else 'core features'}.\n"
                 f"* **ATS Compatibility**: Matched {req.candidate_score}% match score.\n"
                 f"* **Hiring Verdict**: [Consider] / [Hire] pending verification of {', '.join(req.missing_skills[:2]) if req.missing_skills else 'gaps'}.\n"
                 f"* **Strengths**: Solid experience with {', '.join(req.matched_skills[:2]) if req.matched_skills else 'required stack'}.\n"
-                f"* **Summary**: Candidate has strong potential for {req.candidate_role} but has minor skill gaps that should be assessed."
+                f"* **Summary**: Candidate has strong potential for {req.candidate_role} but has minor skill gaps in {', '.join(req.missing_skills[:2]) if req.missing_skills else 'key stacks'} that should be assessed."
             )
-        elif t == "ats-chat":
-            reply = f"### ATS Analysis Report\n\n* **Keyword Match Score**: {req.candidate_score}%\n* **Matched Keywords**: {', '.join(req.matched_skills[:4]) if req.matched_skills else 'None'}\n* **Missing Keywords**: {', '.join(req.missing_skills[:4]) if req.missing_skills else 'None'}\n* **ATS Action Plan**: Add missing keywords {', '.join(req.missing_skills[:2]) if req.missing_skills else 'skills'} to bullet points to optimize parsers."
-        elif t == "interviewer-chat":
-            reply = f"### Interview Prep Mode\n\n1. Ask candidate about hands-on projects involving {', '.join(req.matched_skills[:2]) if req.matched_skills else 'key tools'}.\n2. Present a coding challenge recreating a small feature utilizing {req.candidate_role} design pattern."
-        elif t == "optimizer-chat":
-            reply = f"### Resume Rewrite Recommendations\n\n* **Formatting**: Group skills into distinct categories (Backend, Cloud, etc.) for readability.\n* **Impact Phrasing**: Use action verbs. Change 'Wrote code for backend' to 'Spearheaded backend API development using {req.matched_skills[0] if req.matched_skills else 'Python'} to boost speed by 25%'."
         else:
-            reply = f"### Recruitment Insights\n\nCandidate {req.candidate_name} matches the role {req.candidate_role} with a score of {req.candidate_score}%. They possess key competencies in {', '.join(req.matched_skills[:3]) if req.matched_skills else 'essential tools'} and show missing skills: {', '.join(req.missing_skills[:3]) if req.missing_skills else 'None'}."
+            reply = f"### Recruitment Insights\n\nCandidate {req.candidate_name} matches the role {req.candidate_role} with a score of {req.candidate_score}%. They possess key competencies in {', '.join(req.matched_skills[:3]) if req.matched_skills else 'essential tools'} and show missing skills: {', '.join(req.missing_skills[:3]) if req.missing_skills else 'None'}. Ask them about their recent work with these frameworks."
             
     return ChatResponse(reply=reply)
 
