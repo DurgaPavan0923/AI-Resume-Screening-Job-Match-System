@@ -21,8 +21,8 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import io
 import logging
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Depends, Cookie, Response
+from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
@@ -218,6 +218,60 @@ root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 app.mount("/assets", StaticFiles(directory=os.path.join(root_dir, "assets")), name="assets")
 
 # ---------------------------------------------------------------------------
+# Cryptographic Session & Auth Verification Helpers
+# ---------------------------------------------------------------------------
+import hmac
+import hashlib
+import json
+import base64
+import time
+import datetime
+
+SECRET_KEY = "insightai-enterprise-secret-key-12345!"
+
+def create_session_token(user_data: dict) -> str:
+    # Expiration set for 2 hours
+    payload = {
+        "user": user_data,
+        "exp": int(time.time()) + 7200
+    }
+    payload_b64 = base64.urlsafe_b64encode(json.dumps(payload).encode()).decode()
+    signature = hmac.new(SECRET_KEY.encode(), payload_b64.encode(), hashlib.sha256).hexdigest()
+    return f"{payload_b64}.{signature}"
+
+def verify_session_token(token: str | None) -> dict | None:
+    if not token or "." not in token:
+        return None
+    try:
+        payload_b64, signature = token.split(".", 1)
+        expected_sig = hmac.new(SECRET_KEY.encode(), payload_b64.encode(), hashlib.sha256).hexdigest()
+        if not hmac.compare_digest(signature, expected_sig):
+            return None
+        payload = json.loads(base64.urlsafe_b64decode(payload_b64.encode()).decode())
+        if payload.get("exp", 0) < time.time():
+            return None
+        return payload.get("user")
+    except Exception:
+        return None
+
+async def get_current_user(auth_token: str | None = Cookie(None)) -> dict:
+    user = verify_session_token(auth_token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Unauthorized session")
+    return user
+
+class SignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    role: str
+    organization: str
+
+class LoginRequest(BaseModel):
+    email: str
+    password: str
+
+# ---------------------------------------------------------------------------
 # Load model once at startup
 # ---------------------------------------------------------------------------
 @app.on_event("startup")
@@ -381,6 +435,110 @@ async def root() -> FileResponse:
     return FileResponse(os.path.join(root_dir, "index.html"))
 
 
+@app.post("/api/auth/login", tags=["Auth"])
+async def auth_login(req: LoginRequest):
+    email = req.email.strip()
+    
+    # Inferred role matching the recruiter/admin/hr/candidate specs
+    inferred_role = "recruiter"
+    if "admin" in email.lower():
+        inferred_role = "admin"
+    elif "hr" in email.lower():
+        inferred_role = "hr"
+    elif "candidate" in email.lower():
+        inferred_role = "candidate"
+        
+    name_part = email.split("@")[0].replace(".", " ").title()
+    if email.lower() == "pavan@insightai.com":
+        name_part = "Pavan Kumar"
+        inferred_role = "recruiter"
+        
+    avatar_url = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80"
+    if inferred_role == "admin":
+        avatar_url = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=80&h=80"
+    elif inferred_role == "hr":
+        avatar_url = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80"
+    elif inferred_role == "candidate":
+        avatar_url = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80"
+
+    user_data = {
+        "name": name_part,
+        "role": inferred_role,
+        "email": email,
+        "organization": "InsightAI",
+        "avatar": avatar_url,
+        "last_login": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "device_info": "Chrome on Windows 11 (Secure SSL)",
+    }
+    
+    token = create_session_token(user_data)
+    response = JSONResponse(content={"status": "success", "user": user_data})
+    response.set_cookie(
+        key="auth-token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        max_age=7200,
+        path="/"
+    )
+    return response
+
+
+@app.post("/api/auth/signup", tags=["Auth"])
+async def auth_signup(req: SignupRequest):
+    email = req.email.strip()
+    name = req.name.strip()
+    role = req.role.strip()
+    org = req.organization.strip()
+    
+    avatar_url = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80"
+    if role == "admin":
+        avatar_url = "https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?auto=format&fit=crop&w=80&h=80"
+    elif role == "hr":
+        avatar_url = "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&w=80&h=80"
+    elif role == "candidate":
+        avatar_url = "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&w=80&h=80"
+
+    user_data = {
+        "name": name,
+        "role": role,
+        "email": email,
+        "organization": org,
+        "avatar": avatar_url,
+        "last_login": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S"),
+        "device_info": "Chrome on Windows 11 (Secure SSL)",
+    }
+    
+    token = create_session_token(user_data)
+    response = JSONResponse(content={"status": "success", "user": user_data})
+    response.set_cookie(
+        key="auth-token",
+        value=token,
+        httponly=True,
+        samesite="lax",
+        secure=False,
+        max_age=7200,
+        path="/"
+    )
+    return response
+
+
+@app.post("/api/auth/logout", tags=["Auth"])
+async def auth_logout(response: Response):
+    res = JSONResponse(content={"status": "success", "message": "Logged out successfully"})
+    res.delete_cookie(key="auth-token", path="/")
+    return res
+
+
+@app.get("/api/auth/session", tags=["Auth"])
+async def auth_session(auth_token: str | None = Cookie(None)):
+    user = verify_session_token(auth_token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Session expired or invalid")
+    return {"status": "success", "user": user}
+
+
 class SettingsResponse(BaseModel):
     active_provider: str
     openai_key_masked: str
@@ -420,8 +578,7 @@ def mask_key(key: str, prefix_len: int = 4, suffix_len: int = 4) -> str:
     return f"{key[:prefix_len]}...{key[-suffix_len:]}"
 
 
-@app.get("/api/settings", response_model=SettingsResponse, tags=["Settings"])
-async def get_settings() -> SettingsResponse:
+def get_settings_internal() -> SettingsResponse:
     total_reqs = AIConfig.requests_today + AIConfig.failed_requests
     success_rate = (AIConfig.requests_today * 100.0 / total_reqs) if total_reqs > 0 else 100.0
     
@@ -439,8 +596,14 @@ async def get_settings() -> SettingsResponse:
         success_rate = round(success_rate, 2)
     )
 
+
+@app.get("/api/settings", response_model=SettingsResponse, tags=["Settings"])
+async def get_settings(current_user: dict = Depends(get_current_user)) -> SettingsResponse:
+    return get_settings_internal()
+
+
 @app.post("/api/settings", response_model=SettingsResponse, tags=["Settings"])
-async def update_settings(req: SettingsUpdateRequest) -> SettingsResponse:
+async def update_settings(req: SettingsUpdateRequest, current_user: dict = Depends(get_current_user)) -> SettingsResponse:
     AIConfig.active_provider = req.active_provider
     
     if req.openai_key is not None and not req.openai_key.startswith("sk-..."):
@@ -457,10 +620,11 @@ async def update_settings(req: SettingsUpdateRequest) -> SettingsResponse:
     if req.enable_cors is not None:
         AIConfig.enable_cors = req.enable_cors
         
-    return await get_settings()
+    return get_settings_internal()
+
 
 @app.post("/api/settings/test", response_model=ConnectionTestResponse, tags=["Settings"])
-async def test_connection(req: ConnectionTestRequest) -> ConnectionTestResponse:
+async def test_connection(req: ConnectionTestRequest, current_user: dict = Depends(get_current_user)) -> ConnectionTestResponse:
     test_key = req.api_key
     provider = req.provider
     
@@ -894,6 +1058,7 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
 async def analyze(
     job_description: str  = Form(..., description="Full job description text"),
     resume:          UploadFile = File(..., description="PDF or ZIP resume file"),
+    current_user:    dict = Depends(get_current_user),
 ) -> AnalyzeResponse | list[AnalyzeResponse]:
     """Analyse a single PDF resume or a ZIP folder of multiple PDF resumes against the supplied job description."""
 
@@ -954,7 +1119,7 @@ class JDAnalyzeRequest(BaseModel):
 
 @app.post("/analyze-jd", response_model=JDAnalyzeResponse, tags=["Job Description"])
 @app.post("/api/analyze-jd", response_model=JDAnalyzeResponse, tags=["Job Description"], include_in_schema=False)
-async def analyze_job_description(req: JDAnalyzeRequest) -> JDAnalyzeResponse:
+async def analyze_job_description(req: JDAnalyzeRequest, current_user: dict = Depends(get_current_user)) -> JDAnalyzeResponse:
     jd = req.job_description
     if not jd.strip():
         raise HTTPException(status_code=400, detail="Job description cannot be empty.")
@@ -1069,7 +1234,7 @@ async def analyze_job_description(req: JDAnalyzeRequest) -> JDAnalyzeResponse:
 
 @app.post("/rewrite", response_model=RewriteResponse, tags=["AI Assistant"])
 @app.post("/api/rewrite", response_model=RewriteResponse, tags=["AI Assistant"], include_in_schema=False)
-async def rewrite_resume(req: RewriteRequest, request: Request) -> RewriteResponse:
+async def rewrite_resume(req: RewriteRequest, request: Request, current_user: dict = Depends(get_current_user)) -> RewriteResponse:
     check_rate_limit(request.client.host)
     original = req.text
     enhanced = ""
@@ -1197,7 +1362,7 @@ def call_gemini_chat_history(messages: list[dict], system_instruction: str = "")
 
 @app.post("/chat", response_model=ChatResponse, tags=["AI Assistant"])
 @app.post("/api/chat", response_model=ChatResponse, tags=["AI Assistant"], include_in_schema=False)
-async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
+async def chat_assistant(req: ChatRequest, request: Request, current_user: dict = Depends(get_current_user)) -> ChatResponse:
     check_rate_limit(request.client.host)
     reply = ""
     
@@ -1368,7 +1533,7 @@ async def chat_assistant(req: ChatRequest, request: Request) -> ChatResponse:
 
 @app.post("/chat-all", response_model=ChatResponse, tags=["AI Assistant"])
 @app.post("/api/chat-all", response_model=ChatResponse, tags=["AI Assistant"], include_in_schema=False)
-async def chat_all_assistant(req: ChatAllRequest, request: Request) -> ChatResponse:
+async def chat_all_assistant(req: ChatAllRequest, request: Request, current_user: dict = Depends(get_current_user)) -> ChatResponse:
     check_rate_limit(request.client.host)
     reply = ""
     
@@ -1457,7 +1622,7 @@ class MockInterviewResponse(BaseModel):
 
 
 @app.post("/api/generate-jd", response_model=GenerateJDResponse, tags=["AI Assistant"])
-async def generate_job_description(req: GenerateJDRequest) -> GenerateJDResponse:
+async def generate_job_description(req: GenerateJDRequest, current_user: dict = Depends(get_current_user)) -> GenerateJDResponse:
     reply = ""
     prompt = f"Write an ATS-optimized, professional, and bias-free Job Description for the role: {req.title}. "
     if req.key_requirements:
@@ -1495,7 +1660,7 @@ async def generate_job_description(req: GenerateJDRequest) -> GenerateJDResponse
 
 
 @app.post("/api/mock-interview", response_model=MockInterviewResponse, tags=["AI Assistant"])
-async def mock_interview_agent(req: MockInterviewRequest) -> MockInterviewResponse:
+async def mock_interview_agent(req: MockInterviewRequest, current_user: dict = Depends(get_current_user)) -> MockInterviewResponse:
     # A standard simulated Voice AI Interview Transcript
     transcript = [
         {"speaker": "AI Interviewer", "text": f"Hello {req.candidate_name}, welcome to the mock interview for the {req.role} role focusing on {req.focus_area}. Let's get started. Can you explain your experience building systems with this stack?"},

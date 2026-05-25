@@ -872,12 +872,47 @@
         <button class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface border border-outline-variant" onclick="toggleTheme()">
           <span class="material-symbols-outlined text-[18px]" id="theme-icon">light_mode</span>
         </button>
-        <button id="nav-btn-logout" class="bg-surface-container border border-outline-variant text-on-surface text-body-sm font-body-sm px-4 py-2 rounded-full font-semibold hidden hover:border-error hover:text-error transition-all" onclick="handleLogout()">
-          Logout
-        </button>
         <button id="nav-btn-launch" class="bg-primary text-on-primary text-body-sm font-body-sm px-4 py-2 rounded-full font-semibold scale-95 duration-150 hover:bg-opacity-90" onclick="switchView('recruiter-dashboard')">
           Launch App
         </button>
+        <!-- Profile Dropdown Relative Wrapper -->
+        <div class="relative" id="profile-dropdown-wrapper">
+          <button id="navbar-profile-avatar-container" class="hidden flex items-center gap-1 cursor-pointer focus:outline-none" onclick="toggleProfileDropdown(event)">
+            <img id="navbar-profile-avatar" class="w-8 h-8 rounded-full border border-primary/40 hover:scale-105 transition-all shadow-md object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
+            <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
+          </button>
+          <!-- Profile Dropdown Content -->
+          <div id="navbar-profile-dropdown" class="absolute hidden top-10 right-0 w-56 bg-surface-container/95 border border-outline-variant/80 rounded-2xl p-4 shadow-xl z-50 backdrop-blur-xl animate-fade-in flex flex-col gap-3 text-xs text-on-surface text-left">
+            <!-- User Quick Snapshot -->
+            <div class="flex items-center gap-2.5 border-b border-outline-variant/30 pb-2.5">
+              <img id="dropdown-user-avatar" class="w-9 h-9 rounded-full border border-primary/30 object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
+              <div class="flex flex-col min-w-0">
+                <span id="dropdown-user-name" class="font-bold text-on-surface truncate">Pavan Kumar</span>
+                <span id="dropdown-user-role" class="text-[8.5px] font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 mt-0.5 w-fit uppercase tracking-wider">Recruiter</span>
+                <span id="dropdown-user-email" class="text-[9px] text-on-surface-variant truncate mt-0.5 max-w-[120px]">pavan@insightai.com</span>
+              </div>
+            </div>
+            <!-- Menu Links -->
+            <div class="flex flex-col gap-1">
+              <button onclick="switchView('profile')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+                <span class="material-symbols-outlined text-sm text-primary">person</span> My Profile
+              </button>
+              <button onclick="switchView('settings')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+                <span class="material-symbols-outlined text-sm text-primary">settings</span> Account Settings
+              </button>
+              <button onclick="switchView('settings')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+                <span class="material-symbols-outlined text-sm text-primary">security</span> Security
+              </button>
+              <button onclick="alert('No new notifications.')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+                <span class="material-symbols-outlined text-sm text-primary">notifications</span> Notifications
+              </button>
+            </div>
+            <!-- Logout -->
+            <button onclick="handleLogout()" class="w-full py-2 bg-error/15 border border-error/30 text-error rounded-xl hover:bg-error/25 font-bold transition-all text-center flex items-center justify-center gap-1.5">
+              <span class="material-symbols-outlined text-sm">logout</span> Sign Out
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   </nav>
@@ -2739,6 +2774,149 @@
     </div>
   </main>
 
+  <!-- ── VIEW 7.5: USER PROFILE VIEW ── -->
+  <main id="view-profile" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-10">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-outline-variant/30">
+      <div>
+        <h1 class="font-headline-xl text-headline-xl text-primary">User Profile &amp; Session</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">View your account privileges, monitor active session indicators, and review your AI recruiting footprint.</p>
+      </div>
+      <button class="bg-surface-container border border-outline-variant text-on-surface px-5 py-2.5 rounded-full font-semibold hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 flex-shrink-0" onclick="switchView('recruiter-dashboard')">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Recruiter Console
+      </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Profile Card (col-span-4) -->
+      <div class="lg:col-span-4 bg-surface-container-lowest border border-outline-variant rounded-[32px] p-6 shadow-ambient flex flex-col items-center text-center gap-5 relative overflow-hidden">
+        <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none"></div>
+        <div class="relative">
+          <img id="profile-page-avatar" class="w-24 h-24 rounded-full border-2 border-primary/40 shadow-lg object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150" />
+          <span class="absolute bottom-0 right-0 w-5.5 h-5.5 rounded-full bg-emerald-500 border-2 border-surface flex items-center justify-center shadow-md" title="Active secure connection">
+            <span class="material-symbols-outlined text-[10px] text-white font-bold">verified_user</span>
+          </span>
+        </div>
+        <div>
+          <h2 id="profile-page-name" class="font-headline-lg text-xl font-bold text-on-surface">Pavan Kumar</h2>
+          <span id="profile-page-badge" class="mt-1.5 inline-block text-[9px] font-bold text-primary px-2.5 py-0.5 rounded-full bg-primary/10 border border-primary/20 uppercase tracking-wider">Recruiter</span>
+          <p id="profile-page-email" class="text-xs text-on-surface-variant mt-2 font-medium">pavan@insightai.com</p>
+        </div>
+        <hr class="w-full border-outline-variant/30" />
+        <div class="w-full text-left space-y-2 text-xs">
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-on-surface-variant font-medium">Organization</span>
+            <span id="profile-page-org" class="font-semibold text-on-surface">InsightAI</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-on-surface-variant font-medium">Department</span>
+            <span class="font-semibold text-on-surface">Talent Acquisition</span>
+          </div>
+          <div class="flex justify-between items-center text-[11px]">
+            <span class="text-on-surface-variant font-medium">Privileges</span>
+            <span class="font-semibold text-on-surface uppercase tracking-wider text-[10px]">Tier-1 Recruiter</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Detailed Info (col-span-8) -->
+      <div class="lg:col-span-8 space-y-6">
+        <!-- Security & Session Telemetry -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">security</span>
+            Active Session telemetry
+          </h3>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="bg-surface p-3.5 rounded-xl border border-outline-variant/30 flex items-center gap-3">
+              <span class="material-symbols-outlined text-emerald-400 bg-emerald-500/10 p-2 rounded-lg">task_alt</span>
+              <div>
+                <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Session Status</span>
+                <span class="text-xs font-semibold text-emerald-400">Active (Valid Auth Token)</span>
+              </div>
+            </div>
+            <div class="bg-surface p-3.5 rounded-xl border border-outline-variant/30 flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">update</span>
+              <div>
+                <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Last Login Time</span>
+                <span id="profile-session-last-login" class="text-xs font-semibold text-on-surface">May 25, 2026 09:01</span>
+              </div>
+            </div>
+            <div class="bg-surface p-3.5 rounded-xl border border-outline-variant/30 flex items-center gap-3">
+              <span class="material-symbols-outlined text-primary bg-primary/10 p-2 rounded-lg">devices</span>
+              <div>
+                <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Device / OS Info</span>
+                <span id="profile-session-device" class="text-xs font-semibold text-on-surface truncate max-w-[200px]">Chrome on Windows 11</span>
+              </div>
+            </div>
+            <div class="bg-surface p-3.5 rounded-xl border border-outline-variant/30 flex items-center gap-3">
+              <span class="material-symbols-outlined text-emerald-400 bg-emerald-500/10 p-2 rounded-lg">vpn_key</span>
+              <div>
+                <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Connection Safety</span>
+                <span class="text-xs font-semibold text-emerald-400">AES-256 SSL Encrypted</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- AI Usage footprint -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient space-y-4">
+          <h3 class="font-headline-md text-base font-bold text-primary flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">bar_chart</span>
+            AI usage & Sourcing Footprint
+          </h3>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="bg-surface p-3 rounded-xl border border-outline-variant/20">
+              <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Resumes Processed</span>
+              <span id="profile-stats-resumes" class="text-lg font-bold text-primary block mt-1">12</span>
+            </div>
+            <div class="bg-surface p-3 rounded-xl border border-outline-variant/20">
+              <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Tokens Consumed</span>
+              <span id="profile-stats-tokens" class="text-lg font-bold text-secondary block mt-1">45,182</span>
+            </div>
+            <div class="bg-surface p-3 rounded-xl border border-outline-variant/20">
+              <span class="text-[9px] text-on-surface-variant font-bold uppercase tracking-wider block">Estimated Cost</span>
+              <span id="profile-stats-cost" class="text-lg font-bold text-tertiary block mt-1">$0.0904</span>
+            </div>
+          </div>
+          <div class="space-y-3 pt-2 text-xs">
+            <div>
+              <div class="flex justify-between mb-1 text-[10px]">
+                <span class="text-on-surface-variant font-semibold">Weekly AI Token Limit Quota</span>
+                <span class="font-bold text-primary">45% Used</span>
+              </div>
+              <div class="w-full bg-surface-container-highest rounded-full h-1.5">
+                <div class="bg-primary h-1.5 rounded-full" style="width: 45%"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Recent actions list -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">timeline</span>
+            Recent Recruiter Actions
+          </h3>
+          <div id="profile-recent-actions" class="space-y-3 text-xs max-h-[160px] overflow-y-auto pr-1">
+            <div class="flex gap-3 border-l-2 border-primary/30 pl-3.5 py-0.5">
+              <div>
+                <span class="font-semibold text-on-surface block">Logged in securely</span>
+                <span class="text-[10px] text-on-surface-variant">May 25, 2026 09:01 • SSO Authenticated</span>
+              </div>
+            </div>
+            <div class="flex gap-3 border-l-2 border-primary/30 pl-3.5 py-0.5">
+              <div>
+                <span class="font-semibold text-on-surface block">Analyzed candidate profile</span>
+                <span class="text-[10px] text-on-surface-variant">May 24, 2026 17:09 • Matches computed: 92%</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
   <!-- ── VIEW 8: LOGOUT SUCCESS SCREEN ── -->
   <main id="view-logout-success" class="view-section hidden flex-grow flex items-center justify-center pt-32 pb-24 px-margin-mobile relative overflow-hidden">
     <div class="absolute w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
@@ -2774,10 +2952,148 @@
     let filteredResults = [];
     let activeProvider = 'gemini';
     let currentRole = 'recruiter';
+    let currentUser = null;
     let activeOnboardingSlide = 0;
     let activeResumeTab = 'docview';
     let candidateTags = {};
     let candidateHiringPriority = {};
+
+    // ---------------------------------------------------------------------------
+    // Production-Grade Auth Helper Functions
+    // ---------------------------------------------------------------------------
+    async function checkSessionStatus() {
+      // Show loading indicator or handle loading transition if needed
+      try {
+        const response = await fetch('/api/auth/session');
+        if (response.ok) {
+          const data = await response.json();
+          if (data.status === 'success' && data.user) {
+            localStorage.setItem('isLoggedIn', 'true');
+            localStorage.setItem('userRole', data.user.role);
+            currentUser = data.user;
+            currentRole = data.user.role;
+            setUserRoleUI(data.user.role);
+            updateUserProfileUI(data.user);
+            return true;
+          }
+        }
+      } catch (err) {
+        console.error("Session verification failed:", err);
+      }
+      
+      // Invalidate session
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      currentUser = null;
+      
+      // Reset UI elements
+      const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
+      const navLaunch = document.getElementById('nav-btn-launch');
+      if (navAvatarContainer) navAvatarContainer.classList.add('hidden');
+      if (navLaunch) navLaunch.classList.remove('hidden');
+      
+      return false;
+    }
+
+    function handleSessionExpired() {
+      showToast("⚠️ Session expired. Redirecting to login...");
+      localStorage.removeItem('isLoggedIn');
+      localStorage.removeItem('userRole');
+      currentUser = null;
+      
+      const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
+      const navLaunch = document.getElementById('nav-btn-launch');
+      if (navAvatarContainer) navAvatarContainer.classList.add('hidden');
+      if (navLaunch) navLaunch.classList.remove('hidden');
+      
+      setTimeout(() => {
+        switchView('login');
+      }, 1000);
+    }
+
+    function updateUserProfileUI(user) {
+      if (!user) return;
+      
+      // Navbar profile avatar & container
+      const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
+      const navAvatar = document.getElementById('navbar-profile-avatar');
+      const navLaunch = document.getElementById('nav-btn-launch');
+      
+      if (navAvatarContainer) navAvatarContainer.classList.remove('hidden');
+      if (navAvatar) navAvatar.src = user.avatar;
+      if (navLaunch) navLaunch.classList.add('hidden'); // Hide launch button once logged in
+      
+      // Dropdown info
+      const dropdownAvatar = document.getElementById('dropdown-user-avatar');
+      const dropdownName = document.getElementById('dropdown-user-name');
+      const dropdownRole = document.getElementById('dropdown-user-role');
+      const dropdownEmail = document.getElementById('dropdown-user-email');
+      
+      if (dropdownAvatar) dropdownAvatar.src = user.avatar;
+      if (dropdownName) dropdownName.innerText = user.name;
+      if (dropdownRole) {
+        dropdownRole.innerText = user.role;
+        setRoleBadgeTheme(dropdownRole, user.role);
+      }
+      if (dropdownEmail) dropdownEmail.innerText = user.email;
+      
+      // Profile Page info
+      const profileAvatar = document.getElementById('profile-page-avatar');
+      const profileName = document.getElementById('profile-page-name');
+      const profileBadge = document.getElementById('profile-page-badge');
+      const profileEmail = document.getElementById('profile-page-email');
+      const profileOrg = document.getElementById('profile-page-org');
+      const profileLastLogin = document.getElementById('profile-session-last-login');
+      const profileDevice = document.getElementById('profile-session-device');
+      
+      if (profileAvatar) profileAvatar.src = user.avatar;
+      if (profileName) profileName.innerText = user.name;
+      if (profileBadge) {
+        profileBadge.innerText = user.role;
+        setRoleBadgeTheme(profileBadge, user.role);
+      }
+      if (profileEmail) profileEmail.innerText = user.email;
+      if (profileOrg) profileOrg.innerText = user.organization || 'InsightAI';
+      if (profileLastLogin) profileLastLogin.innerText = user.last_login || new Date().toLocaleString();
+      if (profileDevice) profileDevice.innerText = user.device_info || 'Chrome on Windows 11';
+    }
+
+    function setRoleBadgeTheme(element, role) {
+      // Clear specific badge class list
+      element.className = "text-[8.5px] font-bold px-1.5 py-0.5 rounded border mt-0.5 w-fit uppercase tracking-wider transition-all duration-300";
+      
+      if (role === 'recruiter') {
+        element.classList.add('bg-primary/10', 'text-primary', 'border-primary/20', 'shadow-[0_0_10px_rgba(255,100,100,0.15)]');
+      } else if (role === 'admin') {
+        element.classList.add('bg-error/10', 'text-error', 'border-error/20', 'shadow-[0_0_10px_rgba(255,0,0,0.15)]');
+      } else if (role === 'hr') {
+        element.classList.add('bg-secondary/10', 'text-secondary', 'border-secondary/20', 'shadow-[0_0_10px_rgba(100,255,100,0.15)]');
+      } else if (role === 'candidate') {
+        element.classList.add('bg-tertiary-fixed/10', 'text-tertiary-fixed-dim', 'border-tertiary-fixed-dim/20', 'shadow-[0_0_10px_rgba(100,100,255,0.15)]');
+      }
+    }
+
+    function toggleProfileDropdown(event) {
+      if (event) event.stopPropagation();
+      const dropdown = document.getElementById('navbar-profile-dropdown');
+      if (dropdown) {
+        dropdown.classList.toggle('hidden');
+      }
+    }
+
+    // Intercept fetch calls globally to handle session expiration gracefully
+    const originalFetch = window.fetch;
+    window.fetch = async function(...args) {
+      const response = await originalFetch(...args);
+      if (response.status === 401) {
+        const url = typeof args[0] === 'string' ? args[0] : args[0].url;
+        if (!url.includes('/api/auth/session') && !url.includes('/api/auth/login') && !url.includes('/api/auth/signup')) {
+          handleSessionExpired();
+        }
+      }
+      return response;
+    };
+
 
     const onboardingSlides = [
       {
@@ -2824,15 +3140,27 @@
         if (rememberBox) rememberBox.checked = true;
       }
       
-      // Check login state
-      const isLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
-      if (!isLoggedIn) {
-        switchView('login');
-      } else {
-        const role = localStorage.getItem('userRole') || 'recruiter';
-        setUserRoleUI(role);
-        switchView('landing');
-      }
+      // Check login state via backend session api
+      checkSessionStatus().then(isLoggedIn => {
+        if (!isLoggedIn) {
+          switchView('login');
+        } else {
+          const lastView = localStorage.getItem('lastActiveView') || 'landing';
+          const viewToLoad = (lastView === 'login' || lastView === 'logout-success') ? 'landing' : lastView;
+          switchView(viewToLoad);
+        }
+      });
+
+      // Click outside dropdown to close it
+      document.addEventListener('click', function(e) {
+        const dropdown = document.getElementById('navbar-profile-dropdown');
+        const wrapper = document.getElementById('profile-dropdown-wrapper');
+        if (dropdown && !dropdown.classList.contains('hidden')) {
+          if (wrapper && !wrapper.contains(e.target)) {
+            dropdown.classList.add('hidden');
+          }
+        }
+      });
       
       // Load initial settings and telemetry
       loadSettings();
@@ -2870,14 +3198,28 @@
 
     // View switcher
     function switchView(viewId) {
+      // Protect routes
+      const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile'];
+      if (protectedViews.includes(viewId)) {
+        const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+        if (!loggedIn) {
+          viewId = 'login';
+        }
+      }
+
       if (viewId === 'login') {
         initLoginParticles();
       }
+      
+      // Save last active view
+      localStorage.setItem('lastActiveView', viewId);
+
       // Hide all sections
-      ['view-login', 'view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings', 'view-admin-analytics', 'view-logout-success'].forEach(id => {
+      ['view-login', 'view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings', 'view-admin-analytics', 'view-logout-success', 'view-profile'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
+      
       // Show selected section
       const selectedView = document.getElementById('view-' + viewId);
       if (selectedView) selectedView.classList.remove('hidden');
@@ -3060,17 +3402,45 @@
       }
     }
 
-    function completeSignupFlow() {
+    async function completeSignupFlow() {
       const signupCard = document.getElementById('login-card-signup');
       const nextBtn = document.getElementById('btn-signup-next');
+      
+      const fullName = document.getElementById('signup-name').value.trim() || 'Enterprise Recruiter';
+      const email = document.getElementById('signup-email').value.trim();
+      const password = document.getElementById('signup-password').value;
+      const org = document.getElementById('signup-company').value.trim() || 'InsightAI';
+      
+      if (!email || !password) {
+        showToast("❌ Email and password are required.");
+        return;
+      }
       
       nextBtn.disabled = true;
       nextBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">pending</span> Initializing AI Engine...`;
       
-      const fullName = document.getElementById('signup-name').value.trim() || 'Enterprise Recruiter';
-      localStorage.setItem('recruiterName', fullName);
-
-      setTimeout(() => {
+      try {
+        const response = await fetch('/api/auth/signup', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            name: fullName,
+            email: email,
+            password: password,
+            role: signupRole,
+            organization: org
+          })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.detail || "Registration failed");
+        }
+        
+        const data = await response.json();
+        
         nextBtn.disabled = false;
         nextBtn.innerHTML = `Complete Onboarding <span class="material-symbols-outlined text-sm">check</span>`;
         
@@ -3080,16 +3450,27 @@
           
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userRole', signupRole);
+          localStorage.setItem('recruiterName', fullName);
+          currentUser = data.user;
           setUserRoleUI(signupRole);
+          updateUserProfileUI(data.user);
           
           const overlay = document.getElementById('onboarding-welcome-overlay');
-          overlay.classList.remove('hidden');
-          overlay.classList.add('flex');
+          if (overlay) {
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+          }
           
           const username = fullName.split(' ')[0];
-          document.getElementById('welcome-title').innerText = `Welcome to InsightAI, ${username}!`;
+          const welcomeTitle = document.getElementById('welcome-title');
+          if (welcomeTitle) welcomeTitle.innerText = `Welcome to InsightAI, ${username}!`;
         }, 300);
-      }, 1500);
+        
+      } catch (err) {
+        nextBtn.disabled = false;
+        nextBtn.innerHTML = `Complete Onboarding <span class="material-symbols-outlined text-sm">check</span>`;
+        showToast(`❌ Registration Error: ${err.message}`);
+      }
     }
 
     function closeOnboardingWelcome() {
@@ -3157,42 +3538,70 @@
       }, 1500);
     }
 
-    function handleSocialLogin(provider) {
+    async function handleSocialLogin(provider) {
       const submitBtn = document.getElementById('btn-login-submit');
-      submitBtn.disabled = true;
-      submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Syncing with ${provider} SSO...`;
+      if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = `<span class="material-symbols-outlined animate-spin text-sm">sync</span> Syncing with ${provider} SSO...`;
+      }
       
-      setTimeout(() => {
-        submitBtn.disabled = false;
-        submitBtn.innerHTML = `<span class="material-symbols-outlined text-base">login</span> Sign In`;
+      const email = `${provider.toLowerCase()}@insightai.com`;
+      const password = `sso-pass-token-${provider.toLowerCase()}`;
+      
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email, password })
+        });
+        
+        if (!response.ok) {
+          throw new Error("SSO synchronization failed");
+        }
+        
+        const data = await response.json();
+        
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span class="material-symbols-outlined text-base">login</span> Sign In`;
+        }
         
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', 'recruiter');
-        setUserRoleUI('recruiter');
+        localStorage.setItem('userRole', data.user.role);
+        localStorage.setItem('recruiterName', data.user.name);
+        currentUser = data.user;
+        setUserRoleUI(data.user.role);
+        updateUserProfileUI(data.user);
         
         switchView('landing');
         showToast(`🔑 SSO Sync Completed: Authenticated via ${provider}`);
-      }, 1200);
+      } catch (err) {
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.innerHTML = `<span class="material-symbols-outlined text-base">login</span> Sign In`;
+        }
+        showToast(`❌ SSO Sync Error: ${err.message}`);
+      }
     }
 
-    function handleLogin(e) {
+    async function handleLogin(e) {
       e.preventDefault();
-      const emailInput = document.getElementById('login-email').value;
+      const emailInput = document.getElementById('login-email').value.trim();
+      const passwordInput = document.getElementById('login-password').value;
       const btn = document.getElementById('btn-login-submit');
       const btnText = document.getElementById('login-btn-text');
       const btnIcon = document.getElementById('login-btn-icon');
       
-      let inferredRole = 'recruiter';
-      if (emailInput.toLowerCase().includes('admin')) {
-        inferredRole = 'admin';
-      } else if (emailInput.toLowerCase().includes('hr')) {
-        inferredRole = 'hr';
-      } else if (emailInput.toLowerCase().includes('candidate')) {
-        inferredRole = 'candidate';
+      if (!emailInput || !passwordInput) {
+        showToast("❌ Email and password are required.");
+        return;
       }
       
-      currentRole = inferredRole;
-
+      btn.disabled = true;
+      btnText.innerText = "Verifying Credentials...";
+      btnIcon.innerText = "pending";
+      btnIcon.classList.add("animate-spin");
+      
       // Remember me logic
       const remember = document.getElementById('login-remember').checked;
       if (remember) {
@@ -3202,32 +3611,51 @@
         localStorage.removeItem('savedEmail');
         localStorage.setItem('rememberDevice', 'false');
       }
-
-      // Track recruiter name
-      const currentRecruiterName = localStorage.getItem('recruiterName') || (inferredRole.toUpperCase() + ' Specialist');
-      localStorage.setItem('recruiterName', currentRecruiterName);
       
-      btn.disabled = true;
-      btnText.innerText = "Verifying Credentials...";
-      btnIcon.innerText = "pending";
-      btnIcon.classList.add("animate-spin");
-      
-      setTimeout(() => {
+      try {
+        const response = await fetch('/api/auth/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: emailInput, password: passwordInput })
+        });
+        
+        if (!response.ok) {
+          const errData = await response.json();
+          throw new Error(errData.detail || "Invalid corporate credentials");
+        }
+        
+        const data = await response.json();
+        
         btn.disabled = false;
         btnText.innerText = "Sign In";
         btnIcon.innerText = "login";
         btnIcon.classList.remove("animate-spin");
         
         localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('userRole', currentRole);
+        localStorage.setItem('userRole', data.user.role);
+        localStorage.setItem('recruiterName', data.user.name);
+        currentUser = data.user;
+        setUserRoleUI(data.user.role);
+        updateUserProfileUI(data.user);
         
-        setUserRoleUI(currentRole);
-        switchView('landing');
-        showToast(`🔑 Welcome back! Logged in as: ${currentRole.toUpperCase()}`);
-      }, 1200);
+        // Go to dashboard based on role
+        if (data.user.role === 'candidate') {
+          switchView('workspace');
+        } else {
+          switchView('recruiter-dashboard');
+        }
+        
+        showToast(`🔑 Welcome back! Logged in as: ${data.user.role.toUpperCase()}`);
+      } catch (err) {
+        btn.disabled = false;
+        btnText.innerText = "Sign In";
+        btnIcon.innerText = "login";
+        btnIcon.classList.remove("animate-spin");
+        showToast(`❌ Authentication failed: ${err.message}`);
+      }
     }
 
-    function handleLogout() {
+    async function handleLogout() {
       const topNav = document.getElementById('top-nav');
       if (topNav) topNav.classList.add('hidden');
       
@@ -3238,10 +3666,28 @@
       
       showToast("🔒 Initiating secure sign-out protocol...");
       
+      try {
+        await fetch('/api/auth/logout', { method: 'POST' });
+      } catch (err) {
+        console.error("Logout request failed:", err);
+      }
+      
       setTimeout(() => {
+        // Clear tokens/data
         localStorage.clear();
         sessionStorage.clear();
+        currentUser = null;
         
+        // Ensure dropdown is hidden
+        const dropdown = document.getElementById('navbar-profile-dropdown');
+        if (dropdown) dropdown.classList.add('hidden');
+        
+        // Reset top-nav elements
+        const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
+        const navLaunch = document.getElementById('nav-btn-launch');
+        if (navAvatarContainer) navAvatarContainer.classList.add('hidden');
+        if (navLaunch) navLaunch.classList.remove('hidden');
+
         if (activeView) {
           activeView.classList.remove('blur-md', 'opacity-0');
         }

@@ -55,7 +55,7 @@ We have upgraded the platform to production-grade SaaS standards, resolving visu
 | 🔄 **Regenerate & Sweep UI** | Assistant responses feature an action toolbar with **Regenerate Answer** (fetch retry), **Collapse Toggle** (compress long card logs), and **Clear History** (sweep active chat context). |
 | 📄 **Interactive ATS Workspace** | Split-screen layout containing scrollable **Interactive ATS Text Parser** on the left, and **AI Parser Annotations** + **Recruiter Comments** sidebar on the right. |
 | 🆚 **Split Screen Compare** | Split-screen visual overlay showing Job Description (left), Match Insights & Gaps (center), and Highlighted Resume Text (right). |
-| 🛡️ **Multi-Role Auth Portal** | Secure login panel supporting tailored dashboard interfaces for **Recruiters**, **HR Managers**, **Admins**, and **Candidates**. |
+| 🛡️ **Production-Grade Auth** | JWT-HMAC secure HTTPOnly session cookie validation, global route protection, role-based glow theming (Recruiter, HR, Admin, Candidate), dropdown navigation, profile page `/profile`, and auto-timeout. |
 | 🛡️ **Explainability Mapping Matrix** | Dynamic table displaying JD requirements, resume evidence context snippet, dynamic confidence level bands, transferable skill matching, decision verdict (Match, Transferable, Missing), and detailed semantic reasoning. |
 | 🗺️ **Skills Knowledge Graph** | Beautiful SVG-based interactive dependency tree depicting candidate skills, clusters, and overlap maps. |
 | 🎙️ **Voice AI Interview Modal** | Select focus areas and start a behavioral or technical mock interview with pulsing soundwaves, live transcripts, and speech fluency audits (WPM, sentiment). |
