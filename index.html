@@ -504,6 +504,63 @@
     .delay-3 { animation-delay: 240ms; }
     .delay-4 { animation-delay: 320ms; }
 
+    /* Premium SaaS Animation Keyframes */
+    .hero-reveal-word {
+      display: inline-block;
+      opacity: 0;
+      filter: blur(8px);
+      transform: translateY(15px);
+      animation: revealWord 0.85s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes revealWord {
+      to {
+        opacity: 1;
+        filter: blur(0);
+        transform: translateY(0);
+      }
+    }
+    
+    .text-shimmer {
+      background: linear-gradient(90deg, var(--color-on-surface) 0%, var(--color-primary) 25%, var(--color-secondary) 50%, var(--color-primary) 75%, var(--color-on-surface) 100%);
+      background-size: 200% auto;
+      color: transparent;
+      -webkit-background-clip: text;
+      background-clip: text;
+      animation: textShimmer 5s linear infinite;
+    }
+    @keyframes textShimmer {
+      to { background-position: 200% center; }
+    }
+
+    .step-active-glow {
+      box-shadow: 0 0 15px rgba(var(--color-primary-rgb), 0.5);
+      animation: pulseActive 1.5s ease-in-out infinite alternate;
+    }
+    @keyframes pulseActive {
+      0% { transform: scale(1); box-shadow: 0 0 8px rgba(0, 90, 194, 0.3); }
+      100% { transform: scale(1.06); box-shadow: 0 0 18px rgba(0, 90, 194, 0.65); }
+    }
+
+    @keyframes floatOrb {
+      0% { transform: translate(0, 0) scale(1); }
+      33% { transform: translate(40px, -60px) scale(1.08); }
+      66% { transform: translate(-30px, 30px) scale(0.94); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+    .animate-float-orb {
+      animation: floatOrb infinite ease-in-out;
+    }
+
+    .typing-cursor {
+      animation: blink-caret 0.75s step-end infinite;
+      color: var(--color-secondary);
+      font-weight: bold;
+    }
+    @keyframes blink-caret {
+      from, to { opacity: 0 }
+      50% { opacity: 1 }
+    }
+
     /* Mobile viewport responsive overrides */
     @media (max-width: 768px) {
       .grid-cols-12 {
@@ -882,33 +939,33 @@
             <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
           </button>
           <!-- Profile Dropdown Content -->
-          <div id="navbar-profile-dropdown" class="absolute hidden top-10 right-0 w-56 bg-surface-container/95 border border-outline-variant/80 rounded-2xl p-4 shadow-xl z-50 backdrop-blur-xl animate-fade-in flex flex-col gap-3 text-xs text-on-surface text-left">
+          <div id="navbar-profile-dropdown" class="absolute top-11 right-0 w-60 bg-white/98 dark:bg-[#0c1020]/96 border border-slate-200 dark:border-slate-800/80 rounded-[24px] p-4 shadow-2xl z-[9999] backdrop-blur-2xl flex flex-col gap-3.5 text-xs text-left transition-all duration-200 origin-top-right transform scale-96 opacity-0 pointer-events-none">
             <!-- User Quick Snapshot -->
-            <div class="flex items-center gap-2.5 border-b border-outline-variant/30 pb-2.5">
-              <img id="dropdown-user-avatar" class="w-9 h-9 rounded-full border border-primary/30 object-cover" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
+            <div class="flex items-center gap-3 bg-slate-50/90 dark:bg-black/35 border border-slate-100 dark:border-white/5 p-3 rounded-xl min-w-0">
+              <img id="dropdown-user-avatar" class="w-10 h-10 rounded-full border border-primary/30 object-cover flex-shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
               <div class="flex flex-col min-w-0">
-                <span id="dropdown-user-name" class="font-bold text-on-surface truncate">Pavan Kumar</span>
-                <span id="dropdown-user-role" class="text-[8.5px] font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 mt-0.5 w-fit uppercase tracking-wider">Recruiter</span>
-                <span id="dropdown-user-email" class="text-[9px] text-on-surface-variant truncate mt-0.5 max-w-[120px]">pavan@insightai.com</span>
+                <span id="dropdown-user-name" class="font-bold text-slate-900 dark:text-white text-sm truncate leading-tight">Pavan Kumar</span>
+                <span id="dropdown-user-role" class="text-[8.5px] font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 mt-1 w-fit uppercase tracking-wider">Recruiter</span>
+                <span id="dropdown-user-email" class="text-[9px] text-slate-500 dark:text-slate-300 truncate mt-1 max-w-[130px]">pavan@insightai.com</span>
               </div>
             </div>
             <!-- Menu Links -->
             <div class="flex flex-col gap-1">
-              <button onclick="switchView('profile')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+              <button onclick="switchView('profile')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">person</span> My Profile
               </button>
-              <button onclick="switchView('settings')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+              <button onclick="switchView('settings')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">settings</span> Account Settings
               </button>
-              <button onclick="switchView('settings')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+              <button onclick="switchView('settings')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">security</span> Security
               </button>
-              <button onclick="alert('No new notifications.')" class="flex items-center gap-2 px-2.5 py-1.5 rounded-lg hover:bg-surface-container-high transition-colors font-medium text-left">
+              <button onclick="alert('No new notifications.')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">notifications</span> Notifications
               </button>
             </div>
             <!-- Logout -->
-            <button onclick="handleLogout()" class="w-full py-2 bg-error/15 border border-error/30 text-error rounded-xl hover:bg-error/25 font-bold transition-all text-center flex items-center justify-center gap-1.5">
+            <button onclick="handleLogout()" class="w-full mt-1 py-2.5 bg-red-500/10 dark:bg-red-500/15 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/25 hover:text-red-700 dark:hover:text-red-200 rounded-xl font-bold transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-sm">logout</span> Sign Out
             </button>
           </div>
@@ -918,11 +975,29 @@
   </nav>
 
   <!-- ── VIEW 1: LANDING MARKETING PAGE ── -->
-  <main id="view-landing" class="view-section flex-grow pt-32 pb-24 md:pt-48 md:pb-32">
-    <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+  <main id="view-landing" class="view-section flex-grow pt-32 pb-24 md:pt-48 md:pb-32 relative overflow-hidden">
+    <!-- Premium background floating orbs -->
+    <div class="absolute inset-0 pointer-events-none overflow-hidden z-0">
+      <div class="absolute top-[10%] left-[5%] w-[350px] h-[350px] rounded-full bg-primary/10 blur-[100px] animate-float-orb" style="animation-duration: 25s;"></div>
+      <div class="absolute top-[35%] right-[10%] w-[400px] h-[400px] rounded-full bg-secondary/8 blur-[120px] animate-float-orb" style="animation-duration: 35s; animation-delay: -5s;"></div>
+      <div class="absolute bottom-[15%] left-[20%] w-[300px] h-[300px] rounded-full bg-tertiary/10 blur-[90px] animate-float-orb" style="animation-duration: 30s; animation-delay: -10s;"></div>
+    </div>
+    
+    <section class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop grid grid-cols-1 lg:grid-cols-2 gap-16 items-center relative z-10">
       <div class="space-y-8">
-        <h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary leading-tight">
-          Land Better Jobs with <span class="text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary-fixed-dim">AI-Powered</span> Resume Matching.
+        <!-- Dynamic Typing Subtitle -->
+        <div class="h-6 font-semibold text-secondary tracking-wide uppercase text-[10px] flex items-center gap-1.5" id="hero-typing-container">
+          <span class="material-symbols-outlined text-[12px] animate-pulse">adjust</span>
+          <span id="hero-typing-text"></span><span class="typing-cursor">|</span>
+        </div>
+        <h1 class="font-display-lg-mobile text-display-lg-mobile md:font-display-lg md:text-display-lg text-primary leading-tight flex flex-wrap gap-x-2.5 gap-y-1" id="hero-headline">
+          <span class="hero-reveal-word" style="animation-delay: 0.1s">AI-Powered</span>
+          <span class="hero-reveal-word" style="animation-delay: 0.22s">Resume</span>
+          <span class="hero-reveal-word" style="animation-delay: 0.34s">Intelligence</span>
+          <span class="hero-reveal-word text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary-fixed-dim" style="animation-delay: 0.46s">Built</span>
+          <span class="hero-reveal-word text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary-fixed-dim" style="animation-delay: 0.58s">for</span>
+          <span class="hero-reveal-word text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary-fixed-dim" style="animation-delay: 0.7s">Modern</span>
+          <span class="hero-reveal-word text-transparent bg-clip-text bg-gradient-to-r from-secondary to-tertiary-fixed-dim" style="animation-delay: 0.82s">Recruiters.</span>
         </h1>
         <p class="font-body-lg text-body-lg text-on-surface-variant max-w-xl">
           Stop guessing what ATS systems want. Our intelligence engine analyzes resumes against job descriptions in real-time, providing actionable insights and recruiter-grade bento analytics dashboards instantly.
@@ -971,7 +1046,7 @@
                   <circle class="text-secondary stroke-current" cx="50" cy="50" fill="transparent" r="40" stroke-dasharray="251.2" stroke-dashoffset="30" stroke-linecap="round" stroke-width="8"></circle>
                 </svg>
                 <div class="absolute inset-0 flex items-center justify-center">
-                  <span class="font-headline-md text-headline-md text-primary text-2xl">88<span class="text-sm text-on-surface-variant">%</span></span>
+                  <span class="font-headline-md text-headline-md text-primary text-2xl" id="landing-hero-score">88<span class="text-sm text-on-surface-variant">%</span></span>
                 </div>
               </div>
               <span class="font-label-caps text-label-caps text-on-surface-variant">Match Score</span>
@@ -1461,62 +1536,63 @@
           <p class="font-body-sm text-body-sm text-on-surface-variant" id="processing-status-text">Uploading documents...</p>
         </div>
       </div>
-      
       <div class="space-y-6 relative">
         <div class="absolute left-4 top-4 bottom-4 w-px bg-outline-variant z-0"></div>
         
         <!-- Step 1 -->
         <div class="flex items-start gap-4 relative z-10" id="step-parsing">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-1">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300" id="step-icon-1">
             <span class="material-symbols-outlined text-[16px]">sync</span>
           </div>
           <div class="flex-grow">
-            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-1">PDF Text Extraction</p>
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-1">Parsing Resume</p>
             <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-1">Extracting clean textual details from uploaded resumes.</p>
           </div>
         </div>
         
         <!-- Step 2 -->
         <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-skills">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-2">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300" id="step-icon-2">
             <span class="material-symbols-outlined text-[16px]">pending</span>
           </div>
           <div class="flex-grow">
-            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-2">Skills &amp; NLP Extraction</p>
-            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-2">Extracting candidate experience, education, and matching skills gaps.</p>
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-2">Extracting Skills</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-2">Mapping technical capabilities and identifying transferability gaps.</p>
           </div>
         </div>
         
         <!-- Step 3 -->
         <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-scoring">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-3">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300" id="step-icon-3">
             <span class="material-symbols-outlined text-[16px]">pending</span>
           </div>
           <div class="flex-grow">
-            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-3">Centroid Matching &amp; AI Explainer</p>
-            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-3">Running similarity engines and generating GPT narrative feedback.</p>
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-3">Running Semantic Matching</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-3">Calculating vector distance centroids against job specification criteria.</p>
           </div>
         </div>
 
         <!-- Step 4 -->
         <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-fraud">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-4">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300" id="step-icon-4">
             <span class="material-symbols-outlined text-[16px]">pending</span>
           </div>
           <div class="flex-grow">
-            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-4">ATS Validation &amp; Integrity Analysis</p>
-            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-4">Detecting keyword stuffing, timeline consistency, and project duplicates.</p>
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-4">Generating AI Insights</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-4">Detecting timeline anomalies, project overlap, and drafting narrative audits.</p>
           </div>
         </div>
 
         <!-- Step 5 -->
         <div class="flex items-start gap-4 relative z-10 opacity-50" id="step-verdict">
-          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1" id="step-icon-5">
+          <div class="w-8 h-8 rounded-full bg-surface-container-high border border-outline-variant text-on-surface-variant flex items-center justify-center flex-shrink-0 mt-1 transition-all duration-300" id="step-icon-5">
             <span class="material-symbols-outlined text-[16px]">pending</span>
           </div>
           <div class="flex-grow">
-            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-5">Recruiter Decision Engine</p>
-            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-5">Generating fit recommendations, custom interview queries, and learning paths.</p>
+            <p class="font-body-md text-body-md text-primary font-medium" id="step-title-5">Finalizing Recruiter Report</p>
+            <p class="font-body-sm text-body-sm text-on-surface-variant" id="step-desc-5">Structuring bento visualization analytics and compiling interview focus guides.</p>
+          </div>
+        </div>it recommendations, custom interview queries, and learning paths.</p>
           </div>
         </div>
       </div>
@@ -3011,6 +3087,66 @@
       }, 1000);
     }
 
+    function initHeroTyping() {
+      const targetText = document.getElementById('hero-typing-text');
+      if (!targetText) return;
+      const phrases = [
+        "Semantic Resume Matching",
+        "ATS Intelligence Engine",
+        "AI Hiring Copilot",
+        "Enterprise Talent Analytics"
+      ];
+      let phraseIndex = 0;
+      let charIndex = 0;
+      let isDeleting = false;
+      let typingSpeed = 70;
+      
+      function type() {
+        const currentPhrase = phrases[phraseIndex];
+        if (isDeleting) {
+          targetText.innerText = currentPhrase.substring(0, charIndex - 1);
+          charIndex--;
+          typingSpeed = 30;
+        } else {
+          targetText.innerText = currentPhrase.substring(0, charIndex + 1);
+          charIndex++;
+          typingSpeed = 70;
+        }
+        
+        if (!isDeleting && charIndex === currentPhrase.length) {
+          isDeleting = true;
+          typingSpeed = 2500;
+        } else if (isDeleting && charIndex === 0) {
+          isDeleting = false;
+          phraseIndex = (phraseIndex + 1) % phrases.length;
+          typingSpeed = 400;
+        }
+        
+        setTimeout(type, typingSpeed);
+      }
+      
+      type();
+    }
+
+    function animateScoreCounter(el, target) {
+      if (!el) return;
+      let start = 0;
+      const duration = 1500;
+      const startTime = performance.now();
+      
+      function update(currentTime) {
+        const elapsed = currentTime - startTime;
+        const progress = Math.min(elapsed / duration, 1);
+        const easedProgress = progress * (2 - progress);
+        const val = Math.round(easedProgress * target);
+        el.innerHTML = `${val}<span class="text-sm text-on-surface-variant">%</span>`;
+        if (progress < 1) {
+          requestAnimationFrame(update);
+        }
+      }
+      requestAnimationFrame(update);
+    }
+
     function updateUserProfileUI(user) {
       if (!user) return;
       
@@ -3077,7 +3213,14 @@
       if (event) event.stopPropagation();
       const dropdown = document.getElementById('navbar-profile-dropdown');
       if (dropdown) {
-        dropdown.classList.toggle('hidden');
+        const isHidden = dropdown.classList.contains('opacity-0');
+        if (isHidden) {
+          dropdown.classList.remove('opacity-0', 'pointer-events-none', 'scale-96');
+          dropdown.classList.add('opacity-100', 'pointer-events-auto', 'scale-100');
+        } else {
+          dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
+          dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+        }
       }
     }
 
@@ -3155,12 +3298,20 @@
       document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('navbar-profile-dropdown');
         const wrapper = document.getElementById('profile-dropdown-wrapper');
-        if (dropdown && !dropdown.classList.contains('hidden')) {
+        if (dropdown && dropdown.classList.contains('opacity-100')) {
           if (wrapper && !wrapper.contains(e.target)) {
-            dropdown.classList.add('hidden');
+            dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
+            dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
           }
         }
       });
+      
+      // Initialize premium landing animations
+      initHeroTyping();
+      setTimeout(() => {
+        const scoreEl = document.getElementById('landing-hero-score');
+        if (scoreEl) animateScoreCounter(scoreEl, 88);
+      }, 1200);
       
       // Load initial settings and telemetry
       loadSettings();
@@ -3680,7 +3831,10 @@
         
         // Ensure dropdown is hidden
         const dropdown = document.getElementById('navbar-profile-dropdown');
-        if (dropdown) dropdown.classList.add('hidden');
+        if (dropdown) {
+          dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
+          dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+        }
         
         // Reset top-nav elements
         const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
@@ -4256,46 +4410,48 @@ Requirements:
         addConsoleLog(`[File ${currentFileIndex}/${uploadedFiles.length}] Queueing document: <span class="text-white">${file.name}</span>`);
         
         // Simulating Stepper Phases
-        addConsoleLog(`Phase 1: Extracting text from PDF streams for ${file.name}...`, "text-green-400");
+        addConsoleLog(`Phase 1: Parsing documents and extracting clean text streams for ${file.name}...`, "text-green-400");
+        stepIcon1.classList.add('step-active-glow');
+        
         setTimeout(() => {
           stepIcon1.innerHTML = 'check';
-          stepIcon1.classList.remove('animate-spin');
-          stepIcon1.classList.replace('text-on-surface-variant', 'text-primary');
+          stepIcon1.classList.remove('animate-spin', 'step-active-glow');
+          stepIcon1.className = 'w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1';
           step2.classList.remove('opacity-50');
           stepIcon2.innerHTML = 'sync';
-          stepIcon2.classList.add('animate-spin');
-          addConsoleLog(`Phase 2: Running skill extraction matching against database features...`, "text-green-400");
-        }, 500);
+          stepIcon2.classList.add('animate-spin', 'step-active-glow');
+          addConsoleLog(`Phase 2: Extracting critical developer skills and mapping clusters...`, "text-green-400");
+        }, 600);
 
         setTimeout(() => {
           stepIcon2.innerHTML = 'check';
-          stepIcon2.classList.remove('animate-spin');
-          stepIcon2.classList.replace('text-on-surface-variant', 'text-primary');
+          stepIcon2.classList.remove('animate-spin', 'step-active-glow');
+          stepIcon2.className = 'w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1';
           step3.classList.remove('opacity-50');
           stepIcon3.innerHTML = 'sync';
-          stepIcon3.classList.add('animate-spin');
-          addConsoleLog(`Phase 3: Calculating similarity centroids and invoking provider generation...`, "text-secondary");
-        }, 1100);
+          stepIcon3.classList.add('animate-spin', 'step-active-glow');
+          addConsoleLog(`Phase 3: Computing semantic distance vectors and match matrix...`, "text-secondary");
+        }, 1300);
 
         setTimeout(() => {
           stepIcon3.innerHTML = 'check';
-          stepIcon3.classList.remove('animate-spin');
-          stepIcon3.classList.replace('text-on-surface-variant', 'text-primary');
+          stepIcon3.classList.remove('animate-spin', 'step-active-glow');
+          stepIcon3.className = 'w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1';
           step4.classList.remove('opacity-50');
           stepIcon4.innerHTML = 'sync';
-          stepIcon4.classList.add('animate-spin');
-          addConsoleLog(`Phase 4: Running integrity models and verifying project timelines...`, "text-secondary");
-        }, 1800);
+          stepIcon4.classList.add('animate-spin', 'step-active-glow');
+          addConsoleLog(`Phase 4: Evaluating match confidence levels and generating LLM audits...`, "text-secondary");
+        }, 2000);
 
         setTimeout(() => {
           stepIcon4.innerHTML = 'check';
-          stepIcon4.classList.remove('animate-spin');
-          stepIcon4.classList.replace('text-on-surface-variant', 'text-primary');
+          stepIcon4.classList.remove('animate-spin', 'step-active-glow');
+          stepIcon4.className = 'w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1';
           step5.classList.remove('opacity-50');
           stepIcon5.innerHTML = 'sync';
-          stepIcon5.classList.add('animate-spin');
-          addConsoleLog(`Phase 5: Mapping compatibility coefficients and structuring custom metrics...`, "text-primary");
-        }, 2400);
+          stepIcon5.classList.add('animate-spin', 'step-active-glow');
+          addConsoleLog(`Phase 5: Structuring final recruiter decision logs and interview focus paths...`, "text-primary");
+        }, 2700);
 
         const formData = new FormData();
         formData.append('job_description', jd);
@@ -4322,6 +4478,10 @@ Requirements:
             r.notes = [];
             
             analysisResults.push(r);
+            stepIcon5.innerHTML = 'check';
+            stepIcon5.classList.remove('animate-spin', 'step-active-glow');
+            stepIcon5.className = 'w-8 h-8 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center flex-shrink-0 mt-1';
+            
             addConsoleLog(`Successfully parsed candidate: <span class="text-primary font-bold">${r.name}</span>. Fit Score: ${Math.round(r.score)}%`, "text-primary");
             addAuditLog(`New match analysis generated for <strong>${r.name.replace('.pdf', '')}</strong>. Score: ${Math.round(r.score)}%`, "primary");
           });
