@@ -728,6 +728,10 @@
       <div class="text-center space-y-2 z-10 relative">
         <h2 class="font-headline-xl text-3xl text-primary font-bold tracking-tight">InsightAI Portal</h2>
         <p class="text-xs text-on-surface-variant">Sign in to your Recruiter Operating System</p>
+        <p class="text-[10px] text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[16px] pt-1">
+          <span class="inline-block w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>
+          <span id="login-typing-text" class="font-medium text-primary transition-all duration-300">AI Hiring Intelligence</span>
+        </p>
       </div>
 
       <form id="login-form" onsubmit="handleLogin(event)" class="space-y-4 z-10 relative">
@@ -2367,6 +2371,19 @@
                 <span class="material-symbols-outlined absolute left-2.5 top-2 text-[12px] text-on-surface-variant/50">search</span>
                 <input type="text" id="resume-search-input" placeholder="Search keywords..." class="w-full bg-surface border border-outline-variant rounded-lg pl-7 pr-2.5 py-1 text-[10px] text-on-surface focus:outline-none focus:border-primary placeholder-on-surface-variant/35" oninput="highlightResumeSearch()" />
               </div>
+              
+              <!-- Zoom Controls -->
+              <div class="flex items-center gap-1.5 font-semibold">
+                <span class="text-on-surface-variant/70">Zoom:</span>
+                <button class="bg-surface border border-outline-variant/60 w-5.5 h-5.5 rounded flex items-center justify-center hover:text-primary transition-colors text-[9px]" onclick="zoomResumeText(-1)" title="Zoom Out">
+                  <span class="material-symbols-outlined text-[10px]">remove</span>
+                </button>
+                <span id="resume-zoom-percent" class="text-[9px] font-semibold min-w-[28px] text-center">100%</span>
+                <button class="bg-surface border border-outline-variant/60 w-5.5 h-5.5 rounded flex items-center justify-center hover:text-primary transition-colors text-[9px]" onclick="zoomResumeText(1)" title="Zoom In">
+                  <span class="material-symbols-outlined text-[10px]">add</span>
+                </button>
+              </div>
+
               <!-- Section Jumps -->
               <div class="flex items-center gap-1.5 font-semibold">
                 <span class="text-on-surface-variant/70">Jump to:</span>
@@ -3073,6 +3090,173 @@
     </div>
   </main>
 
+  <!-- ── VIEW: SECURITY CONFIGURATION ── -->
+  <main id="view-security" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-10">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-outline-variant/30">
+      <div>
+        <h1 class="font-headline-xl text-headline-xl text-primary">Security Settings</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Configure multi-factor authentication, monitor session telemetry, and manage active session keys.</p>
+      </div>
+      <button class="bg-surface-container border border-outline-variant text-on-surface px-5 py-2.5 rounded-full font-semibold hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 flex-shrink-0" onclick="switchView('recruiter-dashboard')">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Recruiter Console
+      </button>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Forms (col-span-7) -->
+      <div class="lg:col-span-7 space-y-8">
+        <!-- 2FA card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">admin_panel_settings</span>
+            Two-Factor Authentication (2FA)
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-6">Enhance your recruiter workspace account security by verifying logins with an additional mobile authenticator code.</p>
+          
+          <div class="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant/30">
+            <div>
+              <span class="font-bold text-xs text-on-surface block">Authenticator App Verification</span>
+              <span class="text-[10px] text-on-surface-variant">Recommended for Tier-1 recruitment access level.</span>
+            </div>
+            <label class="relative inline-flex items-center cursor-pointer">
+              <input type="checkbox" class="sr-only peer" onchange="showToast('🛡️ 2FA configuration changed.')">
+              <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+            </label>
+          </div>
+        </div>
+
+        <!-- Password Change Card -->
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">lock_reset</span>
+            Rotate Password
+          </h3>
+          
+          <form onsubmit="event.preventDefault(); showToast('🔒 Password updated successfully.');" class="space-y-4">
+            <div class="space-y-1">
+              <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Current Password</label>
+              <input type="password" required class="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary" placeholder="••••••••">
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">New Password</label>
+                <input type="password" required class="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary" placeholder="••••••••">
+              </div>
+              <div class="space-y-1">
+                <label class="block text-[10px] font-bold text-on-surface-variant uppercase tracking-wider">Confirm New Password</label>
+                <input type="password" required class="w-full bg-surface border border-outline-variant/40 rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-primary" placeholder="••••••••">
+              </div>
+            </div>
+            <button type="submit" class="bg-primary text-on-primary px-5 py-2.5 rounded-xl font-bold text-xs hover:bg-opacity-90 transition-all shadow-sm">Save Changes</button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Active Sessions (col-span-5) -->
+      <div class="lg:col-span-5 space-y-8">
+        <div class="bg-surface-container-lowest border border-outline-variant rounded-[24px] p-6 shadow-ambient">
+          <h3 class="font-headline-md text-base font-bold text-primary mb-4 flex items-center gap-2">
+            <span class="material-symbols-outlined text-lg">devices</span>
+            Active Sessions
+          </h3>
+          <p class="text-xs text-on-surface-variant mb-4">Review browser access histories to trace active connections.</p>
+          
+          <div class="space-y-4">
+            <div class="p-3.5 bg-surface border border-primary/20 rounded-xl flex gap-3 items-start relative overflow-hidden">
+              <div class="absolute inset-0 bg-primary/5 pointer-events-none"></div>
+              <span class="material-symbols-outlined text-primary text-xl">desktop_windows</span>
+              <div class="flex-grow min-w-0 text-xs">
+                <span class="font-bold text-on-surface block truncate">Chrome on Windows (Current)</span>
+                <span class="text-[10px] text-on-surface-variant block mt-0.5">IP: 192.168.1.14 • Location: Bangalore, India</span>
+                <span class="text-[9px] text-emerald-400 font-semibold block mt-1">Active Now</span>
+              </div>
+            </div>
+
+            <div class="p-3.5 bg-surface border border-outline-variant/30 rounded-xl flex gap-3 items-start">
+              <span class="material-symbols-outlined text-on-surface-variant/80 text-xl">phone_iphone</span>
+              <div class="flex-grow min-w-0 text-xs">
+                <span class="font-bold text-on-surface block truncate">Safari on iPhone 15</span>
+                <span class="text-[10px] text-on-surface-variant block mt-0.5">IP: 103.45.12.8 • Location: Bangalore, India</span>
+                <span class="text-[9px] text-on-surface-variant block mt-1">Last activity: 2 hours ago</span>
+              </div>
+              <button onclick="showToast('📱 iPhone session revoked.')" class="text-error hover:underline text-[10px] font-bold">Revoke</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <!-- ── VIEW: NOTIFICATIONS CONFIGURATION ── -->
+  <main id="view-notifications" class="view-section hidden flex-grow pt-32 pb-24 px-container-padding-mobile md:px-container-padding-desktop max-w-container-max mx-auto w-full flex flex-col gap-10">
+    <header class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-6 pb-6 border-b border-outline-variant/30">
+      <div>
+        <h1 class="font-headline-xl text-headline-xl text-primary">Notifications</h1>
+        <p class="font-body-lg text-body-lg text-on-surface-variant">Configure digest briefings, email reports, and real-time webhook updates.</p>
+      </div>
+      <button class="bg-surface-container border border-outline-variant text-on-surface px-5 py-2.5 rounded-full font-semibold hover:border-primary hover:text-primary transition-all shadow-sm flex items-center gap-2 flex-shrink-0" onclick="switchView('recruiter-dashboard')">
+        <span class="material-symbols-outlined text-base">arrow_back</span>
+        Recruiter Console
+      </button>
+    </header>
+
+    <div class="max-w-2xl mx-auto w-full bg-surface-container-lowest border border-outline-variant rounded-[32px] p-8 shadow-ambient space-y-6">
+      <h3 class="font-headline-md text-base font-bold text-primary border-b border-outline-variant/30 pb-3 flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">mail</span>
+        Email Digest Intervals
+      </h3>
+      
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant/30">
+          <div>
+            <span class="font-bold text-xs text-on-surface block">Daily Candidate Briefing</span>
+            <span class="text-[10px] text-on-surface-variant">Receive a recap email of matching scoring decisions.</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked class="sr-only peer" onchange="showToast('✉️ Notifications updated.')">
+            <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+          </label>
+        </div>
+
+        <div class="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant/30">
+          <div>
+            <span class="font-bold text-xs text-on-surface block">Instantly notify on high-score matches</span>
+            <span class="text-[10px] text-on-surface-variant">Get notified if a candidate matches above 90%.</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" checked class="sr-only peer" onchange="showToast('✉️ Notifications updated.')">
+            <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+          </label>
+        </div>
+      </div>
+      
+      <h3 class="font-headline-md text-base font-bold text-primary border-b border-outline-variant/30 pb-3 pt-4 flex items-center gap-2">
+        <span class="material-symbols-outlined text-lg">terminal</span>
+        Integrations Webhooks
+      </h3>
+      
+      <div class="space-y-4">
+        <div class="flex items-center justify-between p-4 bg-surface rounded-xl border border-outline-variant/30">
+          <div>
+            <span class="font-bold text-xs text-on-surface block">Slack Channels Notification</span>
+            <span class="text-[10px] text-on-surface-variant">Publish matches automatically into corporate Slack rooms.</span>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input type="checkbox" class="sr-only peer" onchange="showToast('✉️ Webhook integration toggled.')">
+            <div class="w-9 h-5 bg-surface-container-highest rounded-full peer peer-checked:after:translate-x-full after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-on-surface-variant after:border-slate-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-primary peer-checked:after:bg-on-primary"></div>
+          </label>
+        </div>
+      </div>
+      
+      <div class="flex justify-end gap-3 border-t border-outline-variant/30 pt-6">
+        <button class="bg-primary text-on-primary px-6 py-3 rounded-full font-bold text-xs hover:bg-opacity-90 transition-all shadow-sm" onclick="showToast('✉️ Settings saved successfully.')">
+          Save Preferences
+        </button>
+      </div>
+    </div>
+  </main>
+
   <!-- ── VIEW 8: LOGOUT SUCCESS SCREEN ── -->
   <main id="view-logout-success" class="view-section hidden flex-grow flex items-center justify-center pt-32 pb-24 px-margin-mobile relative overflow-hidden">
     <div class="absolute w-[500px] h-[500px] bg-primary/10 rounded-full blur-[120px] top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none"></div>
@@ -3376,9 +3560,30 @@
         if (!isLoggedIn) {
           switchView('login');
         } else {
-          const lastView = localStorage.getItem('lastActiveView') || 'landing';
-          const viewToLoad = (lastView === 'login' || lastView === 'logout-success') ? 'landing' : lastView;
-          switchView(viewToLoad);
+          const hashView = window.location.hash.replace('#/', '') || '';
+          const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
+          if (hashView && allowedViews.includes(hashView)) {
+            switchView(hashView);
+          } else {
+            const lastView = localStorage.getItem('lastActiveView') || 'landing';
+            const viewToLoad = (lastView === 'login' || lastView === 'logout-success') ? 'landing' : lastView;
+            switchView(viewToLoad);
+          }
+        }
+      });
+
+      // Window hash change routing listener
+      window.addEventListener('hashchange', () => {
+        const hashView = window.location.hash.replace('#/', '') || 'landing';
+        const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
+        if (allowedViews.includes(hashView)) {
+          checkSessionStatus().then(isLoggedIn => {
+            if (!isLoggedIn && hashView !== 'login' && hashView !== 'logout-success') {
+              switchView('login');
+            } else {
+              switchView(hashView, false);
+            }
+          });
         }
       });
 
@@ -3417,13 +3622,13 @@
         const p = document.createElement('div');
         p.className = 'login-particle';
         
-        const size = Math.random() * 5 + 3; // 3px to 8px
+        const size = Math.random() * 5 + 3;
         p.style.width = `${size}px`;
         p.style.height = `${size}px`;
         p.style.left = `${Math.random() * 100}%`;
         
-        const duration = Math.random() * 12 + 8; // 8s to 20s
-        const delay = Math.random() * -20; // negative delay so they start pre-scattered
+        const duration = Math.random() * 12 + 8;
+        const delay = Math.random() * -20;
         p.style.animationDuration = `${duration}s`;
         p.style.animationDelay = `${delay}s`;
         
@@ -3433,12 +3638,36 @@
         
         container.appendChild(p);
       }
+
+      // Initialize Rotating Text with Smooth Transitions
+      if (window.loginTypingInterval) {
+        clearInterval(window.loginTypingInterval);
+      }
+      const phrases = [
+        "AI Hiring Intelligence",
+        "Semantic Resume Matching",
+        "Enterprise ATS Analytics",
+        "Recruiter Copilot Engine"
+      ];
+      let idx = 0;
+      const textEl = document.getElementById('login-typing-text');
+      if (textEl) {
+        textEl.innerText = phrases[0];
+        window.loginTypingInterval = setInterval(() => {
+          idx = (idx + 1) % phrases.length;
+          textEl.classList.add('opacity-0', 'scale-95', 'blur-sm');
+          setTimeout(() => {
+            textEl.innerText = phrases[idx];
+            textEl.classList.remove('opacity-0', 'scale-95', 'blur-sm');
+          }, 300);
+        }, 3500);
+      }
     }
 
     // View switcher
-    function switchView(viewId) {
+    function switchView(viewId, updateHash = true) {
       // Protect routes
-      const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile'];
+      const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile', 'security', 'notifications'];
       if (protectedViews.includes(viewId)) {
         const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
         if (!loggedIn) {
@@ -3449,19 +3678,29 @@
       if (viewId === 'login') {
         initLoginParticles();
       }
+
+      if (updateHash) {
+        window.location.hash = '/' + viewId;
+      }
       
       // Save last active view
       localStorage.setItem('lastActiveView', viewId);
 
       // Hide all sections
-      ['view-login', 'view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings', 'view-admin-analytics', 'view-logout-success', 'view-profile'].forEach(id => {
+      ['view-login', 'view-landing', 'view-recruiter-dashboard', 'view-workspace', 'view-processing', 'view-dashboard', 'view-settings', 'view-admin-analytics', 'view-logout-success', 'view-profile', 'view-security', 'view-notifications'].forEach(id => {
         const el = document.getElementById(id);
         if (el) el.classList.add('hidden');
       });
       
       // Show selected section
       const selectedView = document.getElementById('view-' + viewId);
-      if (selectedView) selectedView.classList.remove('hidden');
+      if (selectedView) {
+        selectedView.classList.remove('hidden');
+        selectedView.classList.add('animate-fade-in');
+        setTimeout(() => {
+          selectedView.classList.remove('animate-fade-in');
+        }, 300);
+      }
 
       // Hide or show top navigation bar based on the view
       const topNav = document.getElementById('top-nav');
@@ -5704,6 +5943,19 @@ Requirements:
         if (resumeFontSize > 9) resumeFontSize--;
       }
       updateInteractiveResumeView();
+    }
+
+    function zoomResumeText(direction) {
+      if (direction > 0) {
+        zoomResume('in');
+      } else {
+        zoomResume('out');
+      }
+      const percentEl = document.getElementById('resume-zoom-percent');
+      if (percentEl) {
+        const percentVal = Math.round((resumeFontSize / 11) * 100);
+        percentEl.innerText = `${percentVal}%`;
+      }
     }
 
     function navigateResumePage(dir) {
