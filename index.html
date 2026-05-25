@@ -560,6 +560,86 @@
       from, to { opacity: 0 }
       50% { opacity: 1 }
     }
+    /* Premium Profile Dropdown custom styles */
+    .premium-profile-dropdown {
+      z-index: 99999 !important;
+      position: absolute !important;
+      top: 72px !important;
+      right: 0 !important;
+      width: 320px !important;
+      background: rgba(8, 12, 24, 0.96) !important;
+      backdrop-filter: blur(24px) !important;
+      border: 1px solid rgba(255, 255, 255, 0.08) !important;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.45), 0 0 0 1px rgba(255,255,255,0.04) !important;
+      border-radius: 24px !important;
+      padding: 16px !important;
+      display: flex !important;
+      flex-direction: column !important;
+      gap: 14px !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+      transform-origin: top right !important;
+    }
+    
+    html.light .premium-profile-dropdown {
+      background: rgba(255, 255, 255, 0.98) !important;
+      border: 1px solid rgba(0, 0, 0, 0.08) !important;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.02) !important;
+    }
+
+    .dropdown-user-snapshot {
+      background: linear-gradient(to bottom, rgba(12, 16, 28, 0.98), rgba(6, 8, 18, 0.99)) !important;
+      border: 1px solid rgba(255, 255, 255, 0.04) !important;
+    }
+    
+    html.light .dropdown-user-snapshot {
+      background: linear-gradient(to bottom, rgba(248, 250, 252, 0.98), rgba(241, 245, 249, 0.99)) !important;
+      border: 1px solid rgba(0, 0, 0, 0.04) !important;
+    }
+
+    .dropdown-logout-btn {
+      background: rgba(255, 80, 80, 0.08) !important;
+      border: 1px solid rgba(255, 80, 80, 0.22) !important;
+      color: #ffb4b4 !important;
+      transition: all 0.2s ease-in-out !important;
+    }
+    .dropdown-logout-btn:hover {
+      background: rgba(255, 80, 80, 0.12) !important;
+      border: 1px solid rgba(255, 80, 80, 0.4) !important;
+      color: #ffd1d1 !important;
+      transform: translateY(-0.5px);
+    }
+    html.light .dropdown-logout-btn {
+      background: rgba(239, 68, 68, 0.05) !important;
+      border: 1px solid rgba(239, 68, 68, 0.18) !important;
+      color: #b91c1c !important;
+    }
+    html.light .dropdown-logout-btn:hover {
+      background: rgba(239, 68, 68, 0.1) !important;
+      border: 1px solid rgba(239, 68, 68, 0.3) !important;
+      color: #991b1b !important;
+    }
+
+    /* Mobile overrides for profile dropdown positioning */
+    @media (max-width: 480px) {
+      .premium-profile-dropdown {
+        width: calc(100vw - 32px) !important;
+        right: -16px !important;
+      }
+    }
+    /* Premium Card Entrance animation */
+    .login-card-entrance {
+      opacity: 0;
+      transform: scale(0.96) translateY(20px);
+      filter: blur(12px);
+      animation: cardEntrance 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+    @keyframes cardEntrance {
+      to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+        filter: blur(0);
+      }
+    }
 
     /* Mobile viewport responsive overrides */
     @media (max-width: 768px) {
@@ -641,7 +721,7 @@
     </div>
 
     <!-- MAIN SIGNIN CARD -->
-    <div id="login-card-signin" class="glass-card max-w-md w-full border border-outline-variant rounded-[32px] p-8 shadow-2xl space-y-6 relative overflow-hidden z-10 transition-all duration-500 scale-100">
+    <div id="login-card-signin" class="glass-card max-w-md w-full border border-outline-variant rounded-[32px] p-8 shadow-2xl space-y-6 relative overflow-hidden z-10 transition-all duration-500 scale-100 login-card-entrance">
       <!-- Ambient light reflection -->
       <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none"></div>
       
@@ -939,33 +1019,33 @@
             <span class="material-symbols-outlined text-on-surface-variant text-sm">expand_more</span>
           </button>
           <!-- Profile Dropdown Content -->
-          <div id="navbar-profile-dropdown" class="absolute top-11 right-0 w-60 bg-white/98 dark:bg-[#0c1020]/96 border border-slate-200 dark:border-slate-800/80 rounded-[24px] p-4 shadow-2xl z-[9999] backdrop-blur-2xl flex flex-col gap-3.5 text-xs text-left transition-all duration-200 origin-top-right transform scale-96 opacity-0 pointer-events-none">
+          <div id="navbar-profile-dropdown" class="premium-profile-dropdown scale-96 opacity-0 pointer-events-none">
             <!-- User Quick Snapshot -->
-            <div class="flex items-center gap-3 bg-slate-50/90 dark:bg-black/35 border border-slate-100 dark:border-white/5 p-3 rounded-xl min-w-0">
-              <img id="dropdown-user-avatar" class="w-10 h-10 rounded-full border border-primary/30 object-cover flex-shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
+            <div class="flex items-center gap-3 dropdown-user-snapshot p-3.5 rounded-[18px] min-w-0 shadow-inner">
+              <img id="dropdown-user-avatar" class="w-11 h-11 rounded-full border border-primary/30 object-cover flex-shrink-0" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80" />
               <div class="flex flex-col min-w-0">
                 <span id="dropdown-user-name" class="font-bold text-slate-900 dark:text-white text-sm truncate leading-tight">Pavan Kumar</span>
                 <span id="dropdown-user-role" class="text-[8.5px] font-bold text-primary px-1.5 py-0.5 rounded bg-primary/10 border border-primary/20 mt-1 w-fit uppercase tracking-wider">Recruiter</span>
-                <span id="dropdown-user-email" class="text-[9px] text-slate-500 dark:text-slate-300 truncate mt-1 max-w-[130px]">pavan@insightai.com</span>
+                <span id="dropdown-user-email" class="text-[9px] text-slate-500 dark:text-slate-400 truncate mt-1 max-w-[170px]">pavan@insightai.com</span>
               </div>
             </div>
             <!-- Menu Links -->
-            <div class="flex flex-col gap-1">
-              <button onclick="switchView('profile')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
+            <div class="flex flex-col gap-1.5">
+              <button onclick="event.stopPropagation(); switchView('profile'); closeProfileDropdown();" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">person</span> My Profile
               </button>
-              <button onclick="switchView('settings')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
+              <button onclick="event.stopPropagation(); switchView('settings'); closeProfileDropdown();" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">settings</span> Account Settings
               </button>
-              <button onclick="switchView('settings')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
+              <button onclick="event.stopPropagation(); switchView('settings'); closeProfileDropdown();" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">security</span> Security
               </button>
-              <button onclick="alert('No new notifications.')" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
+              <button onclick="event.stopPropagation(); alert('No new notifications.');" class="flex items-center gap-2.5 px-3 py-2 rounded-xl text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-slate-100 dark:hover:bg-white/8 transition-all duration-200 font-medium text-left">
                 <span class="material-symbols-outlined text-sm text-primary">notifications</span> Notifications
               </button>
             </div>
             <!-- Logout -->
-            <button onclick="handleLogout()" class="w-full mt-1 py-2.5 bg-red-500/10 dark:bg-red-500/15 border border-red-200 dark:border-red-500/30 text-red-600 dark:text-red-300 hover:bg-red-100 dark:hover:bg-red-500/25 hover:text-red-700 dark:hover:text-red-200 rounded-xl font-bold transition-all duration-200 text-center flex items-center justify-center gap-2 cursor-pointer">
+            <button onclick="event.stopPropagation(); handleLogout();" class="w-full mt-1 py-2.5 dropdown-logout-btn rounded-xl font-bold transition-all text-center flex items-center justify-center gap-2 cursor-pointer">
               <span class="material-symbols-outlined text-sm">logout</span> Sign Out
             </button>
           </div>
@@ -3221,6 +3301,14 @@
           dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
           dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
         }
+      }
+    }
+
+    function closeProfileDropdown() {
+      const dropdown = document.getElementById('navbar-profile-dropdown');
+      if (dropdown) {
+        dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
+        dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
       }
     }
 
