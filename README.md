@@ -28,17 +28,21 @@ We have upgraded the platform to production-grade SaaS standards, resolving visu
 
 * **Premium Login Portal**: Dynamic, performance-safe background particle engine (`initLoginParticles()`), smoother card shadows, premium input focus glows, credentials caching (Remember Me), and refined enterprise SSO buttons.
 * **Onboarding Welcome Experience**: A multi-step onboarding wizard (Role Persona -> Corporate Credentials -> Sourcing Specialization -> AI Personalization Tuning) feeding into a Welcome Checklist showing setup progress with direct redirection to the file dropzone.
-* **High-Fidelity AI Narrative**: Detailed evaluation narrative divided into 6 distinct sections:
-  1. *Executive Summary*: Suitability and alignment overview.
-  2. *Strongest Evidence*: Concrete proof found in projects.
-  3. *Missing Proof*: Key requirements not verified in candidate text.
-  4. *Hiring Risks*: Timeline inconsistencies, stuffing density, and gaps.
-  5. *Interview Focus Areas*: Custom screening questions to verify weak spots.
-  6. *Recommendation Reasoning*: Nuanced recommendations.
+* **High-Fidelity AI Narrative**: Detailed evaluation narrative divided into exactly 10 distinct recruiter-grade sections:
+  1. *Executive Summary*: Concise summary of candidate fit, background alignment, and overall suitability.
+  2. *Candidate Strengths*: Key highlights of technical qualifications and project achievements.
+  3. *Critical Skill Gaps*: Hard skills, platforms, or tools missing relative to the JD.
+  4. *Technical Capability Analysis*: Evaluation of core patterns, software engineering quality, and scale capabilities.
+  5. *Career Trajectory Assessment*: Stability, growth path, role progression, and promotion readiness.
+  6. *ATS Readiness*: Structural integrity, keyword density, and formatting compliance.
+  7. *Interview Focus Areas*: Custom screening questions to verify weak spots.
+  8. *Hiring Risks*: Red flags, timeline gaps, or keyword stuffing density alerts.
+  9. *Semantic Match Reasoning*: Weighted semantic alignment parameters between resume and JD.
+  10. *Final Hiring Recommendation*: Contextual recommendation and detailed justification.
 * **Nuanced Recruiter Decision Support**: Replaced binary match scores with realistic hold and sourcing recommendations (e.g., *"Hold for Junior ML / Support Engineer Roles"* or *"Archive & Flag for Future Junior Sourcing"*), including candidate-specific reasoning lists.
-* **Enterprise PDF & Print Formatting**: Printable cover sheets containing candidate name, target role, evaluation date, assigned recruiter name, match score, and confidence rating. Logical page breaks split sections cleanly, with header and footer branding.
+* **Enterprise PDF & Print Formatting**: Printable cover sheets containing candidate snapshot metadata, target role, evaluation date, assigned recruiter name, match score, verification confidence, recruiter remarks, signature blocks, and export timestamps.
 * **Staged Copilot Reasoning & Streaming**: Chatbot responses feature dynamic typewriter streaming effects prefaced by active reasoning state logs (*"Staging AI reasoning..."* and *"Formulating decision rationale..."*).
-* **Resume Navigation Upgrade**: Matched skill highlighter search bar, clickable evidence mapping table, and scroll jump buttons targeting *Education*, *Experience*, *Projects*, and *Skills*.
+* **Resume Navigation & Workspace Upgrade**: Matched skill highlighter search bar, clickable evidence mapping table, scroll jump buttons targeting *Education*, *Experience*, *Projects*, and *Skills*, side annotations card, and recruiter comments input block.
 * **Mobile Responsiveness**: Stacked columns on narrow screens, wrapped overflow tables, and full-screen configurations for chatbot and intelligence panels on screens <= 640px.
 
 ---
@@ -47,11 +51,12 @@ We have upgraded the platform to production-grade SaaS standards, resolving visu
 
 | Feature | Description |
 |---|---|
-| 🤖 **AI Co-pilot Switcher** | 4 specialized chatbot modes: **Recruiter Mode** (fit & qualifications), **ATS Analyzer** (keywords & gaps), **Interview Generator** (custom technical/HR questions), and **Resume Optimizer** (impact rewrites). |
-| 🔄 **Regenerate & Collapse UI** | Assistant responses feature an action toolbar with **Regenerate Answer** (fetch retry) and **Collapse Toggle** (compress long card logs down to `max-h-14` dynamically). |
-| 📄 **Interactive Match Highlights** | Switch between visual Document PDF view and an **Interactive ATS Text Parser** highlighting matched and missing skills with live tooltips. |
+| 🤖 **AI Co-pilot Switcher** | 6 specialized chatbot modes: **Recruiter Assistant**, **ATS Analyzer**, **Interview Generator**, **Resume Optimizer**, **Candidate Comparator**, and **Hiring Decision Assistant**. Supports message history context memory. |
+| 🔄 **Regenerate & Sweep UI** | Assistant responses feature an action toolbar with **Regenerate Answer** (fetch retry), **Collapse Toggle** (compress long card logs), and **Clear History** (sweep active chat context). |
+| 📄 **Interactive ATS Workspace** | Split-screen layout containing scrollable **Interactive ATS Text Parser** on the left, and **AI Parser Annotations** + **Recruiter Comments** sidebar on the right. |
 | 🆚 **Split Screen Compare** | Split-screen visual overlay showing Job Description (left), Match Insights & Gaps (center), and Highlighted Resume Text (right). |
 | 🛡️ **Multi-Role Auth Portal** | Secure login panel supporting tailored dashboard interfaces for **Recruiters**, **HR Managers**, **Admins**, and **Candidates**. |
+| 🛡️ **Explainability Mapping Matrix** | Dynamic table displaying JD requirements, resume evidence context snippet, dynamic confidence level bands, transferable skill matching, decision verdict (Match, Transferable, Missing), and detailed semantic reasoning. |
 | 🗺️ **Skills Knowledge Graph** | Beautiful SVG-based interactive dependency tree depicting candidate skills, clusters, and overlap maps. |
 | 🎙️ **Voice AI Interview Modal** | Select focus areas and start a behavioral or technical mock interview with pulsing soundwaves, live transcripts, and speech fluency audits (WPM, sentiment). |
 | 🛡️ **Resume Fraud signals** | Scans for keyword stuffing index, candidate experience anomalies, and displays a mock GitHub contribution matrix. |
