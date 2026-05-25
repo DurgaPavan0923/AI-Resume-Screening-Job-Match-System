@@ -640,6 +640,30 @@
         filter: blur(0);
       }
     }
+    /* Premium Button CTA classes */
+    .premium-cta-primary {
+      background: var(--color-primary) !important;
+      color: var(--color-on-primary) !important;
+      box-shadow: 0 4px 14px rgba(0, 90, 194, 0.2);
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .premium-cta-primary:hover {
+      box-shadow: 0 6px 20px rgba(0, 90, 194, 0.4);
+      transform: translateY(-1.5px);
+      filter: brightness(1.1);
+    }
+    
+    .premium-cta-secondary {
+      border: 1px solid var(--color-outline-variant) !important;
+      color: var(--color-primary) !important;
+      background: transparent !important;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1) !important;
+    }
+    .premium-cta-secondary:hover {
+      background: rgba(0, 90, 194, 0.05) !important;
+      border-color: var(--color-primary) !important;
+      transform: translateY(-1.5px);
+    }
 
     /* Mobile viewport responsive overrides */
     @media (max-width: 768px) {
@@ -1087,11 +1111,11 @@
           Stop guessing what ATS systems want. Our intelligence engine analyzes resumes against job descriptions in real-time, providing actionable insights and recruiter-grade bento analytics dashboards instantly.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <button class="bg-primary-container text-on-primary-container px-8 py-4 rounded-full font-body-md text-body-md font-semibold hover:bg-opacity-90 transition-all flex items-center justify-center gap-2 shadow-sm" onclick="switchView('workspace')">
+          <button class="premium-cta-primary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2 shadow-sm" onclick="switchView('workspace')">
             <span class="material-symbols-outlined">upload_file</span>
             Go to Workspace
           </button>
-          <button class="bg-transparent border border-outline-variant text-primary px-8 py-4 rounded-full font-body-md text-body-md font-semibold hover:bg-surface-container-low transition-all flex items-center justify-center gap-2" onclick="alert('This demo will walk you through uploading resumes and exploring analytics. Click Get Started to try it yourself!')">
+          <button class="premium-cta-secondary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2" onclick="alert('This demo will walk you through uploading resumes and exploring analytics. Click Get Started to try it yourself!')">
             <span class="material-symbols-outlined">play_circle</span>
             Watch Demo
           </button>
@@ -3949,6 +3973,9 @@
         setTimeout(() => {
           signupCard.classList.add('hidden');
           
+          if (data.token) {
+            localStorage.setItem('authToken', data.token);
+          }
           localStorage.setItem('isLoggedIn', 'true');
           localStorage.setItem('userRole', signupRole);
           localStorage.setItem('recruiterName', fullName);
