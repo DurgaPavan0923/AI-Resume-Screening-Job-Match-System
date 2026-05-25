@@ -21,7 +21,7 @@ sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 import io
 import logging
 
-from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Depends, Cookie, Response
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile, Depends, Cookie, Response, Header
 from fastapi.responses import RedirectResponse, FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.middleware.cors import CORSMiddleware
@@ -254,8 +254,14 @@ def verify_session_token(token: str | None) -> dict | None:
     except Exception:
         return None
 
-async def get_current_user(auth_token: str | None = Cookie(None)) -> dict:
-    user = verify_session_token(auth_token)
+async def get_current_user(
+    auth_token: str | None = Cookie(None),
+    authorization: str | None = Header(None)
+) -> dict:
+    token = auth_token
+    if not token and authorization and authorization.lower().startswith("bearer "):
+        token = authorization[7:]
+    user = verify_session_token(token)
     if not user:
         raise HTTPException(status_code=401, detail="Unauthorized session")
     return user
@@ -472,7 +478,7 @@ async def auth_login(req: LoginRequest):
     }
     
     token = create_session_token(user_data)
-    response = JSONResponse(content={"status": "success", "user": user_data})
+    response = JSONResponse(content={"status": "success", "user": user_data, "token": token})
     response.set_cookie(
         key="auth-token",
         value=token,
@@ -511,7 +517,7 @@ async def auth_signup(req: SignupRequest):
     }
     
     token = create_session_token(user_data)
-    response = JSONResponse(content={"status": "success", "user": user_data})
+    response = JSONResponse(content={"status": "success", "user": user_data, "token": token})
     response.set_cookie(
         key="auth-token",
         value=token,
@@ -532,8 +538,14 @@ async def auth_logout(response: Response):
 
 
 @app.get("/api/auth/session", tags=["Auth"])
-async def auth_session(auth_token: str | None = Cookie(None)):
-    user = verify_session_token(auth_token)
+async def auth_session(
+    auth_token: str | None = Cookie(None),
+    authorization: str | None = Header(None)
+):
+    token = auth_token
+    if not token and authorization and authorization.lower().startswith("bearer "):
+        token = authorization[7:]
+    user = verify_session_token(token)
     if not user:
         raise HTTPException(status_code=401, detail="Session expired or invalid")
     return {"status": "success", "user": user}
