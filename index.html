@@ -469,6 +469,9 @@
       opacity: 0;
       z-index: 1;
       animation: float-particle linear infinite;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
     }
 
     /* Focus Ring & Glow styling */
@@ -549,6 +552,9 @@
     }
     .animate-float-orb {
       animation: floatOrb infinite ease-in-out;
+      will-change: transform;
+      transform: translate3d(0, 0, 0);
+      backface-visibility: hidden;
     }
 
     .typing-cursor {
@@ -1027,11 +1033,11 @@
         InsightAI
       </div>
       <div class="hidden md:flex items-center gap-6">
-        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#features" onclick="switchView('landing')">Features</a>
-        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('recruiter-dashboard')">Recruiter Console</a>
-        <a id="nav-link-admin-analytics" class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 hidden" href="#" onclick="switchView('admin-analytics')">Admin Analytics</a>
-        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('workspace')">Workspace</a>
-        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="#" onclick="switchView('settings')">Settings</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('landing')">Features</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('recruiter-dashboard')">Recruiter Console</a>
+        <a id="nav-link-admin-analytics" class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 hidden" href="javascript:void(0)" onclick="switchView('admin-analytics')">Admin Analytics</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('workspace')">Workspace</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('settings')">Settings</a>
       </div>
       <div class="flex items-center gap-3">
         <button class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface border border-outline-variant" onclick="toggleTheme()">
@@ -3375,7 +3381,12 @@
       }, 1000);
     }
 
+    let heroTypingTimeout = null;
     function initHeroTyping() {
+      if (heroTypingTimeout) {
+        clearTimeout(heroTypingTimeout);
+        heroTypingTimeout = null;
+      }
       const targetText = document.getElementById('hero-typing-text');
       if (!targetText) return;
       const phrases = [
@@ -3390,6 +3401,11 @@
       let typingSpeed = 70;
       
       function type() {
+        const landingView = document.getElementById('view-landing');
+        if (landingView && landingView.classList.contains('hidden')) {
+          heroTypingTimeout = null;
+          return;
+        }
         const currentPhrase = phrases[phraseIndex];
         if (isDeleting) {
           targetText.innerText = currentPhrase.substring(0, charIndex - 1);
@@ -3410,7 +3426,7 @@
           typingSpeed = 400;
         }
         
-        setTimeout(type, typingSpeed);
+        heroTypingTimeout = setTimeout(type, typingSpeed);
       }
       
       type();
@@ -3604,18 +3620,22 @@
       
       // Check login state via backend session api
       checkSessionStatus().then(isLoggedIn => {
-        if (!isLoggedIn) {
+        const hashView = window.location.hash.replace('#/', '') || '';
+        const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
+        const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile', 'security', 'notifications'];
+        
+        let viewToLoad = 'landing';
+        if (hashView && allowedViews.includes(hashView)) {
+          viewToLoad = hashView;
+        } else {
+          const lastView = localStorage.getItem('lastActiveView') || 'landing';
+          viewToLoad = (lastView === 'login' || lastView === 'logout-success') ? 'landing' : lastView;
+        }
+        
+        if (protectedViews.includes(viewToLoad) && !isLoggedIn) {
           switchView('login');
         } else {
-          const hashView = window.location.hash.replace('#/', '') || '';
-          const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
-          if (hashView && allowedViews.includes(hashView)) {
-            switchView(hashView);
-          } else {
-            const lastView = localStorage.getItem('lastActiveView') || 'landing';
-            const viewToLoad = (lastView === 'login' || lastView === 'logout-success') ? 'landing' : lastView;
-            switchView(viewToLoad);
-          }
+          switchView(viewToLoad);
         }
       });
 
@@ -3623,9 +3643,10 @@
       window.addEventListener('hashchange', () => {
         const hashView = window.location.hash.replace('#/', '') || 'landing';
         const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
+        const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile', 'security', 'notifications'];
         if (allowedViews.includes(hashView)) {
           checkSessionStatus().then(isLoggedIn => {
-            if (!isLoggedIn && hashView !== 'login' && hashView !== 'logout-success') {
+            if (protectedViews.includes(hashView) && !isLoggedIn) {
               switchView('login');
             } else {
               switchView(hashView, false);
@@ -3713,6 +3734,16 @@
 
     // View switcher
     function switchView(viewId, updateHash = true) {
+      if (viewId !== 'login') {
+        if (window.loginTypingInterval) {
+          clearInterval(window.loginTypingInterval);
+          window.loginTypingInterval = null;
+        }
+        const particleContainer = document.getElementById('login-particles');
+        if (particleContainer) {
+          particleContainer.querySelectorAll('.login-particle').forEach(p => p.remove());
+        }
+      }
       // Protect routes
       const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile', 'security', 'notifications'];
       if (protectedViews.includes(viewId)) {
@@ -3724,6 +3755,10 @@
 
       if (viewId === 'login') {
         initLoginParticles();
+      }
+
+      if (viewId === 'landing') {
+        initHeroTyping();
       }
 
       if (updateHash) {
@@ -3758,6 +3793,32 @@
           topNav.classList.remove('hidden');
         }
       }
+
+      // Update active navbar indicator link states
+      const navLinks = {
+        'landing': document.querySelector('#top-nav a[onclick*="landing"]'),
+        'recruiter-dashboard': document.querySelector('#top-nav a[onclick*="recruiter-dashboard"]'),
+        'workspace': document.querySelector('#top-nav a[onclick*="workspace"]'),
+        'settings': document.querySelector('#top-nav a[onclick*="settings"]'),
+        'admin-analytics': document.getElementById('nav-link-admin-analytics')
+      };
+      
+      Object.keys(navLinks).forEach(key => {
+        const link = navLinks[key];
+        if (link) {
+          if (key === viewId) {
+            link.classList.remove('text-on-surface-variant');
+            link.classList.add('text-primary', 'font-bold');
+            link.style.borderBottom = '2px solid var(--color-primary)';
+            link.style.paddingBottom = '4px';
+          } else {
+            link.classList.remove('text-primary', 'font-bold');
+            link.classList.add('text-on-surface-variant');
+            link.style.borderBottom = 'none';
+            link.style.paddingBottom = '0px';
+          }
+        }
+      });
       
       if (viewId === 'settings') {
         loadSettings();
@@ -5193,6 +5254,9 @@ Requirements:
       }
     }
 
+    let currentRadarPoints = [50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50, 50];
+    let radarAnimationId = null;
+
     function updateRadarChart(r) {
       const scoreBreakdown = r.score_breakdown || { similarity: r.score * 0.5, skills: r.score * 0.3, experience: r.score * 0.2 };
       
@@ -5205,15 +5269,55 @@ Requirements:
       const v4 = totalKeywords > 0 ? (r.matched_skills.length / totalKeywords) : 0.5;
       const v5 = 0.8;
       
-      const p0 = `50,${(50 - 35 * v0).toFixed(1)}`;
-      const p1 = `${(50 + 30 * v1).toFixed(1)},${(50 - 15 * v1).toFixed(1)}`;
-      const p2 = `${(50 + 30 * v2).toFixed(1)},${(50 + 15 * v2).toFixed(1)}`;
-      const p3 = `50,${(50 + 35 * v3).toFixed(1)}`;
-      const p4 = `${(50 - 30 * v4).toFixed(1)},${(50 + 15 * v4).toFixed(1)}`;
-      const p5 = `${(50 - 30 * v5).toFixed(1)},${(50 - 15 * v5).toFixed(1)}`;
+      const targetPoints = [
+        50, 50 - 35 * v0,
+        50 + 30 * v1, 50 - 15 * v1,
+        50 + 30 * v2, 50 + 15 * v2,
+        50, 50 + 35 * v3,
+        50 - 30 * v4, 50 + 15 * v4,
+        50 - 30 * v5, 50 - 15 * v5
+      ];
       
-      const pointsStr = `${p0} ${p1} ${p2} ${p3} ${p4} ${p5}`;
-      document.getElementById('radar-shape').setAttribute('points', pointsStr);
+      if (radarAnimationId) {
+        cancelAnimationFrame(radarAnimationId);
+      }
+      
+      const duration = 400;
+      const startTime = performance.now();
+      const startPoints = [...currentRadarPoints];
+      
+      function animate(time) {
+        const elapsed = time - startTime;
+        const progress = Math.min(elapsed / duration, 1.0);
+        
+        // easeOutQuad
+        const ease = progress * (2 - progress);
+        
+        const current = startPoints.map((startVal, idx) => {
+          const targetVal = targetPoints[idx];
+          return startVal + (targetVal - startVal) * ease;
+        });
+        
+        currentRadarPoints = current;
+        
+        const pointsStr = `${current[0].toFixed(1)},${current[1].toFixed(1)} ` +
+                          `${current[2].toFixed(1)},${current[3].toFixed(1)} ` +
+                          `${current[4].toFixed(1)},${current[5].toFixed(1)} ` +
+                          `${current[6].toFixed(1)},${current[7].toFixed(1)} ` +
+                          `${current[8].toFixed(1)},${current[9].toFixed(1)} ` +
+                          `${current[10].toFixed(1)},${current[11].toFixed(1)}`;
+                          
+        const shape = document.getElementById('radar-shape');
+        if (shape) {
+          shape.setAttribute('points', pointsStr);
+        }
+        
+        if (progress < 1.0) {
+          radarAnimationId = requestAnimationFrame(animate);
+        }
+      }
+      
+      radarAnimationId = requestAnimationFrame(animate);
     }
 
     function changeQuestionsDifficulty() {
