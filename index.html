@@ -1033,7 +1033,7 @@
         InsightAI
       </div>
       <div class="hidden md:flex items-center gap-6">
-        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('landing')">Features</a>
+        <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('landing', true, 'features')">Features</a>
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('recruiter-dashboard')">Recruiter Console</a>
         <a id="nav-link-admin-analytics" class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200 hidden" href="javascript:void(0)" onclick="switchView('admin-analytics')">Admin Analytics</a>
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('workspace')">Workspace</a>
@@ -1197,6 +1197,61 @@
       </div>
     </section>
     
+    <!-- Interactive Features Section -->
+    <section id="features" class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mt-32 relative z-10 scroll-mt-24">
+      <div class="text-center space-y-4 mb-16">
+        <span class="text-xs font-bold text-secondary tracking-widest uppercase bg-secondary/15 px-3.5 py-1 rounded-full border border-secondary/20">System Capabilities</span>
+        <h2 class="font-display-lg text-primary text-3xl md:text-4xl font-extrabold tracking-tight leading-none mt-2">Next-Gen Recruiting Architecture</h2>
+        <p class="font-body-lg text-on-surface-variant max-w-2xl mx-auto">Explore the core intelligence modules driving matching accuracy, screening explainability, and recruiter efficiency.</p>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <!-- Feature 1 -->
+        <div class="glass-card border border-outline-variant rounded-3xl p-6 hover:border-primary/55 transition-all hover:translate-y-[-4px] hover:shadow-lg flex flex-col gap-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-2xl">psychology</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-primary text-sm font-headline-md">Semantic AI Matcher</h3>
+            <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Analyzes candidate experience against job requirements using vector similarity search, bypassing simple keyword limits.</p>
+          </div>
+        </div>
+
+        <!-- Feature 2 -->
+        <div class="glass-card border border-outline-variant rounded-3xl p-6 hover:border-secondary/55 transition-all hover:translate-y-[-4px] hover:shadow-lg flex flex-col gap-4">
+          <div class="w-12 h-12 bg-secondary/10 rounded-2xl flex items-center justify-center text-secondary">
+            <span class="material-symbols-outlined text-2xl">analytics</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-secondary text-sm font-headline-md">Explainability Matrix</h3>
+            <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Maps specific JD lines directly to candidate resume snippets, assigning match verdicts and confidence levels.</p>
+          </div>
+        </div>
+
+        <!-- Feature 3 -->
+        <div class="glass-card border border-outline-variant rounded-3xl p-6 hover:border-tertiary-fixed-dim/55 transition-all hover:translate-y-[-4px] hover:shadow-lg flex flex-col gap-4">
+          <div class="w-12 h-12 bg-tertiary/10 rounded-2xl flex items-center justify-center text-tertiary">
+            <span class="material-symbols-outlined text-2xl">record_voice_over</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-tertiary text-sm font-headline-md">Voice AI Simulator</h3>
+            <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Launches custom technical/behavioral screening interviews with real-time audio transcripts and fluency telemetry.</p>
+          </div>
+        </div>
+
+        <!-- Feature 4 -->
+        <div class="glass-card border border-outline-variant rounded-3xl p-6 hover:border-primary/55 transition-all hover:translate-y-[-4px] hover:shadow-lg flex flex-col gap-4">
+          <div class="w-12 h-12 bg-primary/10 rounded-2xl flex items-center justify-center text-primary">
+            <span class="material-symbols-outlined text-2xl">chat</span>
+          </div>
+          <div>
+            <h3 class="font-bold text-primary text-sm font-headline-md">Recruiter Copilot</h3>
+            <p class="text-xs text-on-surface-variant mt-2 leading-relaxed">Converse directly with a pool assistant to draft interview questions, summarize qualifications, or generate follow-ups.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+    
     <!-- Upgraded Premium Footer -->
     <div class="max-w-container-max mx-auto px-margin-mobile md:px-margin-desktop mt-32 w-full">
       <!-- Subtle animated gradient divider line -->
@@ -1236,19 +1291,19 @@
           <div class="space-y-3">
             <span class="text-[10px] font-bold uppercase tracking-wider text-primary block">Platform</span>
             <ul class="space-y-2 text-xs">
-              <li><a href="#" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing')">About Us</a></li>
-              <li><a href="#features" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing')">Features</a></li>
-              <li><a href="#" class="hover:text-primary transition-colors duration-150" onclick="switchView('workspace')">Dashboard</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing')">About Us</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150" onclick="switchView('landing', true, 'features')">Features</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150" onclick="switchView('workspace')">Dashboard</a></li>
               <li><a href="mailto:durgapavan0923@gmail.com" class="hover:text-primary transition-colors duration-150">Contact Support</a></li>
             </ul>
           </div>
           <div class="space-y-3">
             <span class="text-[10px] font-bold uppercase tracking-wider text-secondary block">Trust &amp; Legal</span>
             <ul class="space-y-2 text-xs">
-              <li><a href="#" class="hover:text-primary transition-colors duration-150">Privacy Policy</a></li>
-              <li><a href="#" class="hover:text-primary transition-colors duration-150">Terms of Service</a></li>
-              <li><a href="#" class="hover:text-primary transition-colors duration-150">Security Standard</a></li>
-              <li><a href="#" class="hover:text-primary transition-colors duration-150">Cookie Preferences</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150">Privacy Policy</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150">Terms of Service</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150">Security Standard</a></li>
+              <li><a href="javascript:void(0)" class="hover:text-primary transition-colors duration-150">Cookie Preferences</a></li>
             </ul>
           </div>
         </div>
@@ -3733,7 +3788,7 @@
     }
 
     // View switcher
-    function switchView(viewId, updateHash = true) {
+    function switchView(viewId, updateHash = true, scrollToSectionId = null) {
       if (viewId !== 'login') {
         if (window.loginTypingInterval) {
           clearInterval(window.loginTypingInterval);
@@ -3828,7 +3883,16 @@
         renderAdminActivityLog();
       }
       
-      // Smooth scroll to top
+      // Smooth scroll to target section or top
+      if (scrollToSectionId) {
+        const sectionEl = document.getElementById(scrollToSectionId);
+        if (sectionEl) {
+          setTimeout(() => {
+            sectionEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }, 350);
+          return;
+        }
+      }
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
 
