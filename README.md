@@ -11,13 +11,13 @@
 
 <div align="center">
   <h3>Recruiter Command Console</h3>
-  <img src="assets/screenshots/home.png" alt="Recruiter Command Console" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+  <img src="assets\screenshots\Recruiter Command Console.png" alt="Recruiter Command Console" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
 
   <h3>Candidate Ingestion Workspace</h3>
-  <img src="assets/screenshots/upload.png" alt="Candidate Ingestion Workspace" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+  <img src="assets\screenshots\Candidate Ingestion Workspace.png" alt="Candidate Ingestion Workspace" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
 
   <h3>Interactive Match Analytics & Radar Chart</h3>
-  <img src="assets/screenshots/result.png" alt="Interactive Match Analytics" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
+  <img src="assets\screenshots\Interactive Match Analytics & Radar Chart.png" alt="Interactive Match Analytics" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
 </div>
 
 ---
