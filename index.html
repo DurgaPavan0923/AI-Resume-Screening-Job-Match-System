@@ -677,8 +677,13 @@
         grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
       }
       #view-dashboard {
-        padding-top: 18px !important;
+        padding-top: 104px !important;
         flex-direction: column !important;
+        height: auto !important;
+      }
+      #dashboard-sidebar, #dashboard-content-panel {
+        height: auto !important;
+        overflow-y: visible !important;
       }
       #view-dashboard > aside {
         width: 100% !important;
@@ -1040,6 +1045,10 @@
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('settings')">Settings</a>
       </div>
       <div class="flex items-center gap-3">
+        <!-- Hamburger Menu Button for Mobile -->
+        <button id="mobile-menu-btn" class="md:hidden w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface border border-outline-variant" onclick="toggleMobileMenu(event)">
+          <span class="material-symbols-outlined text-[20px]" id="mobile-menu-icon">menu</span>
+        </button>
         <button class="w-8 h-8 flex items-center justify-center rounded-full bg-surface-container-high hover:bg-surface-container-highest transition-colors text-on-surface border border-outline-variant" onclick="toggleTheme()">
           <span class="material-symbols-outlined text-[18px]" id="theme-icon">light_mode</span>
         </button>
@@ -1084,6 +1093,26 @@
             </button>
           </div>
         </div>
+      </div>
+    </div>
+    <!-- Mobile Navigation Dropdown Menu -->
+    <div id="mobile-menu-dropdown" class="absolute top-[76px] left-4 right-4 bg-surface-container-lowest/95 backdrop-blur-xl border border-outline-variant/60 rounded-3xl p-6 shadow-2xl space-y-4 md:hidden hidden transition-all duration-300 scale-95 opacity-0 transform origin-top z-40">
+      <div class="flex flex-col gap-3 font-semibold text-sm">
+        <a class="px-4 py-3 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all flex items-center gap-2" href="javascript:void(0)" onclick="mobileNavigate('landing', 'features')">
+          <span class="material-symbols-outlined text-lg">features</span> Features
+        </a>
+        <a class="px-4 py-3 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all flex items-center gap-2" href="javascript:void(0)" onclick="mobileNavigate('recruiter-dashboard')">
+          <span class="material-symbols-outlined text-lg">manage_accounts</span> Recruiter Console
+        </a>
+        <a id="mobile-nav-link-admin-analytics" class="px-4 py-3 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all flex items-center gap-2 hidden" href="javascript:void(0)" onclick="mobileNavigate('admin-analytics')">
+          <span class="material-symbols-outlined text-lg">analytics</span> Admin Analytics
+        </a>
+        <a class="px-4 py-3 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all flex items-center gap-2" href="javascript:void(0)" onclick="mobileNavigate('workspace')">
+          <span class="material-symbols-outlined text-lg">upload_file</span> Workspace
+        </a>
+        <a class="px-4 py-3 rounded-xl hover:bg-primary/10 text-on-surface-variant hover:text-primary transition-all flex items-center gap-2" href="javascript:void(0)" onclick="mobileNavigate('settings')">
+          <span class="material-symbols-outlined text-lg">settings</span> Settings
+        </a>
       </div>
     </div>
   </nav>
@@ -1784,6 +1813,16 @@
   <!-- ── VIEW 4: RESULTS ANALYTICS DASHBOARD ── -->
   <div id="view-dashboard" class="view-section hidden flex flex-col md:flex-row flex-grow pt-24 min-h-screen">
     
+    <!-- Mobile Dashboard View Switcher Tab Bar -->
+    <div class="md:hidden flex border-b border-outline-variant bg-surface-container-low z-30 sticky top-0 w-full">
+      <button id="db-tab-btn-queue" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-primary text-primary" onclick="switchDashboardMobileView('queue')">
+        Candidate Queue (<span id="mobile-queue-count">0</span>)
+      </button>
+      <button id="db-tab-btn-analysis" class="flex-1 py-3 text-center text-xs font-bold border-b-2 border-transparent text-on-surface-variant" onclick="switchDashboardMobileView('analysis')">
+        Match Analysis
+      </button>
+    </div>
+    
     <!-- Print Only Cover Page -->
     <div id="print-cover-page" class="hidden print:flex flex-col justify-between items-center h-[90vh] p-12 text-center border-4 border-double border-primary/40 rounded-[32px] my-8 w-full max-w-2xl mx-auto">
       <div class="space-y-4 my-auto">
@@ -1846,7 +1885,7 @@
       </div>
     </div>
 
-    <aside class="w-full md:w-80 bg-surface-container-low border-r border-outline-variant p-6 flex flex-col gap-6 flex-shrink-0">
+    <aside id="dashboard-sidebar" class="w-full md:w-80 bg-surface-container-low border-r border-outline-variant p-6 flex flex-col gap-6 flex-shrink-0">
       <div class="flex justify-between items-center">
         <h2 class="font-headline-md text-lg text-primary">Candidate Queue</h2>
         <button class="text-xs text-primary bg-surface-container px-2.5 py-1 rounded-full hover:bg-surface-container-high" onclick="switchView('workspace')">
@@ -3710,6 +3749,29 @@
         }
       });
 
+      // Window resize listener to dynamically adapt layout and orientation changes
+      window.addEventListener('resize', () => {
+        const activeView = localStorage.getItem('lastActiveView') || 'landing';
+        if (activeView === 'dashboard') {
+          const sidebar = document.getElementById('dashboard-sidebar');
+          const content = document.getElementById('dashboard-content-panel');
+          if (window.innerWidth >= 768) {
+            if (sidebar) sidebar.classList.remove('hidden');
+            if (content) content.classList.remove('hidden');
+          } else {
+            const btnQueue = document.getElementById('db-tab-btn-queue');
+            const isQueueActive = btnQueue && btnQueue.classList.contains('text-primary');
+            if (isQueueActive) {
+              if (sidebar) sidebar.classList.remove('hidden');
+              if (content) content.classList.add('hidden');
+            } else {
+              if (sidebar) sidebar.classList.add('hidden');
+              if (content) content.classList.remove('hidden');
+            }
+          }
+        }
+      });
+
       // Click outside dropdown to close it
       document.addEventListener('click', function(e) {
         const dropdown = document.getElementById('navbar-profile-dropdown');
@@ -3718,6 +3780,20 @@
           if (wrapper && !wrapper.contains(e.target)) {
             dropdown.classList.add('opacity-0', 'pointer-events-none', 'scale-96');
             dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
+          }
+        }
+
+        const mobileDropdown = document.getElementById('mobile-menu-dropdown');
+        const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+        if (mobileDropdown && !mobileDropdown.classList.contains('hidden')) {
+          if (mobileMenuBtn && !mobileMenuBtn.contains(e.target) && !mobileDropdown.contains(e.target)) {
+            mobileDropdown.classList.remove('scale-100', 'opacity-100');
+            mobileDropdown.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+              mobileDropdown.classList.add('hidden');
+            }, 300);
+            const icon = document.getElementById('mobile-menu-icon');
+            if (icon) icon.innerText = 'menu';
           }
         }
       });
@@ -3784,6 +3860,71 @@
             textEl.classList.remove('opacity-0', 'scale-95', 'blur-sm');
           }, 300);
         }, 3500);
+      }
+    }
+
+    // Responsive Mobile Layout Helpers
+    function toggleMobileMenu(event) {
+      if (event) event.stopPropagation();
+      const dropdown = document.getElementById('mobile-menu-dropdown');
+      const icon = document.getElementById('mobile-menu-icon');
+      if (!dropdown) return;
+      
+      const isHidden = dropdown.classList.contains('hidden');
+      if (isHidden) {
+        dropdown.classList.remove('hidden');
+        setTimeout(() => {
+          dropdown.classList.remove('scale-95', 'opacity-0');
+          dropdown.classList.add('scale-100', 'opacity-100');
+        }, 20);
+        if (icon) icon.innerText = 'close';
+      } else {
+        dropdown.classList.remove('scale-100', 'opacity-100');
+        dropdown.classList.add('scale-95', 'opacity-0');
+        setTimeout(() => {
+          dropdown.classList.add('hidden');
+        }, 300);
+        if (icon) icon.innerText = 'menu';
+      }
+    }
+
+    function mobileNavigate(viewId, sectionId = null) {
+      toggleMobileMenu();
+      switchView(viewId, true, sectionId);
+    }
+
+    function switchDashboardMobileView(view) {
+      const sidebar = document.getElementById('dashboard-sidebar');
+      const content = document.getElementById('dashboard-content-panel');
+      const btnQueue = document.getElementById('db-tab-btn-queue');
+      const btnAnalysis = document.getElementById('db-tab-btn-analysis');
+      
+      if (!sidebar || !content) return;
+      
+      if (view === 'queue') {
+        sidebar.classList.remove('hidden');
+        content.classList.add('hidden');
+        
+        if (btnQueue) {
+          btnQueue.classList.add('border-primary', 'text-primary');
+          btnQueue.classList.remove('border-transparent', 'text-on-surface-variant');
+        }
+        if (btnAnalysis) {
+          btnAnalysis.classList.remove('border-primary', 'text-primary');
+          btnAnalysis.classList.add('border-transparent', 'text-on-surface-variant');
+        }
+      } else {
+        sidebar.classList.add('hidden');
+        content.classList.remove('hidden');
+        
+        if (btnAnalysis) {
+          btnAnalysis.classList.add('border-primary', 'text-primary');
+          btnAnalysis.classList.remove('border-transparent', 'text-on-surface-variant');
+        }
+        if (btnQueue) {
+          btnQueue.classList.remove('border-primary', 'text-primary');
+          btnQueue.classList.add('border-transparent', 'text-on-surface-variant');
+        }
       }
     }
 
@@ -3881,6 +4022,17 @@
       
       if (viewId === 'admin-analytics') {
         renderAdminActivityLog();
+      }
+
+      if (viewId === 'dashboard') {
+        if (window.innerWidth < 768) {
+          switchDashboardMobileView('queue');
+        } else {
+          const sidebar = document.getElementById('dashboard-sidebar');
+          const content = document.getElementById('dashboard-content-panel');
+          if (sidebar) sidebar.classList.remove('hidden');
+          if (content) content.classList.remove('hidden');
+        }
       }
       
       // Smooth scroll to target section or top
@@ -4679,6 +4831,11 @@
         if (role === 'admin') navAnalytics.classList.remove('hidden');
         else navAnalytics.classList.add('hidden');
       }
+      const mobileNavAnalytics = document.getElementById('mobile-nav-link-admin-analytics');
+      if (mobileNavAnalytics) {
+        if (role === 'admin') mobileNavAnalytics.classList.remove('hidden');
+        else mobileNavAnalytics.classList.add('hidden');
+      }
       
       if (navLogout) navLogout.classList.remove('hidden');
       if (navLaunch) {
@@ -5059,6 +5216,11 @@ Requirements:
     function renderCandidateSelector(list = analysisResults) {
       const container = document.getElementById('dashboard-candidate-list');
       container.innerHTML = '';
+      
+      const queueCountEl = document.getElementById('mobile-queue-count');
+      if (queueCountEl) {
+        queueCountEl.innerText = list.length;
+      }
 
       list.forEach((r) => {
         const idx = r.originalIndex !== undefined ? r.originalIndex : analysisResults.indexOf(r);
@@ -5398,6 +5560,10 @@ Requirements:
 
     function selectCandidate(index) {
       currentCandidateIndex = index;
+      
+      if (window.innerWidth < 768) {
+        switchDashboardMobileView('analysis');
+      }
       
       // Update highlights in sidebar list immediately
       analysisResults.forEach((_, idx) => {
