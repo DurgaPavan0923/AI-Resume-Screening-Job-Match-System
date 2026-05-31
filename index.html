@@ -8129,9 +8129,9 @@ InsightAI Recruiting Dev`;
     </div>
 
     <!-- Content Area -->
-    <div class="flex-grow overflow-y-auto p-5 flex flex-col min-h-0 bg-surface-container-lowest/40">
+    <div class="flex-grow overflow-hidden p-5 flex flex-col min-h-0 bg-surface-container-lowest/40">
       <!-- Chat Tab -->
-      <div id="copilot-tab-chat" class="flex-grow flex flex-col gap-4 min-h-0">
+      <div id="copilot-tab-chat" class="flex-grow flex flex-col gap-4 min-h-0 overflow-hidden">
         <!-- Chat Target Mode Switcher -->
         <div class="flex bg-surface-container rounded-xl p-1 border border-outline-variant/30 text-[10px] font-semibold items-center justify-between">
           <span class="text-on-surface-variant/80 pl-2">Co-pilot Scope:</span>
@@ -8171,7 +8171,7 @@ InsightAI Recruiting Dev`;
         </div>
 
         <!-- Chat Messages list -->
-        <div id="copilot-chat-messages" class="flex-grow bg-surface/50 backdrop-blur-md border border-outline-variant/60 rounded-2xl p-4 overflow-y-auto space-y-3 min-h-[160px] max-h-[300px] flex flex-col shadow-inner">
+        <div id="copilot-chat-messages" class="flex-grow bg-surface/50 backdrop-blur-md border border-outline-variant/60 rounded-2xl p-4 overflow-y-auto space-y-3 min-h-0 flex flex-col shadow-inner">
           <div class="text-xs text-on-surface-variant italic text-center py-8 flex flex-col items-center gap-2">
             <span class="material-symbols-outlined text-primary text-3xl opacity-40">chat_bubble</span>
             <span>Ask anything about the candidate's skills, qualifications, or interview readiness.</span>
@@ -8188,7 +8188,7 @@ InsightAI Recruiting Dev`;
       </div>
 
       <!-- Rewrite Tab -->
-      <div id="copilot-tab-rewrite" class="hidden flex flex-col gap-4">
+      <div id="copilot-tab-rewrite" class="hidden flex-grow overflow-y-auto flex flex-col gap-4 min-h-0">
         <div>
           <label class="block text-[10px] font-bold text-on-surface-variant/85 uppercase tracking-wider mb-2">Rewrite Target Role:</label>
           <input type="text" id="rewrite-role" class="w-full bg-surface border border-outline-variant/60 rounded-xl px-3 py-2 text-xs focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary text-on-surface shadow-sm" value="Senior Machine Learning Engineer"/>
