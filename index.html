@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html class="scroll-smooth dark" lang="en">
+<html class="scroll-smooth dark overflow-x-hidden" lang="en">
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
@@ -733,7 +733,7 @@
     }
   </style>
 </head>
-<body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col">
+<body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col overflow-x-hidden">
   <!-- Print Only Header/Footer -->
   <header class="print-header hidden">
     <span>InsightAI Enterprise Recruiter OS • Internal Evaluation Dossier</span>
@@ -2007,7 +2007,7 @@
           <p class="font-body-lg text-on-surface-variant mt-1" id="candidate-predicted-role">Senior Machine Learning Engineer</p>
           <div class="flex flex-wrap gap-2 mt-2" id="candidate-insight-chips"></div>
         </div>
-        <div class="flex gap-3 items-center">
+        <div class="flex flex-wrap gap-3 items-center">
           <div class="flex items-center gap-2 bg-surface-container-high px-3.5 py-2 rounded-full border border-outline-variant shadow-sm text-xs">
             <span class="font-semibold text-on-surface-variant">Anonymous Mode</span>
             <input type="checkbox" id="anonymous-toggle" class="form-checkbox h-3.5 w-3.5 text-primary bg-surface border-outline rounded focus:ring-0 cursor-pointer" onchange="toggleAnonymousMode()"/>
