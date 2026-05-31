@@ -158,4 +158,4 @@ kanban:1
 communication:1
 leadership:1
 problem solving:1
-teamwork:1
+teamwork:1bot
