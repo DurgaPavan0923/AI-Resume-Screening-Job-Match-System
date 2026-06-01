@@ -3458,6 +3458,17 @@
 
   <!-- ── JAVASCRIPT APP CONTROLLER ── -->
   <script>
+    // Global fetch interceptor to support local file/cross-port dev server API routing
+    const originalFetch = window.fetch;
+    window.fetch = function(input, init) {
+      if (typeof input === 'string' && input.startsWith('/api')) {
+        if (window.location.protocol === 'file:' || !window.location.host.includes('8000')) {
+          input = `http://127.0.0.1:8000${input}`;
+        }
+      }
+      return originalFetch(input, init);
+    };
+
     // State management
     let uploadedFiles = [];
     let analysisResults = [];
