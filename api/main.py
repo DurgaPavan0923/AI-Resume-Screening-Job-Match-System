@@ -873,16 +873,32 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         else:
             rec_text = f"[Archive & Flag for Future Sourcing] (Score: {score_pct}%). Candidate is a low match for the target role requirement due to critical skill gaps in {missing_skills_str}."
 
+        exp_summary_phrase = (
+            f"Candidate demonstrates {result.experience} years of professional engineering experience with key specialisation in {domain}."
+            if result.experience > 0
+            else "Professional experience duration could not be reliably determined from the resume."
+        )
+        trajectory_phrase = (
+            f"Stable professional trajectory over {result.experience} years matching the role of {cand_role}."
+            if result.experience > 0
+            else "Insufficient employment history available for accurate experience calculation."
+        )
+        progression_phrase = (
+            f"Demonstrates positive career progression over {result.experience} years."
+            if result.experience > 0
+            else "Professional experience duration could not be reliably determined from the resume."
+        )
+
         gpt_analysis = (
             f"1. Executive Summary\n"
-            f"Candidate demonstrates {result.experience} years of professional engineering experience with key specialisation in {domain}. "
+            f"{exp_summary_phrase} "
             f"Shows alignment on core stack: {matched_skills_str}. "
             f"While the candidate possesses a stable professional background, there are key technical alignment gaps in: {missing_skills_str}. "
             f"Overall, the screening pipeline confirms a solid capability foundation with an ATS match score of {score_pct}%.\n\n"
             
             f"2. Candidate Strengths\n"
             f"- {strengths_desc}\n"
-            f"- Stable professional trajectory over {result.experience} years matching the role of {cand_role}.\n\n"
+            f"- {trajectory_phrase}\n\n"
             
             f"3. Critical Skill Gaps\n"
             f"- Missing key requirements: {missing_skills_str}.\n"
@@ -893,7 +909,7 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
             f"- Needs further validation on backend system scalability and data consistency design patterns.\n\n"
             
             f"5. Career Trajectory Assessment\n"
-            f"- Demonstrates positive career progression over {result.experience} years.\n"
+            f"- {progression_phrase}\n"
             f"- Consistent tenure lengths indicating strong retention probability and role ownership.\n\n"
             
             f"6. ATS Readiness\n"
@@ -928,8 +944,13 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
             summary = m.group(1).strip()
 
     if not summary or len(summary) < 20:
+        summary_exp_phrase = (
+            f"with {result.experience} years of experience"
+            if result.experience > 0
+            else "with professional experience duration that could not be reliably determined"
+        )
         summary = (
-            f"Experienced professional with {result.experience} years of experience in the {result.role or 'specified'} domain. "
+            f"Experienced professional {summary_exp_phrase} in the {result.role or 'specified'} domain. "
             f"Demonstrates alignment on core skills such as {', '.join(list(result.skills.keys())[:3]) or 'technical execution'}. "
             f"Has minor gaps in {', '.join(result.missing_skills[:2]) or 'specific domain requirements'}. "
             f"ATS screening indicates match score of {int(result.score)}% and overall recommendation: {decision_plain}."

@@ -1,4 +1,4 @@
-# 🤖 InsightAI — AI-Native Recruiting Operating System
+# 🤖 InsightAI — AI Resume Job Matching System
 
 > A premium, enterprise-grade AI-powered ATS (Applicant Tracking System) and Resume Screening Platform.  
 > Serve the single-page application locally or deploy serverless to Vercel, matching candidate resumes against job descriptions with dual-provider AI support (Google Gemini + OpenAI GPT).

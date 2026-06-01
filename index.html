@@ -378,15 +378,19 @@
         margin: 0 !important;
       }
       .pdf-page {
-        padding: 24mm 20mm !important; /* Proper A4 margins */
+        padding: 12mm 15mm !important; /* Compact A4 margins */
         box-sizing: border-box !important;
         width: 100% !important;
-        min-height: 297mm !important; /* Standard A4 height */
+        height: 297mm !important; /* Force strict single A4 page height */
+        max-height: 297mm !important;
         page-break-after: always !important;
         break-after: page !important;
+        page-break-inside: avoid !important;
+        break-inside: avoid !important;
         background: #ffffff !important;
         color: #000000 !important;
         overflow: hidden !important;
+        position: relative !important;
       }
       .pdf-page:last-child {
         page-break-after: avoid !important;
@@ -762,6 +766,23 @@
         padding: 12px !important;
       }
     }
+    
+    /* Brand Logo & Icon Theme Adaptation */
+    .insightai-logo {
+      mix-blend-mode: multiply;
+      display: inline-block;
+      vertical-align: middle;
+    }
+    .dark .insightai-logo {
+      filter: invert(0.9) hue-rotate(180deg) brightness(1.2) contrast(1.2);
+      mix-blend-mode: screen;
+    }
+    .insightai-icon {
+      display: inline-block;
+      vertical-align: middle;
+      object-fit: cover;
+      object-position: left;
+    }
   </style>
 </head>
 <body class="bg-background text-on-surface font-body-md antialiased selection:bg-secondary selection:text-surface parallax-bg min-h-screen flex flex-col overflow-x-hidden">
@@ -792,7 +813,9 @@
       <div class="absolute inset-0 bg-gradient-to-tr from-primary/5 via-transparent to-secondary/5 opacity-50 pointer-events-none"></div>
       
       <div class="text-center space-y-2 z-10 relative">
-        <h2 class="font-headline-xl text-3xl text-primary font-bold tracking-tight">InsightAI Portal</h2>
+        <div class="flex justify-center mb-1">
+          <img src="assets/logo.png" alt="InsightAI Logo" class="insightai-logo h-16 object-contain" />
+        </div>
         <p class="text-xs text-on-surface-variant">Sign in to your Recruiter Operating System</p>
         <p class="text-[10px] text-on-surface-variant flex items-center justify-center gap-1.5 min-h-[16px] pt-1">
           <span class="inline-block w-1 h-1 rounded-full bg-emerald-400 animate-pulse"></span>
@@ -1065,8 +1088,8 @@
   <!-- ── TOP NAVIGATION BAR ── -->
   <nav id="top-nav" class="fixed top-0 left-0 right-0 z-50 flex justify-center w-full mt-4">
     <div class="glass-card rounded-full mx-auto max-w-fit px-6 py-3 border border-outline-variant shadow-sm flex items-center gap-8">
-      <div class="font-headline-md text-headline-md font-bold text-primary cursor-pointer" onclick="switchView('landing')">
-        InsightAI
+      <div class="flex items-center gap-2 cursor-pointer" onclick="switchView('landing')">
+        <img src="assets/logo.png" alt="InsightAI" class="insightai-logo h-7 object-contain" />
       </div>
       <div class="hidden md:flex items-center gap-6">
         <a class="text-on-surface-variant font-body-md text-body-md hover:text-primary transition-colors duration-200" href="javascript:void(0)" onclick="switchView('landing', true, 'features')">Features</a>
@@ -1323,9 +1346,9 @@
         <!-- Left: Logo + Tagline + Stats -->
         <div class="md:col-span-4 space-y-6">
           <div>
-            <span class="font-headline-md text-headline-md font-bold text-primary cursor-pointer hover:opacity-90" onclick="switchView('landing')">
-              InsightAI
-            </span>
+            <div class="cursor-pointer hover:opacity-90 w-fit" onclick="switchView('landing')">
+              <img src="assets/logo.png" alt="InsightAI Logo" class="insightai-logo h-7 object-contain" />
+            </div>
             <p class="text-xs text-on-surface-variant mt-2 font-medium">Intelligent Resume Screening Powered by AI</p>
           </div>
           
@@ -1680,19 +1703,19 @@
       </div>
       
       <!-- Job Description Card -->
-      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl ambient-shadow p-8 flex flex-col input-glow transition-colors duration-300">
+      <div class="bg-surface-container-lowest border border-outline-variant rounded-xl ambient-shadow p-5 sm:p-8 flex flex-col input-glow transition-colors duration-300">
         <div class="flex items-center justify-between mb-6">
           <h2 class="font-headline-md text-headline-md text-primary">Job Description</h2>
           <span class="bg-surface-container-low text-on-surface-variant font-label-md text-label-md px-3 py-1 rounded-full">Paste Text</span>
         </div>
-        <div class="flex-grow flex flex-col relative">
-          <textarea class="w-full h-full min-h-[240px] resize-none bg-surface border border-outline-variant rounded-lg p-6 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-0 focus:border-primary transition-colors placeholder-on-surface-variant/30" id="jd-textarea" placeholder="Paste the target job description here. The AI matcher will analyze suitability, extract required skills, check years of experience, and output a candidate ranking..."></textarea>
-          <div class="absolute bottom-4 right-4 flex gap-2">
-            <button class="bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary p-2 rounded-lg transition-colors flex items-center gap-1 font-body-sm text-body-sm" onclick="pasteSampleJD()">
+        <div class="flex-grow flex flex-col">
+          <textarea class="w-full min-h-[220px] sm:min-h-[240px] resize-none bg-surface border border-outline-variant rounded-lg p-4 sm:p-5 font-body-md text-body-md text-on-surface focus:outline-none focus:ring-0 focus:border-primary transition-colors placeholder-on-surface-variant/30" id="jd-textarea" placeholder="Paste the target job description here. The AI matcher will analyze suitability, extract required skills, check years of experience, and output a candidate ranking..."></textarea>
+          <div class="mt-3 flex flex-wrap sm:flex-nowrap justify-end gap-2">
+            <button class="bg-surface-container border border-outline-variant text-on-surface-variant hover:text-primary hover:border-primary px-3 py-2 rounded-lg transition-colors flex items-center gap-1.5 font-body-sm text-body-sm" onclick="pasteSampleJD()">
               <span class="material-symbols-outlined text-[18px]">content_paste</span>
               Sample JD
             </button>
-            <button id="btn-analyze-jd" class="bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 p-2 rounded-lg transition-all flex items-center gap-1 font-body-sm text-body-sm font-semibold" onclick="runJDAnalysis()">
+            <button id="btn-analyze-jd" class="bg-primary/10 border border-primary/30 text-primary hover:bg-primary/20 px-3 py-2 rounded-lg transition-all flex items-center gap-1.5 font-body-sm text-body-sm font-semibold" onclick="runJDAnalysis()">
               <span class="material-symbols-outlined text-[18px]">psychology</span>
               Analyze JD
             </button>
@@ -4647,7 +4670,7 @@
       renderStatusHistory(r.name);
       showToast(`🔄 Status updated to ${newStatus.toUpperCase()}`);
       
-      const roleFit = Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5);
+      const roleFit = Math.max(0, Math.min(100, Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5)));
       animateNumberCounter('ai-confidence-role-fit', roleFit, '%');
       animateNumberCounter('ai-confidence-recruiter', getRecruiterConfidenceScore(r.name), '%');
     }
@@ -4738,7 +4761,7 @@
         }
       }
       
-      const roleFit = Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5);
+      const roleFit = Math.max(0, Math.min(100, Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5)));
       animateNumberCounter('ai-confidence-role-fit', roleFit, '%');
       animateNumberCounter('ai-confidence-recruiter', getRecruiterConfidenceScore(r.name), '%');
     }
@@ -5668,9 +5691,84 @@ Requirements:
       }
     }
 
+    function getExecutiveSummaryText(r, parsedSections) {
+      const score = Math.round(r.score);
+      let summaryText = "";
+      const sect = parsedSections.find(s => ['executive summary', 'summary'].some(p => s.title.toLowerCase().includes(p)));
+      if (sect && sect.content && sect.content.length > 0) {
+        summaryText = sect.content.map(item => item.text).join(' ');
+      }
+
+      const matchedCount = r.matched_skills ? r.matched_skills.length : 0;
+      const missingCount = r.missing_skills ? r.missing_skills.length : 0;
+      const totalSkills = matchedCount + missingCount;
+      const expText = (r.experience > 0) ? `${r.experience} years of relevant experience` : 'foundational experience';
+
+      if (score < 30) {
+        return `Candidate demonstrates limited alignment with the target role requirements, matching only ${matchedCount} of ${totalSkills} core skills. With an ATS score of ${score}%, significant competency gaps exist in critical technologies like ${r.missing_skills.slice(0, 3).join(', ') || 'the required stack'}. Insufficient professional alignment for the current profile expectations.`;
+      } else if (score < 55) {
+        return `Candidate presents moderate, borderline alignment with the target role. Possesses ${expText} with capability in ${r.matched_skills.slice(0, 3).join(', ') || 'some core skills'}. However, the candidate lacks exposure in critical requirements such as ${r.missing_skills.slice(0, 3).join(', ') || 'essential systems'}. Targeted interviews are recommended to explore these gaps.`;
+      } else if (score < 75) {
+        return `Candidate is a solid contender demonstrating strong baseline capabilities with an ATS match score of ${score}%. Shows good alignment over ${expText}, particularly with ${r.matched_skills.slice(0, 4).join(', ')}. Gaps exist in secondary skills like ${r.missing_skills.slice(0, 2).join(', ') || 'minor areas'}, which can likely be addressed with minimal onboarding.`;
+      } else {
+        return `Candidate demonstrates exceptional alignment with the target role, achieving an ATS match score of ${score}%. Possesses ${expText} showing deep expertise in ${r.matched_skills.slice(0, 5).join(', ')}. The resume exhibits high structural readiness and strong evidence matching nearly all core expectations of the position.`;
+      }
+    }
+
+    function getRecommendationText(r, parsedSections, decision) {
+      let verdict = "Consider";
+      const dLower = String(decision || '').toLowerCase();
+      if (dLower.includes('hire') || r.score >= 75) {
+        verdict = "Hire";
+      } else if (dLower.includes('consider') || r.score >= 50) {
+        verdict = "Consider";
+      } else if (dLower.includes('hold') || r.score >= 35) {
+        verdict = "Hold";
+      } else {
+        verdict = "Reject";
+      }
+
+      let reasonText = "";
+      const sect = parsedSections.find(s => ['final hiring recommendation', 'recommendation', 'hiring verdict'].some(p => s.title.toLowerCase().includes(p)));
+      if (sect && sect.content && sect.content.length > 0) {
+        const textParts = sect.content.map(item => item.text).join(' ');
+        reasonText = textParts.replace(/^(?:recommendation:?\s*(?:\[?[a-zA-Z\s]+\]?)?\.?\s*)/i, '').trim();
+      }
+
+      if (!reasonText || reasonText.length < 15 || reasonText.includes('calibrated to')) {
+        const matchedCount = r.matched_skills ? r.matched_skills.length : 0;
+        const missingCount = r.missing_skills ? r.missing_skills.length : 0;
+        const totalSkills = matchedCount + missingCount;
+        
+        if (verdict === "Hire") {
+          reasonText = `Candidate demonstrates strong technical alignment with ${matchedCount} of ${totalSkills} core competencies identified in the resume. Strong background matches the target role requirement.`;
+        } else if (verdict === "Consider") {
+          reasonText = `Candidate exhibits a reasonable foundation with ${matchedCount} of ${totalSkills} core skills matched. However, key competencies in ${r.missing_skills.slice(0, 3).join(', ') || 'required systems'} are missing and should be verified during the interview.`;
+        } else if (verdict === "Hold") {
+          reasonText = `Candidate meets some fundamental engineering criteria but has significant skill gaps. Only ${matchedCount} of ${totalSkills} core skills are verified. Missing essential expertise in ${r.missing_skills.slice(0, 4).join(', ') || 'target stack'}.`;
+        } else {
+          reasonText = `Candidate matches only ${matchedCount} of ${totalSkills} required competencies. Critical gaps exist in ${r.missing_skills.slice(0, 5).join(', ') || 'essential technologies'} required for the target position.`;
+        }
+      }
+
+      return `<strong>Recommendation:</strong> ${verdict}<br/><strong style="margin-top: 4px; display: block;">Reason:</strong> ${reasonText}`;
+    }
+
     function populatePDFReportData(r, displayName) {
       const container = document.getElementById('candidate-report-export');
       if (!container) return;
+
+      // STRICT VALIDATION LAYER: Sanitize input candidate object values to prevent undefined/NaN leakages
+      r.score = Math.max(0, Math.min(100, Math.round(cleanNum(r.score, 0))));
+      r.name = cleanVal(r.name, "Candidate Document");
+      r.role = cleanVal(r.role, "Unspecified Position");
+      r.experience = cleanNum(r.experience, 0);
+      r.matched_skills = cleanArr(r.matched_skills);
+      r.missing_skills = cleanArr(r.missing_skills);
+      r.decision = cleanVal(r.decision, "Consider");
+      r.summary = cleanVal(r.summary, "No summary available for this candidate.");
+      r.gpt_analysis = cleanVal(r.gpt_analysis, "");
+      r.evidence_map = cleanArr(r.evidence_map);
 
       const dateStr = new Date().toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' });
       const recruiterName = cleanVal(localStorage.getItem('recruiterName'), 'Enterprise Recruiter');
@@ -5683,17 +5781,17 @@ Requirements:
       const reportId = `IAI-${new Date().getFullYear()}-${hash.toString().substring(0, 6)}`;
 
       // Experience check
-      const expVal = cleanVal(r.experience);
+      const expVal = cleanNum(r.experience, 0);
       let expDisplay = "";
-      if (expVal === 0 || expVal === "0" || !expVal || expVal === "Information unavailable") {
-        expDisplay = "Experience duration could not be reliably determined from the resume.";
+      if (expVal === 0) {
+        expDisplay = "Insufficient History Available";
       } else {
         expDisplay = `${expVal} Years`;
       }
 
       // Clean values & arrays
-      const matchedSkills = cleanArr(r.matched_skills);
-      const missingSkills = cleanArr(r.missing_skills);
+      const matchedSkills = r.matched_skills;
+      const missingSkills = r.missing_skills;
 
       // Skill matrix data formatting
       const matchedSkillsList = matchedSkills.length > 0
@@ -5708,55 +5806,62 @@ Requirements:
         ? matchedSkills.slice().reverse().slice(0, 3).map(s => `<span style="display: inline-block; background-color: #eff6ff; border: 1px solid #dbeafe; color: #1d4ed8; padding: 2px 6px; border-radius: 4px; font-size: 9px; margin-right: 6px; margin-bottom: 6px; font-weight: 500;">${s} (Cross-functional)</span>`).join('')
         : '<span style="color: #94a3b8; font-style: italic;">No cross-functional skills determined.</span>';
 
-      // Score Breakdown values
-      const breakdown = r.score_breakdown || { similarity: r.score * 0.5, skills: r.score * 0.3, experience: r.score * 0.2 };
-      const semConf = Math.round(r.score * 0.97 > 100 ? 100 : r.score * 0.97);
-      const parseConf = Math.round(92 + (currentCandidateIndex % 3) * 2.5);
-      const overallConf = Math.round((semConf + parseConf) / 2);
-      const roleFit = Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5);
-      const recruiterConf = getRecruiterConfidenceScore(r.name);
+      // Score Breakdown values - STRICTLY CLAMPED
+      const breakdown = {
+        similarity: Math.max(0, Math.min(100, Math.round(cleanNum(r.score_breakdown?.similarity, r.score * 0.5)))),
+        skills: Math.max(0, Math.min(100, Math.round(cleanNum(r.score_breakdown?.skills, r.score * 0.3)))),
+        experience: Math.max(0, Math.min(100, Math.round(cleanNum(r.score_breakdown?.experience, r.score * 0.2))))
+      };
+      const semConf = Math.max(0, Math.min(100, Math.round(r.score * 0.97)));
+      const parseConf = Math.max(0, Math.min(100, Math.round(92 + (currentCandidateIndex % 3) * 2.5)));
+      const overallConf = Math.max(0, Math.min(100, Math.round((semConf + parseConf) / 2)));
+      const roleFit = Math.max(0, Math.min(100, Math.round(r.score - 4 + (currentCandidateIndex % 3) * 2.5)));
+      const recruiterConf = Math.max(0, Math.min(100, Math.round(getRecruiterConfidenceScore(r.name))));
       const persona = getCandidatePersona(r.score, r.experience, r.matched_skills, r.role);
 
       // JD keyword mapping table rows
-      const jdKeywords = extractKeywordsFromText(document.getElementById('jd-textarea')?.value || '');
+      const jdKeywords = cleanArr(extractKeywordsFromText(document.getElementById('jd-textarea')?.value || '')).slice(0, 5);
       let jdMappingHtml = '';
       if (jdKeywords.length === 0) {
         jdMappingHtml = '<tr><td colspan="3" style="color: #94a3b8; font-style: italic; text-align: center; padding: 8px;">No Job Description requirements found.</td></tr>';
       } else {
-        jdKeywords.forEach(skill => {
+        jdKeywords.forEach((skill, idx) => {
           const matched = matchedSkills.some(s => s.toLowerCase().includes(skill.toLowerCase()));
           const matchLabel = matched ? '✓ Found' : '✗ Missing';
           const matchColor = matched ? 'color: #047857; background-color: #ecfdf5; border-color: #a7f3d0;' : 'color: #b91c1c; background-color: #fef2f2; border-color: #fca5a5;';
+          const rowBg = idx % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f1f5f9;';
+          
           jdMappingHtml += `
-            <tr>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #1e293b; font-size: 10px;">${skill}</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; ${matched ? 'color: #059669;' : 'color: #dc2626;'} font-size: 10px;">${matchLabel}</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center;"><span style="display: inline-block; border-width: 1px; border-style: solid; padding: 1px 6px; border-radius: 3px; font-size: 8px; font-weight: bold; ${matchColor}">${matchLabel}</span></td>
+            <tr style="${rowBg}">
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: 600; color: #1e293b; font-size: 8px; width: 50% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${skill}</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; ${matched ? 'color: #059669;' : 'color: #dc2626;'} font-size: 8px; width: 25% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${matchLabel}</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; width: 25% !important;"><span style="display: inline-block; border-width: 1px; border-style: solid; padding: 1px 4px; border-radius: 3px; font-size: 7px; font-weight: bold; ${matchColor}">${matchLabel}</span></td>
             </tr>
           `;
         });
       }
 
       // Evidence Map rows with clean values
-      const evidenceMap = cleanArr(r.evidence_map);
+      const evidenceMap = r.evidence_map.slice(0, 5);
       let evidenceMappingHtml = '';
       if (evidenceMap.length === 0) {
         evidenceMappingHtml = '<tr><td colspan="5" style="color: #94a3b8; font-style: italic; text-align: center; padding: 8px;">No explicit semantic evidence mapped.</td></tr>';
       } else {
-        evidenceMap.forEach(item => {
+        evidenceMap.forEach((item, idx) => {
           const req = cleanVal(item.jd_requirement, "Requirement Keyword");
           const evidence = cleanVal(item.resume_evidence, "No evidence found in document");
           const confidence = cleanVal(item.confidence, "High");
           const decision = cleanVal(item.decision, "Information unavailable");
           const reasoning = cleanVal(item.semantic_reasoning, "No explanation compiled");
+          const rowBg = idx % 2 === 0 ? 'background-color: #ffffff;' : 'background-color: #f1f5f9;';
           
           evidenceMappingHtml += `
-            <tr>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: 600; color: #1e293b; font-size: 9px;">${req}</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-style: italic; font-size: 9px; line-height: 1.4;">"${evidence}"</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; font-size: 9px;">${confidence}</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #1e3b8b; font-size: 9px;">${decision}</td>
-              <td style="padding: 6px 8px; border: 1px solid #cbd5e1; font-size: 9px; line-height: 1.4;">${reasoning}</td>
+            <tr style="${rowBg}">
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: 600; color: #1e293b; font-size: 8px; width: 20% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${req}</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; font-style: italic; font-size: 8px; line-height: 1.3; width: 35% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">"${evidence}"</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; font-size: 8px; width: 11% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${confidence}</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; color: #1e3b8b; font-size: 8px; width: 12% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${decision}</td>
+              <td style="padding: 5px 6px; border: 1px solid #cbd5e1; font-size: 8px; line-height: 1.3; width: 22% !important; word-wrap: break-word; word-break: break-word; white-space: normal; overflow: hidden;">${reasoning}</td>
             </tr>
           `;
         });
@@ -5809,89 +5914,143 @@ Requirements:
       const decision = cleanVal(r.decision);
       const filename = cleanVal(r.name);
       
-      const recommendationText = getRecommendationText(parsedSections, decision);
+      const recommendationText = getRecommendationText(r, parsedSections, decision);
       const strengthsHtml = getTopStrengthsHtml(parsedSections, matchedSkills);
       const gapsHtml = getTopGapsHtml(parsedSections, missingSkills);
-      const summaryText = cleanVal(r.summary, "No summary available for this candidate.");
+      const summaryText = getExecutiveSummaryText(r, parsedSections);
+
+      // Determine verdict metrics
+      let verdict = "Consider";
+      let verdictColor = "#fbbf24";
+      const dLower = String(decision || '').toLowerCase();
+      if (dLower.includes('hire') || score >= 75) {
+        verdict = "Hire";
+        verdictColor = "#10b981";
+      } else if (dLower.includes('consider') || score >= 50) {
+        verdict = "Consider";
+        verdictColor = "#fbbf24";
+      } else if (dLower.includes('hold') || score >= 35) {
+        verdict = "Hold";
+        verdictColor = "#818cf8";
+      } else {
+        verdict = "Reject";
+        verdictColor = "#f87171";
+      }
+
+      const interviewRec = (verdict === "Hire" || verdict === "Consider") ? "Yes" : "No";
+      const interviewColor = interviewRec === "Yes" ? "#10b981" : "#f87171";
+      const recruiterConf = Math.round(getRecruiterConfidenceScore(r.name));
 
       return `
-        <!-- Page 1: Cover Sheet & Executive Summary -->
-        <div class="pdf-page bg-white flex flex-col justify-between" style="min-height: 297mm; page-break-after: always; break-after: page;">
+        <!-- Page 1: Cover Sheet & Recruiter Decision Snapshot -->
+        <div class="pdf-page bg-white flex flex-col justify-between" style="height: 297mm; max-height: 297mm; page-break-after: always; break-after: page; box-sizing: border-box; overflow: hidden; position: relative;">
           <div style="text-align: left;">
             <!-- Header Logo block -->
-            <div style="display: flex; align-items: center; border-bottom: 2px solid #1e3b8b; padding-bottom: 12px; margin-bottom: 20px;">
-              <div style="background-color: #1e3b8b !important; width: 44px; height: 44px; border-radius: 8px; display: flex; align-items: center; justify-content: center; margin-right: 12px;">
-                <span style="font-family: 'Material Symbols Outlined'; font-size: 24px; color: #ffffff !important;">smart_toy</span>
-              </div>
-              <div>
-                <span style="color: #1e3b8b !important; font-size: 20px; font-weight: 800; display: block; line-height: 1.1;">InsightAI</span>
-                <span style="font-size: 8px; color: #64748b; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; display: block;">Enterprise Talent Intelligence</span>
-              </div>
+            <div style="display: flex; align-items: center; border-bottom: 2px solid #1e3b8b; padding-bottom: 8px; margin-bottom: 12px;">
+              <img src="assets/logo.png" alt="InsightAI Logo" style="height: 28px; object-fit: contain; margin-right: 12px;" />
               <div style="margin-left: auto; text-align: right;">
                 <span style="font-size: 8px; font-weight: bold; color: #64748b; display: block;">REPORT ID: ${reportId}</span>
                 <span style="font-size: 8px; color: #94a3b8; display: block;">DATE: ${dateStr}</span>
               </div>
             </div>
             
-            <div style="margin-top: 16px;">
-              <h1 style="font-size: 22px; font-weight: 900; color: #0f172a; line-height: 1.2; text-transform: uppercase; margin-bottom: 2px; text-align: left;">Candidate Screening Report</h1>
-              <p style="font-size: 10px; color: #475569; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; text-align: left;">AI-Powered Competency Rationale & Talent Evaluation</p>
+            <div style="margin-bottom: 10px;">
+              <h1 style="font-size: 16px; font-weight: 900; color: #0f172a; line-height: 1.2; text-transform: uppercase; margin: 0; text-align: left;">Candidate Screening Report</h1>
+              <p style="font-size: 8px; color: #475569; font-weight: bold; text-transform: uppercase; letter-spacing: 0.05em; margin: 2px 0 0 0; text-align: left;">AI-Powered Competency Rationale & Talent Evaluation</p>
+            </div>
+
+            <!-- Recruiter Decision Snapshot Section -->
+            <div style="background-color: #0f172a; border-radius: 8px; padding: 10px; color: #ffffff; margin-bottom: 12px;">
+              <h3 style="color: #38bdf8 !important; font-size: 9px; font-weight: 800; text-transform: uppercase; margin-top: 0; margin-bottom: 8px; letter-spacing: 0.05em; border-bottom: 1px solid #334155; padding-bottom: 3px;">Recruiter Decision Snapshot</h3>
+              <div style="display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 8px; text-align: center;">
+                
+                <!-- Match Score Card -->
+                <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px;">
+                  <span style="color: #94a3b8 !important; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Match Score</span>
+                  <span style="color: #38bdf8; font-size: 16px; font-weight: 900; display: block; margin-top: 2px;">${score}%</span>
+                </div>
+
+                <!-- Recommendation Card -->
+                <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px;">
+                  <span style="color: #94a3b8 !important; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Overall Decision</span>
+                  <span style="color: ${verdictColor}; font-size: 13px; font-weight: 900; display: block; margin-top: 3px; text-transform: uppercase;">${verdict}</span>
+                </div>
+
+                <!-- Interview Recommended Card -->
+                <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px;">
+                  <span style="color: #94a3b8 !important; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Interview Rec.</span>
+                  <span style="color: ${interviewColor}; font-size: 13px; font-weight: 900; display: block; margin-top: 3px; text-transform: uppercase;">${interviewRec}</span>
+                </div>
+
+                <!-- Recruiter Confidence Card -->
+                <div style="background-color: #1e293b; border: 1px solid #334155; border-radius: 6px; padding: 6px;">
+                  <span style="color: #94a3b8 !important; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Confidence</span>
+                  <span style="color: #e2e8f0; font-size: 13px; font-weight: 900; display: block; margin-top: 3px;">${recruiterConf}%</span>
+                </div>
+
+              </div>
             </div>
             
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; padding: 14px; margin-top: 16px;">
+            <!-- Metadata Grid -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 10px; margin-bottom: 12px;">
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Candidate Name</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px;">${displayName}</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Candidate Name</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px;">${displayName}</span>
               </div>
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Target Role</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px;">${cleanVal(r.role, "Unspecified")}</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Target Role</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px;">${cleanVal(r.role, "Unspecified")}</span>
               </div>
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Overall Match Score</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px;">${score}% Match (${decision})</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Track Record</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px;">${expDisplay}</span>
               </div>
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Resume Filename</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px; word-break: break-all;">${filename}</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Resume Filename</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px; word-break: break-all; max-height: 24px; overflow: hidden;">${filename}</span>
               </div>
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Assigned Recruiter</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px;">${recruiterName}</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Assigned Recruiter</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px;">${recruiterName}</span>
               </div>
               <div>
-                <span style="color: #94a3b8; font-size: 8px; font-weight: bold; text-transform: uppercase; display: block;">Candidate Track Record</span>
-                <span style="color: #1e3b8b; font-size: 11px; font-weight: bold; display: block; margin-top: 2px;">${expDisplay}</span>
+                <span style="color: #94a3b8; font-size: 7px; font-weight: bold; text-transform: uppercase; display: block;">Match Verdict</span>
+                <span style="color: #1e3b8b; font-size: 9px; font-weight: bold; display: block; margin-top: 1px;">${verdict}</span>
               </div>
             </div>
             
-            <div style="margin-top: 20px;">
-              <h2 style="font-size: 13px; font-weight: bold; color: #1e3b8b; border-bottom: 2px solid #e2e8f0; padding-bottom: 4px; margin-bottom: 10px; text-transform: uppercase; text-align: left;">Recruiter Executive Summary</h2>
-              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 10px; padding: 12px; font-size: 10.5px; line-height: 1.6; color: #334155; text-align: left;">
+            <!-- Executive Summary -->
+            <div style="margin-bottom: 12px;">
+              <h2 style="font-size: 10px; font-weight: bold; color: #1e3b8b; border-bottom: 1.5px solid #e2e8f0; padding-bottom: 3px; margin: 0 0 6px 0; text-transform: uppercase; text-align: left;">Recruiter Executive Summary</h2>
+              <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 8px; font-size: 9px; line-height: 1.5; color: #334155; text-align: left;">
                 ${summaryText}
               </div>
             </div>
 
-            <div style="margin-top: 16px; display: grid; grid-template-columns: 1fr 1fr; gap: 16px;">
+            <!-- Strengths and Gaps -->
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
               <div>
-                <h3 style="font-size: 10.5px; font-weight: bold; color: #059669; text-transform: uppercase; margin-bottom: 6px; text-align: left;">Top Strengths Profile</h3>
-                <ul style="padding-left: 0; margin-left: 0; list-style-type: none;">
+                <h3 style="font-size: 9px; font-weight: bold; color: #059669; text-transform: uppercase; margin: 0 0 5px 0; text-align: left;">Top Strengths Profile</h3>
+                <ul style="padding-left: 0; margin: 0; list-style-type: none;">
                   ${strengthsHtml}
                 </ul>
               </div>
               <div>
-                <h3 style="font-size: 10.5px; font-weight: bold; color: #dc2626; text-transform: uppercase; margin-bottom: 6px; text-align: left;">Major Skill Gaps</h3>
-                <ul style="padding-left: 0; margin-left: 0; list-style-type: none;">
+                <h3 style="font-size: 9px; font-weight: bold; color: #dc2626; text-transform: uppercase; margin: 0 0 5px 0; text-align: left;">Major Skill Gaps</h3>
+                <ul style="padding-left: 0; margin: 0; list-style-type: none;">
                   ${gapsHtml}
                 </ul>
               </div>
             </div>
           </div>
           
-          <div style="border-top: 1px solid #e2e8f0; padding-top: 10px; margin-top: 20px; text-align: left;">
-            <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 8px; padding: 10px; width: 100%;">
-              <span style="font-size: 8px; font-weight: bold; color: #1e3b8b; text-transform: uppercase; display: block;">Hiring Team Recommendation</span>
-              <span style="font-size: 10px; font-weight: bold; color: #1e293b; display: block; margin-top: 2px; text-align: left;">${recommendationText}</span>
+          <!-- Recommendation Container at Bottom -->
+          <div style="border-top: 1px solid #e2e8f0; padding-top: 8px; text-align: left;">
+            <div style="background-color: #eff6ff; border: 1px solid #bfdbfe; border-radius: 6px; padding: 8px; width: 100%; box-sizing: border-box;">
+              <span style="font-size: 7px; font-weight: bold; color: #1e3b8b; text-transform: uppercase; display: block;">Hiring Team Recommendation Summary</span>
+              <div style="font-size: 9px; color: #1e293b; display: block; margin-top: 3px; text-align: left; line-height: 1.4;">
+                ${recommendationText}
+              </div>
             </div>
           </div>
         </div>
@@ -5904,7 +6063,7 @@ Requirements:
       
       return `
         <!-- Page 2: ATS Match Analysis & Metrics -->
-        <div class="pdf-page bg-white print-page-break" style="min-height: 297mm; page-break-after: always; break-after: page;">
+        <div class="pdf-page bg-white print-page-break" style="height: 297mm; max-height: 297mm; overflow: hidden; page-break-after: always; break-after: page;">
           <h2 style="color: #1e3b8b !important; border-bottom: 2px solid #f1f5f9 !important; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">ATS Match Analysis & Metrics</h2>
           
           <div style="display: grid; grid-template-columns: 1fr 1.2fr; gap: 20px;">
@@ -5994,8 +6153,7 @@ Requirements:
       const gapGraph = renderGapAnalysisGraphSVG(r.matched_skills, r.missing_skills);
       
       return `
-        <!-- Page 3: Competency & Skill Matrix -->
-        <div class="pdf-page bg-white print-page-break" style="min-height: 297mm; page-break-after: always; break-after: page;">
+        <div class="pdf-page bg-white print-page-break" style="height: 297mm; max-height: 297mm; overflow: hidden; page-break-after: always; break-after: page;">
           <h2 style="color: #1e3b8b !important; border-bottom: 2px solid #f1f5f9 !important; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">Competency & Skill Matrix</h2>
           
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; text-align: left;">
@@ -6005,7 +6163,7 @@ Requirements:
               
               <div style="margin-top: 16px;">
                 <h3 style="color: #475569 !important; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px;">Transferable Competencies</h3>
-                <div style="background-color: #eff6ff !important; border: 1px solid #dbeafe !important; border-radius: 8px; padding: 10px; font-size: 9.5px; line-height: 1.5; min-height: 60px;">
+                <div style="background-color: #eff6ff !important; border: 1px solid #dbeafe !important; border-radius: 8px; padding: 10px; font-size: 9.5px; line-height: 1.5; min-height: 60px; max-height: 100px; overflow: hidden;">
                   ${transferableList}
                 </div>
               </div>
@@ -6069,7 +6227,7 @@ Requirements:
 
       return `
         <!-- Page 4: AI Narrative Report -->
-        <div class="pdf-page bg-white print-page-break" style="min-height: 297mm; page-break-after: always; break-after: page;">
+        <div class="pdf-page bg-white print-page-break" style="height: 297mm; max-height: 297mm; overflow: hidden; page-break-after: always; break-after: page;">
           <h2 style="color: #1e3b8b !important; border-bottom: 2px solid #f1f5f9 !important; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">AI Narrative Report</h2>
           <div class="space-y-6">
             ${p4Content}
@@ -6081,17 +6239,17 @@ Requirements:
     function renderPage5(r, jdMappingHtml, evidenceMappingHtml) {
       return `
         <!-- Page 5: Explainability Matrix -->
-        <div class="pdf-page bg-white print-page-break" style="min-height: 297mm; page-break-after: always; break-after: page;">
+        <div class="pdf-page bg-white print-page-break" style="height: 297mm; max-height: 297mm; overflow: hidden; page-break-after: always; break-after: page;">
           <h2 style="color: #1e3b8b !important; border-bottom: 2px solid #f1f5f9 !important; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">Explainability Matrix</h2>
           
           <div style="text-align: left;">
             <h3 style="color: #475569 !important; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px;">Job Description Requirement Alignment</h3>
-            <table style="width: 100% !important; border-collapse: collapse !important; font-size: 9px; margin-top: 0; margin-bottom: 16px;">
+            <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; font-size: 8px; margin-top: 0; margin-bottom: 12px; word-wrap: break-word;">
               <thead>
                 <tr style="background-color: #f1f5f9 !important;">
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: bold;">Requirement Keyword</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 80px;">Status</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 100px;">Match Verdict</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: bold; width: 50% !important;">Requirement Keyword</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; width: 25% !important;">Status</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; width: 25% !important;">Match Verdict</th>
                 </tr>
               </thead>
               <tbody>
@@ -6099,17 +6257,17 @@ Requirements:
               </tbody>
             </table>
           </div>
-
-          <div style="text-align: left; margin-top: 16px;">
+ 
+          <div style="text-align: left; margin-top: 12px;">
             <h3 style="color: #475569 !important; font-size: 10px; font-weight: bold; text-transform: uppercase; margin-bottom: 6px;">Resume Evidence Mapping</h3>
-            <table style="width: 100% !important; border-collapse: collapse !important; font-size: 8.5px; margin-top: 0;">
+            <table style="width: 100% !important; table-layout: fixed !important; border-collapse: collapse !important; font-size: 8px; margin-top: 0; word-wrap: break-word;">
               <thead>
                 <tr style="background-color: #f1f5f9 !important;">
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: bold; width: 90px;">Hiring Requirement</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: bold;">Document Textual Evidence Proof</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 50px;">Confidence</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; text-align: center; width: 50px;">Decision</th>
-                  <th style="padding: 6px 8px; border: 1px solid #cbd5e1; font-weight: bold; width: 90px;">Reasoning</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: bold; width: 20% !important;">Hiring Requirement</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: bold; width: 35% !important;">Document Textual Evidence Proof</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; width: 11% !important;">Confidence</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; text-align: center; font-weight: bold; width: 12% !important;">Decision</th>
+                  <th style="padding: 5px 6px; border: 1px solid #cbd5e1; font-weight: bold; width: 22% !important;">Reasoning</th>
                 </tr>
               </thead>
               <tbody>
@@ -6145,11 +6303,11 @@ Requirements:
 
       const risksContent = getPDFSectionHtml(['Hiring Risks', 'Risk Indicators']);
       const reasoningContent = getPDFSectionHtml(['Semantic Match Reasoning', 'Recommendation Reasoning']);
-      const recommendationText = getRecommendationText(parsedSections, decision);
+      const recommendationText = getRecommendationText(r, parsedSections, decision);
 
       return `
         <!-- Page 6: Decision Support & Interview Roadmap -->
-        <div class="pdf-page bg-white print-page-break" style="min-height: 297mm; page-break-after: avoid; break-after: avoid;">
+        <div class="pdf-page bg-white print-page-break" style="height: 297mm; max-height: 297mm; overflow: hidden; page-break-after: avoid; break-after: avoid;">
           <h2 style="color: #1e3b8b !important; border-bottom: 2px solid #f1f5f9 !important; font-size: 15px; font-weight: 800; text-transform: uppercase; margin-bottom: 12px;">Decision Support & Interview Roadmap</h2>
           
           <div style="text-align: left;">
@@ -6610,23 +6768,23 @@ Requirements:
       document.getElementById('gauge-circle').style.strokeDashoffset = offset;
 
       // Update Secondary Match Percentages
-      animateNumberCounter('score-keywords', r.score * 1.05 > 100 ? 100 : r.score * 1.05, '%');
-      animateNumberCounter('score-structure', r.score * 0.95, '%');
-      animateNumberCounter('score-readability', r.score * 0.98, '%');
+      animateNumberCounter('score-keywords', Math.max(0, Math.min(100, Math.round(r.score * 1.05 > 100 ? 100 : r.score * 1.05))), '%');
+      animateNumberCounter('score-structure', Math.max(0, Math.min(100, Math.round(r.score * 0.95))), '%');
+      animateNumberCounter('score-readability', Math.max(0, Math.min(100, Math.round(r.score * 0.98))), '%');
 
       // Update AI Confidence Scores
-      const semConf = Math.round(r.score * 0.97 > 100 ? 100 : r.score * 0.97);
-      const parseConf = Math.round(92 + (index % 3) * 2.5);
-      const overallConf = (semConf + parseConf) / 2;
+      const semConf = Math.max(0, Math.min(100, Math.round(r.score * 0.97 > 100 ? 100 : r.score * 0.97)));
+      const parseConf = Math.max(0, Math.min(100, Math.round(92 + (index % 3) * 2.5)));
+      const overallConf = Math.max(0, Math.min(100, (semConf + parseConf) / 2));
       animateNumberCounter('ai-confidence-semantic', semConf, '%');
       animateNumberCounter('ai-confidence-parsing', parseConf, '%');
       
       // Update Role Fit, Recruiter, and Range
-      const roleFit = Math.round(r.score - 4 + (index % 3) * 2.5);
+      const roleFit = Math.max(0, Math.min(100, Math.round(r.score - 4 + (index % 3) * 2.5)));
       animateNumberCounter('ai-confidence-role-fit', roleFit, '%');
       animateNumberCounter('ai-confidence-recruiter', getRecruiterConfidenceScore(r.name), '%');
-      const rangeMin = Math.round(r.score - 5);
-      const rangeMax = Math.round(Math.min(100, r.score + 5));
+      const rangeMin = Math.max(0, Math.round(r.score - 5));
+      const rangeMax = Math.max(0, Math.min(100, Math.round(r.score + 5)));
       const rangeEl = document.getElementById('ai-confidence-range');
       if (rangeEl) rangeEl.innerText = `${rangeMin}% - ${rangeMax}%`;
       
@@ -7042,39 +7200,67 @@ Requirements:
       const skillsStr = cleanSkills.join(' ').toLowerCase();
       const roleStr = String(role || '').toLowerCase();
       
-      if (experience >= 8 || skillsStr.includes('lead') || skillsStr.includes('manage') || skillsStr.includes('architect')) {
-        return {
-          title: "Leadership Potential",
-          icon: "supervisor_account",
-          color: "bg-indigo-500/10 text-indigo-400 border-indigo-500/25",
-          desc: "Demonstrates senior seniority, system architecture exposure, or management indicators."
-        };
+      let title = "Technical Builder";
+      let icon = "construction";
+      let color = "bg-emerald-500/10 text-emerald-400 border-emerald-500/25";
+      let desc = "Hands-on builder with strong alignment on engineering practices and implementation tools.";
+
+      // Check for specific keywords
+      const isAI = skillsStr.includes('pytorch') || skillsStr.includes('tensorflow') || skillsStr.includes('keras') || skillsStr.includes('deep learning') || skillsStr.includes('llm') || skillsStr.includes('nlp') || skillsStr.includes('transformers');
+      const isML = skillsStr.includes('machine learning') || skillsStr.includes('scikit') || skillsStr.includes('mlops') || skillsStr.includes('pandas') || skillsStr.includes('numpy') || skillsStr.includes('modeling') || skillsStr.includes('data science') || skillsStr.includes('predictive');
+      const isFrontend = skillsStr.includes('react') || skillsStr.includes('vue') || skillsStr.includes('angular') || skillsStr.includes('html') || skillsStr.includes('css') || skillsStr.includes('typescript') || skillsStr.includes('javascript') || skillsStr.includes('ui') || skillsStr.includes('ux') || roleStr.includes('frontend') || roleStr.includes('ui') || roleStr.includes('ux');
+      const isBackend = skillsStr.includes('node') || skillsStr.includes('python') || skillsStr.includes('django') || skillsStr.includes('flask') || skillsStr.includes('express') || skillsStr.includes('sql') || skillsStr.includes('postgres') || skillsStr.includes('mongodb') || skillsStr.includes('docker') || skillsStr.includes('kubernetes') || skillsStr.includes('redis') || skillsStr.includes('aws') || skillsStr.includes('api') || skillsStr.includes('apis') || roleStr.includes('backend') || roleStr.includes('system');
+      const isResearch = skillsStr.includes('research') || skillsStr.includes('thesis') || skillsStr.includes('phd') || skillsStr.includes('scientific') || skillsStr.includes('paper') || skillsStr.includes('publications') || roleStr.includes('research');
+      const isProduct = skillsStr.includes('product') || skillsStr.includes('agile') || skillsStr.includes('scrum') || skillsStr.includes('mobile') || skillsStr.includes('flutter') || skillsStr.includes('swift') || skillsStr.includes('kotlin') || roleStr.includes('product');
+
+      if (isResearch) {
+        title = "Research Candidate";
+        icon = "biotech";
+        color = "bg-purple-500/10 text-purple-400 border-purple-500/25";
+        desc = "Shows strong alignment with scientific methodologies, research standards, or academic publications.";
+      } else if (isAI) {
+        title = "AI Engineer";
+        icon = "psychology";
+        color = "bg-indigo-500/10 text-indigo-400 border-indigo-500/25";
+        desc = "Specializes in neural network architectures, generative models, large language models, or natural language processing.";
+      } else if (isML) {
+        title = "Machine Learning Practitioner";
+        icon = "memory";
+        color = "bg-teal-500/10 text-teal-400 border-teal-500/25";
+        desc = "Focuses on predictive modeling, feature engineering, and the deployment of production-grade machine learning pipelines.";
+      } else if (isFrontend && isBackend) {
+        title = "Full Stack Engineer";
+        icon = "layers";
+        color = "bg-blue-500/10 text-blue-400 border-blue-500/25";
+        desc = "Demonstrates multi-layered capabilities spanning modern client interfaces and server-side logic/database interactions.";
+      } else if (isFrontend) {
+        title = "Frontend Specialist";
+        icon = "devices";
+        color = "bg-pink-500/10 text-pink-400 border-pink-500/25";
+        desc = "Expert in component-based UI structures, styling sheets, responsive design, and fluid user experiences.";
+      } else if (isBackend) {
+        title = "Backend Developer";
+        icon = "dns";
+        color = "bg-cyan-500/10 text-cyan-400 border-cyan-500/25";
+        desc = "Focuses on API construction, data storage schemas, microservices orchestration, and backend processing pipelines.";
+      } else if (isProduct) {
+        title = "Product Engineer";
+        icon = "rocket_launch";
+        color = "bg-amber-500/10 text-amber-400 border-amber-500/25";
+        desc = "Strong focus on product development, fast prototyping, and user-centric features.";
+      } else if (experience >= 8) {
+        title = "Leadership Potential";
+        icon = "supervisor_account";
+        color = "bg-violet-500/10 text-violet-400 border-violet-500/25";
+        desc = "Possesses extensive industry tenure, strategic architectural perspective, or organizational lead qualities.";
+      } else if (experience <= 3 && score >= 75) {
+        title = "Startup Ready";
+        icon = "bolt";
+        color = "bg-yellow-500/10 text-yellow-400 border-yellow-500/25";
+        desc = "High velocity, high capability match early in career. Ideal for fast-paced growth.";
       }
-      
-      if (skillsStr.includes('research') || skillsStr.includes('thesis') || skillsStr.includes('tensor') || skillsStr.includes('pytorch') || skillsStr.includes('science') || skillsStr.includes('phd') || skillsStr.includes('paper')) {
-        return {
-          title: "Research-Oriented",
-          icon: "biotech",
-          color: "bg-teal-500/10 text-teal-400 border-teal-500/25",
-          desc: "Shows alignment with advanced algorithms, scientific stacks, or data methodologies."
-        };
-      }
-      
-      if (experience <= 3 && score >= 75) {
-        return {
-          title: "Startup Ready",
-          icon: "bolt",
-          color: "bg-amber-500/10 text-amber-400 border-amber-500/25",
-          desc: "High velocity, high capability match early in career. Ideal for fast-paced growth."
-        };
-      }
-      
-      return {
-        title: "Technical Builder",
-        icon: "construction",
-        color: "bg-emerald-500/10 text-emerald-400 border-emerald-500/25",
-        desc: "Hands-on builder with strong alignment on engineering practices and implementation tools."
-      };
+
+      return { title, icon, color, desc };
     }
 
     function updateInteractiveResumeView() {
@@ -7640,8 +7826,11 @@ InsightAI Recruiting Dev`;
       
       container.innerHTML = `
         <div class="onboarding-slide text-center space-y-3 animate-fade-in">
-          <div class="w-16 h-16 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto">
-            <span class="material-symbols-outlined text-3xl">${slide.icon}</span>
+          <div class="w-16 h-16 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto overflow-hidden">
+            ${slide.icon === 'smart_toy'
+              ? `<img src="assets/logo.png" alt="InsightAI Icon" class="insightai-icon h-12 w-12 object-cover object-left rounded-md" />`
+              : `<span class="material-symbols-outlined text-3xl">${slide.icon}</span>`
+            }
           </div>
           <h4 class="font-bold text-sm text-on-surface">${slide.title}</h4>
           <p class="text-on-surface-variant leading-relaxed">${slide.desc}</p>
@@ -8941,8 +9130,8 @@ InsightAI Recruiting Dev`;
   </div>
 
   <!-- Floating FAB for Recruitment Co-pilot -->
-  <button id="copilot-fab" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-primary to-secondary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 z-40 pulse-animation group" onclick="toggleCopilotDrawer()">
-    <span class="material-symbols-outlined text-2xl group-hover:rotate-12 transition-transform duration-300">smart_toy</span>
+  <button id="copilot-fab" class="fixed bottom-6 right-6 w-16 h-16 bg-gradient-to-tr from-primary to-secondary text-on-primary rounded-full shadow-2xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all duration-300 z-40 pulse-animation group overflow-hidden" onclick="toggleCopilotDrawer()">
+    <img src="assets/logo.png" alt="InsightAI" class="insightai-icon h-10 w-10 object-cover object-left rounded-xl group-hover:rotate-12 transition-transform duration-300" />
   </button>
 
   <!-- Copilot Popover Drawer (Floating style) -->
@@ -8951,7 +9140,7 @@ InsightAI Recruiting Dev`;
     <div class="p-5 flex items-center justify-between bg-gradient-to-r from-primary to-secondary text-on-primary shadow-sm flex-shrink-0">
       <div class="flex items-center gap-3">
         <div class="relative flex items-center justify-center w-10 h-10 rounded-full bg-on-primary/10 border border-on-primary/20">
-          <span class="material-symbols-outlined text-[22px] text-on-primary">smart_toy</span>
+          <img src="assets/logo.png" alt="InsightAI" class="insightai-icon h-8 w-8 object-cover object-left rounded-lg" />
           <span class="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-400 rounded-full border-2 border-primary animate-pulse"></span>
         </div>
         <div>
@@ -9355,8 +9544,8 @@ InsightAI Recruiting Dev`;
       <div id="onboarding-slides-container" class="min-h-[160px] text-xs leading-relaxed space-y-4">
         <!-- Slide 1 -->
         <div class="onboarding-slide text-center space-y-3">
-          <div class="w-16 h-16 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto">
-            <span class="material-symbols-outlined text-3xl">smart_toy</span>
+          <div class="w-16 h-16 bg-primary/10 text-primary border border-primary/20 rounded-full flex items-center justify-center mx-auto overflow-hidden">
+            <img src="assets/logo.png" alt="InsightAI Icon" class="insightai-icon h-12 w-12 object-cover object-left rounded-md" />
           </div>
           <h4 class="font-bold text-sm text-on-surface">Futuristic AI Sourcing Assistant</h4>
           <p class="text-on-surface-variant">InsightAI matches resumes to Job Descriptions in seconds using semantic vectors and deep models, highlighting match strengths and critical career limitations.</p>
