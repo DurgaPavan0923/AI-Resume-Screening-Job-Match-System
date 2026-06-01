@@ -20,30 +20,22 @@
   <img src="assets\screenshots\Interactive Match Analytics & Radar Chart.png" alt="Interactive Match Analytics" width="800px" style="border-radius: 12px; margin-bottom: 24px; box-shadow: 0 10px 30px rgba(0,0,0,0.3);" />
 </div>
 
----
+## 🎨 Latest UI/UX, PDF Engine, & Authentication Upgrades
 
-## 🎨 Latest UI/UX & Realism Audit Upgrades
+We have upgraded the platform to enterprise-grade SaaS standards, resolving visual polish, PDF layout quality, authentication reliability, and mobile responsiveness:
 
-We have upgraded the platform to production-grade SaaS standards, resolving visual polish, trust, interaction quality, and UX consistency:
-
-* **Premium Login Portal**: Dynamic, performance-safe background particle engine (`initLoginParticles()`), smoother card shadows, premium input focus glows, credentials caching (Remember Me), and refined enterprise SSO buttons.
-* **Onboarding Welcome Experience**: A multi-step onboarding wizard (Role Persona -> Corporate Credentials -> Sourcing Specialization -> AI Personalization Tuning) feeding into a Welcome Checklist showing setup progress with direct redirection to the file dropzone.
-* **High-Fidelity AI Narrative**: Detailed evaluation narrative divided into exactly 10 distinct recruiter-grade sections:
-  1. *Executive Summary*: Concise summary of candidate fit, background alignment, and overall suitability.
-  2. *Candidate Strengths*: Key highlights of technical qualifications and project achievements.
-  3. *Critical Skill Gaps*: Hard skills, platforms, or tools missing relative to the JD.
-  4. *Technical Capability Analysis*: Evaluation of core patterns, software engineering quality, and scale capabilities.
-  5. *Career Trajectory Assessment*: Stability, growth path, role progression, and promotion readiness.
-  6. *ATS Readiness*: Structural integrity, keyword density, and formatting compliance.
-  7. *Interview Focus Areas*: Custom screening questions to verify weak spots.
-  8. *Hiring Risks*: Red flags, timeline gaps, or keyword stuffing density alerts.
-  9. *Semantic Match Reasoning*: Weighted semantic alignment parameters between resume and JD.
-  10. *Final Hiring Recommendation*: Contextual recommendation and detailed justification.
-* **Nuanced Recruiter Decision Support**: Replaced binary match scores with realistic hold and sourcing recommendations (e.g., *"Hold for Junior ML / Support Engineer Roles"* or *"Archive & Flag for Future Junior Sourcing"*), including candidate-specific reasoning lists.
-* **Enterprise PDF & Print Formatting**: Printable cover sheets containing candidate snapshot metadata, target role, evaluation date, assigned recruiter name, match score, verification confidence, recruiter remarks, signature blocks, and export timestamps.
-* **Staged Copilot Reasoning & Streaming**: Chatbot responses feature dynamic typewriter streaming effects prefaced by active reasoning state logs (*"Staging AI reasoning..."* and *"Formulating decision rationale..."*).
-* **Resume Navigation & Workspace Upgrade**: Matched skill highlighter search bar, clickable evidence mapping table, scroll jump buttons targeting *Education*, *Experience*, *Projects*, and *Skills*, side annotations card, and recruiter comments input block.
-* **Mobile Responsiveness**: Stacked columns on narrow screens, wrapped overflow tables, and full-screen configurations for chatbot and intelligence panels on screens <= 640px.
+* **Rebuilt PDF Report Generation Engine**: Restructured the printed layout format to match Greenhouse/Lever ATS platform standards:
+  * *A4 Printing Geometry*: Enforced A4 boundary clamping (`297mm` height) with compact print paddings to guarantee zero blank pages.
+  * *Recruiter Decision Snapshot*: Integrated a premium executive card layout summarizing fit verdict (HIRE / CONSIDER / HOLD / REJECT), score details, and candidate strengths/gaps at the very top of Page 1.
+  * *Fixed Column-Width Tables*: Applied fixed table-layout width distributions and word wrapping rules on the Resume Evidence Matrix to prevent text compression and clipping.
+  * *Diagnostic Watermarks & Footers*: Embedded absolute confidential footers (with dynamic page numbers) and a styled background `InsightAI` watermark.
+* **Environment-Aware Global API Routing**: A unified frontend `window.fetch` interceptor automatically adjusts routing paths:
+  * For local file opens (`file:///`) or custom local development server ports, it redirects requests to the local FastAPI backend (`http://127.0.0.1:8000`).
+  * For production/Vercel hostnames, it preserves relative routes so that Vercel serverless routing directs traffic to the hosted python functions.
+  * Eliminates mixed-content security prompts and HTTPS-to-HTTP connection warnings.
+* **JWT Authentication & SSO Persistence**: Persists session tokens (`authToken`) to client-side storage across credentials forms and corporate SSO login syncs, automatically attaching them to the `Authorization: Bearer` headers of backend endpoints.
+* **Premium Login Portal**: Dynamic background particle engine (`initLoginParticles()`), credentials caching (Remember Me), role-based profile themes, and multi-step onboarding wizard.
+* **Resume Navigation & Workspace**: Matched skill highlighter search bar, clickable evidence mapping tables, and scroll anchors targeting *Education*, *Experience*, *Projects*, and *Skills*.
 
 ---
 
