@@ -3465,13 +3465,18 @@
       let url = input;
       let options = init || {};
 
-      // 1. Rewrite URL for local files or alternative ports
+      // 1. Rewrite URL for local files or local alternative development ports.
+      // Do NOT rewrite requests if the application is running in production (e.g. Vercel deployment hostname).
       if (typeof url === 'string' && url.startsWith('/api')) {
-        if (window.location.protocol === 'file:' || !window.location.host.includes('8000')) {
+        const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isFileProtocol = window.location.protocol === 'file:';
+        if (isFileProtocol || (isLocalHost && window.location.port !== '8000')) {
           url = `http://127.0.0.1:8000${url}`;
         }
       } else if (url instanceof URL && url.pathname.startsWith('/api')) {
-        if (window.location.protocol === 'file:' || !window.location.host.includes('8000')) {
+        const isLocalHost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        const isFileProtocol = window.location.protocol === 'file:';
+        if (isFileProtocol || (isLocalHost && window.location.port !== '8000')) {
           url = new URL(`http://127.0.0.1:8000${url.pathname}${url.search}`);
         }
       }
