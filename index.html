@@ -3458,15 +3458,55 @@
 
   <!-- ── JAVASCRIPT APP CONTROLLER ── -->
   <script>
-    // Global fetch interceptor to support local file/cross-port dev server API routing
+    // Global fetch interceptor to support local file/cross-port dev server API routing,
+    // handle session expiration gracefully, and inject bearer token fallback.
     const originalFetch = window.fetch;
-    window.fetch = function(input, init) {
-      if (typeof input === 'string' && input.startsWith('/api')) {
+    window.fetch = async function(input, init) {
+      let url = input;
+      let options = init || {};
+
+      // 1. Rewrite URL for local files or alternative ports
+      if (typeof url === 'string' && url.startsWith('/api')) {
         if (window.location.protocol === 'file:' || !window.location.host.includes('8000')) {
-          input = `http://127.0.0.1:8000${input}`;
+          url = `http://127.0.0.1:8000${url}`;
+        }
+      } else if (url instanceof URL && url.pathname.startsWith('/api')) {
+        if (window.location.protocol === 'file:' || !window.location.host.includes('8000')) {
+          url = new URL(`http://127.0.0.1:8000${url.pathname}${url.search}`);
         }
       }
-      return originalFetch(input, init);
+
+      // 2. Inject Authorization Token
+      const token = localStorage.getItem('authToken');
+      if (token) {
+        options.headers = options.headers || {};
+        if (options.headers instanceof Headers) {
+          if (!options.headers.has('Authorization')) {
+            options.headers.set('Authorization', `Bearer ${token}`);
+          }
+        } else if (Array.isArray(options.headers)) {
+          const hasAuth = options.headers.some(h => h[0].toLowerCase() === 'authorization');
+          if (!hasAuth) {
+            options.headers.push(['Authorization', `Bearer ${token}`]);
+          }
+        } else {
+          if (!options.headers['Authorization'] && !options.headers['authorization']) {
+            options.headers['Authorization'] = `Bearer ${token}`;
+          }
+        }
+      }
+
+      // 3. Perform original fetch
+      const response = await originalFetch(url, options);
+
+      // 4. Handle Session Expiry (401)
+      if (response.status === 401) {
+        const urlString = typeof url === 'string' ? url : (url.url || (url.pathname ? url.pathname : ''));
+        if (!urlString.includes('/api/auth/session') && !urlString.includes('/api/auth/login') && !urlString.includes('/api/auth/signup')) {
+          handleSessionExpired();
+        }
+      }
+      return response;
     };
 
     // State management
@@ -3693,42 +3733,7 @@
         dropdown.classList.remove('opacity-100', 'pointer-events-auto', 'scale-100');
       }
     }
-
-    // Intercept fetch calls globally to handle session expiration gracefully and inject bearer token fallback
-    const originalFetch = window.fetch;
-    window.fetch = async function(...args) {
-      const token = localStorage.getItem('authToken');
-      if (token) {
-        let options = args[1] || {};
-        options.headers = options.headers || {};
-        if (typeof args[0] === 'string' || args[0] instanceof URL) {
-          if (options.headers instanceof Headers) {
-            if (!options.headers.has('Authorization')) {
-              options.headers.set('Authorization', `Bearer ${token}`);
-            }
-          } else if (Array.isArray(options.headers)) {
-            const hasAuth = options.headers.some(h => h[0].toLowerCase() === 'authorization');
-            if (!hasAuth) {
-              options.headers.push(['Authorization', `Bearer ${token}`]);
-            }
-          } else {
-            if (!options.headers['Authorization'] && !options.headers['authorization']) {
-              options.headers['Authorization'] = `Bearer ${token}`;
-            }
-          }
-          args[1] = options;
-        }
-      }
-      
-      const response = await originalFetch(...args);
-      if (response.status === 401) {
-        const url = typeof args[0] === 'string' ? args[0] : args[0].url;
-        if (!url.includes('/api/auth/session') && !url.includes('/api/auth/login') && !url.includes('/api/auth/signup')) {
-          handleSessionExpired();
-        }
-      }
-      return response;
-    };
+    // Global fetch interception is handled at the top of the script block
 
 
     const onboardingSlides = [
@@ -4435,6 +4440,9 @@
           submitBtn.innerHTML = `<span class="material-symbols-outlined text-base">login</span> Sign In`;
         }
         
+        if (data.token) {
+          localStorage.setItem('authToken', data.token);
+        }
         localStorage.setItem('isLoggedIn', 'true');
         localStorage.setItem('userRole', data.user.role);
         localStorage.setItem('recruiterName', data.user.name);
@@ -6497,12 +6505,6 @@ Requirements:
             <div style="background-color: ${verdictBg}; border-left: 3px solid ${verdictText}; padding: 8px; border-radius: 4px;">
               <h4 style="font-size: 8px; font-weight: bold; color: ${verdictText}; margin: 0 0 2px 0; text-transform: uppercase;">Recruiter Action</h4>
               <p style="font-size: 8.5px; color: #334155; margin: 0; line-height: 1.4; font-weight: 500;">${actionText}</p>
-            </div>
-          </div>
-        </div>
-      `;size: 10.5px; font-weight: bold; text-transform: uppercase; margin-top: 0; margin-bottom: 4px;">Final Talent Acquisition Recommendation</h3>
-            <div style="color: #1e293b !important; font-weight: bold; font-size: 10px; line-height: 1.5; text-align: left;">
-              ${recommendationText}
             </div>
           </div>
         </div>
