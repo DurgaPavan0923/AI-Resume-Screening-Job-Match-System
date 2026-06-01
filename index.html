@@ -6356,15 +6356,7 @@ Requirements:
       return `<li style="font-size: 9.5px; color: #64748b; font-style: italic; text-align: left;">No major skill gaps identified.</li>`;
     }
 
-    function getRecommendationText(parsedSections, decision) {
-      const sect = parsedSections.find(s => ['final hiring recommendation', 'recommendation', 'hiring verdict'].some(p => s.title.toLowerCase().includes(p)));
-      if (sect && sect.content && sect.content.length > 0) {
-        const txt = sect.content.find(item => item.type === 'text');
-        if (txt) return txt.text;
-        return sect.content[0].text;
-      }
-      return `AI Talent Verdict calibrated to: ${decision}`;
-    }
+
 
     function parsePDFNarrativeText(text) {
       if (!text) return [];
