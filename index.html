@@ -355,6 +355,10 @@
       display: none;
     }
     @media print {
+      * {
+        -webkit-print-color-adjust: exact !important;
+        print-color-adjust: exact !important;
+      }
       body {
         background: #ffffff !important;
         color: #000000 !important;
@@ -5432,6 +5436,207 @@ Requirements:
       return arr.filter(item => item !== undefined && item !== null && item !== "");
     }
 
+    function cleanNum(val, fallback = 0) {
+      if (val === undefined || val === null || val === "" || Number.isNaN(Number(val))) {
+        return fallback;
+      }
+      return Number(val);
+    }
+
+    function getSkillName(item) {
+      if (!item) return "";
+      if (typeof item === 'string') return item;
+      if (typeof item === 'object') {
+        return item.name || item.skill || item.jd_requirement || "";
+      }
+      return String(item);
+    }
+
+    function renderATSScoreChartSVG(score, breakdown) {
+      const cleanScore = Math.round(cleanNum(score, 0));
+      const sim = Math.round(cleanNum(breakdown?.similarity, 0));
+      const sk = Math.round(cleanNum(breakdown?.skills, 0));
+      const exp = Math.round(cleanNum(breakdown?.experience, 0));
+
+      const strokeDashoffset = 282.74 - (282.74 * Math.min(cleanScore, 100)) / 100;
+
+      const simPct = Math.min(100, Math.round((sim / 50) * 100));
+      const skPct = Math.min(100, Math.round((sk / 30) * 100));
+      const expPct = Math.min(100, Math.round((exp / 20) * 100));
+
+      const simWidth = (simPct / 100) * 120;
+      const skWidth = (skPct / 100) * 120;
+      const expWidth = (expPct / 100) * 120;
+
+      return `
+        <svg width="100%" height="140" viewBox="0 0 320 140" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <!-- Overall Donut -->
+          <circle cx="60" cy="70" r="45" fill="none" stroke="#e2e8f0" stroke-width="8" />
+          <circle cx="60" cy="70" r="45" fill="none" stroke="#1e3b8b" stroke-width="8"
+                  stroke-dasharray="282.74" stroke-dashoffset="${strokeDashoffset}"
+                  stroke-linecap="round" transform="rotate(-90 60 70)" />
+          <text x="60" y="73" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" font-weight="800" fill="#0f172a">${cleanScore}%</text>
+          <text x="60" y="88" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#64748b" text-transform="uppercase">Match</text>
+
+          <!-- Labels and Bars -->
+          <g transform="translate(130, 25)" font-family="Inter, sans-serif">
+            <!-- Similarity -->
+            <text x="0" y="10" font-size="9" font-weight="700" fill="#475569">Semantic Similarity</text>
+            <text x="120" y="10" font-size="9" font-weight="700" fill="#1e3b8b" text-anchor="end">${simPct}%</text>
+            <rect x="0" y="16" width="120" height="6" rx="3" fill="#e2e8f0" />
+            <rect x="0" y="16" width="${simWidth}" height="6" rx="3" fill="#3b82f6" />
+
+            <!-- Skills -->
+            <g transform="translate(0, 35)">
+              <text x="0" y="10" font-size="9" font-weight="700" fill="#475569">Skills Alignment</text>
+              <text x="120" y="10" font-size="9" font-weight="700" fill="#1e3b8b" text-anchor="end">${skPct}%</text>
+              <rect x="0" y="16" width="120" height="6" rx="3" fill="#e2e8f0" />
+              <rect x="0" y="16" width="${skWidth}" height="6" rx="3" fill="#10b981" />
+            </g>
+
+            <!-- Experience -->
+            <g transform="translate(0, 70)">
+              <text x="0" y="10" font-size="9" font-weight="700" fill="#475569">Experience Relevance</text>
+              <text x="120" y="10" font-size="9" font-weight="700" fill="#1e3b8b" text-anchor="end">${expPct}%</text>
+              <rect x="0" y="16" width="120" height="6" rx="3" fill="#e2e8f0" />
+              <rect x="0" y="16" width="${expWidth}" height="6" rx="3" fill="#f59e0b" />
+            </g>
+          </g>
+        </svg>
+      `;
+    }
+
+    function renderConfidenceChartSVG(semConf, parseConf, roleFit, recruiterConf) {
+      const sc = Math.round(cleanNum(semConf, 0));
+      const pc = Math.round(cleanNum(parseConf, 0));
+      const rf = Math.round(cleanNum(roleFit, 0));
+      const rc = Math.round(cleanNum(recruiterConf, 0));
+
+      const R = 22;
+      const perimeter = 2 * Math.PI * R;
+
+      function getOffset(val) {
+        return perimeter - (perimeter * Math.min(val, 100)) / 100;
+      }
+
+      const metrics = [
+        { label: "Semantic", val: sc, color: "#3b82f6" },
+        { label: "Parsing", val: pc, color: "#10b981" },
+        { label: "Role Fit", val: rf, color: "#8b5cf6" },
+        { label: "Calibration", val: rc, color: "#f59e0b" }
+      ];
+
+      return `
+        <svg width="100%" height="140" viewBox="0 0 320 140" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <g transform="translate(0, 10)">
+            ${metrics.map((m, idx) => {
+              const cx = 40 + idx * 80;
+              const cy = 55;
+              const offset = getOffset(m.val);
+              return `
+                <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="#e2e8f0" stroke-width="4" />
+                <circle cx="${cx}" cy="${cy}" r="${R}" fill="none" stroke="${m.color}" stroke-width="4"
+                        stroke-dasharray="${perimeter}" stroke-dashoffset="${offset}"
+                        stroke-linecap="round" transform="rotate(-90 ${cx} ${cy})" />
+                <text x="${cx}" y="${cy + 4}" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" font-weight="800" fill="#0f172a">${m.val}%</text>
+                <text x="${cx}" y="${cy + R + 18}" text-anchor="middle" font-family="Inter, sans-serif" font-size="8" font-weight="700" fill="#64748b">${m.label}</text>
+              `;
+            }).join('')}
+          </g>
+        </svg>
+      `;
+    }
+
+    function renderSkillMatchChartSVG(matchedCount, missingCount) {
+      const m = cleanNum(matchedCount, 0);
+      const ms = cleanNum(missingCount, 0);
+      const total = m + ms;
+
+      const matchedPct = total > 0 ? Math.round((m / total) * 100) : 0;
+      const missingPct = total > 0 ? Math.round((ms / total) * 100) : 0;
+
+      const R = 40;
+      const perimeter = 2 * Math.PI * R;
+      const strokeDashoffsetMatched = perimeter - (perimeter * matchedPct) / 100;
+
+      return `
+        <svg width="100%" height="140" viewBox="0 0 320 140" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px;">
+          <circle cx="70" cy="70" r="${R}" fill="none" stroke="#ef4444" stroke-width="12" />
+          <circle cx="70" cy="70" r="${R}" fill="none" stroke="#10b981" stroke-width="12"
+                  stroke-dasharray="${perimeter}" stroke-dashoffset="${strokeDashoffsetMatched}"
+                  stroke-linecap="round" transform="rotate(-90 70 70)" />
+          
+          <text x="70" y="73" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="800" fill="#0f172a">${matchedPct}%</text>
+          <text x="70" y="85" text-anchor="middle" font-family="Inter, sans-serif" font-size="7" font-weight="700" fill="#64748b" text-transform="uppercase">Matched</text>
+
+          <g transform="translate(145, 45)" font-family="Inter, sans-serif" font-size="9" font-weight="700">
+            <rect x="0" y="2" width="10" height="10" rx="2" fill="#10b981" />
+            <text x="16" y="10" fill="#334155">Matched Skills (${m})</text>
+            <text x="140" y="10" fill="#64748b" text-anchor="end">${matchedPct}%</text>
+
+            <g transform="translate(0, 24)">
+              <rect x="0" y="2" width="10" height="10" rx="2" fill="#ef4444" />
+              <text x="16" y="10" fill="#334155">Missing Skills (${ms})</text>
+              <text x="140" y="10" fill="#64748b" text-anchor="end">${missingPct}%</text>
+            </g>
+          </g>
+        </svg>
+      `;
+    }
+
+    function renderGapAnalysisGraphSVG(matchedSkills, missingSkills) {
+      const cleanMatched = cleanArr(matchedSkills);
+      const cleanMissing = cleanArr(missingSkills);
+
+      const displayMatched = cleanMatched.slice(0, 4);
+      const displayMissing = cleanMissing.slice(0, 4);
+
+      let html = `
+        <svg width="100%" height="140" viewBox="0 0 320 140" style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; font-family: Inter, sans-serif;">
+          <text x="10" y="18" font-size="9" font-weight="800" fill="#047857" text-transform="uppercase">Top Matched (${cleanMatched.length})</text>
+          <text x="170" y="18" font-size="9" font-weight="800" fill="#b91c1c" text-transform="uppercase">Top Gaps (${cleanMissing.length})</text>
+          
+          <line x1="160" y1="10" x2="160" y2="130" stroke="#cbd5e1" stroke-dasharray="2" />
+      `;
+
+      if (displayMatched.length === 0) {
+        html += `<text x="10" y="50" font-size="9" font-style="italic" fill="#94a3b8">No matched skills detected.</text>`;
+      } else {
+        displayMatched.forEach((item, idx) => {
+          const rawName = getSkillName(item);
+          const name = cleanVal(rawName, "Unknown Skill").toUpperCase();
+          const y = 38 + idx * 24;
+          const val = 80 + (idx % 3) * 5;
+          const barWidth = (val / 100) * 130;
+          html += `
+            <text x="10" y="${y}" font-size="8.5" font-weight="700" fill="#334155">${name}</text>
+            <rect x="10" y="${y + 4}" width="130" height="4" rx="2" fill="#e2e8f0" />
+            <rect x="10" y="${y + 4}" width="${barWidth}" height="4" rx="2" fill="#10b981" />
+          `;
+        });
+      }
+
+      if (displayMissing.length === 0) {
+        html += `<text x="170" y="50" font-size="9" font-style="italic" fill="#94a3b8">No missing skills detected.</text>`;
+      } else {
+        displayMissing.forEach((item, idx) => {
+          const rawName = getSkillName(item);
+          const name = cleanVal(rawName, "Unknown Skill").toUpperCase();
+          const y = 38 + idx * 24;
+          const val = 15 + (idx % 3) * 5;
+          const barWidth = (val / 100) * 130;
+          html += `
+            <text x="170" y="${y}" font-size="8.5" font-weight="700" fill="#334155">${name}</text>
+            <rect x="170" y="${y + 4}" width="130" height="4" rx="2" fill="#e2e8f0" />
+            <rect x="170" y="${y + 4}" width="${barWidth}" height="4" rx="2" fill="#ef4444" />
+          `;
+        });
+      }
+
+      html += `</svg>`;
+      return html;
+    }
+
     function downloadCandidateReportPDF() {
       try {
         if (typeof currentCandidateIndex === 'undefined' || !analysisResults || !analysisResults[currentCandidateIndex]) {
@@ -6833,8 +7038,9 @@ Requirements:
     let resumeTextChunks = [];
 
     function getCandidatePersona(score, experience, skills, role) {
-      const skillsStr = (skills || []).join(' ').toLowerCase();
-      const roleStr = (role || '').toLowerCase();
+      const cleanSkills = cleanArr(skills);
+      const skillsStr = cleanSkills.join(' ').toLowerCase();
+      const roleStr = String(role || '').toLowerCase();
       
       if (experience >= 8 || skillsStr.includes('lead') || skillsStr.includes('manage') || skillsStr.includes('architect')) {
         return {
@@ -7616,7 +7822,8 @@ InsightAI Recruiting Dev`;
         }
       }
 
-      const topSkills = skills.slice(0, 2);
+      const cleanSkills = cleanArr(skills);
+      const topSkills = cleanSkills.slice(0, 2);
       topSkills.forEach(skill => {
         if (difficulty === 'advanced') {
           questions.push(`Design an enterprise system architecture leveraging ${skill.toUpperCase()} under high concurrency.`);
