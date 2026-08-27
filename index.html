@@ -66,7 +66,8 @@
             "surface-bright": "var(--color-surface-bright)",
             "primary-fixed": "var(--color-primary-fixed)",
             "on-secondary-fixed": "var(--color-on-secondary-fixed)",
-            "surface-tint": "var(--color-surface-tint)"
+            "surface-tint": "var(--color-surface-tint)",
+            "surface": "var(--color-surface)"
           },
           borderRadius: {
             "DEFAULT": "0.25rem",
@@ -176,6 +177,7 @@
     }
 
     .dark {
+      color-scheme: dark;
       /* Theme base */
       --bg-gradient: radial-gradient(circle at top right, #191b23 0%, #10131a 50%, #0b0e15 100%);
       --glass-bg: rgba(16, 19, 26, 0.6);
@@ -259,6 +261,22 @@
     .input-glow:focus-within {
       border-color: var(--color-primary);
       box-shadow: 0 0 0 2px var(--color-primary-container);
+    }
+    .dark input:not([type="checkbox"]):not([type="range"]):not([type="radio"]),
+    .dark textarea,
+    .dark select {
+      background-color: var(--color-surface-container-low) !important;
+      color: var(--color-on-surface) !important;
+      -webkit-text-fill-color: var(--color-on-surface) !important;
+    }
+    input:-webkit-autofill,
+    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:focus, 
+    input:-webkit-autofill:active {
+      -webkit-box-shadow: 0 0 0 1000px #191b23 inset !important;
+      -webkit-text-fill-color: #e1e2ec !important;
+      caret-color: #e1e2ec !important;
+      transition: background-color 5000s ease-in-out 0s;
     }
     @keyframes pulse-ring {
       0% { transform: scale(0.8); opacity: 0.5; }
@@ -4283,10 +4301,10 @@
       
       document.getElementById('signup-step-badge').innerText = `Step ${signupStep} of 4`;
       
-      const nextBtnSpan = document.querySelector('#btn-signup-next > span');
-      const nextBtnIcon = document.getElementById('btn-signup-next-icon');
-      if (nextBtnSpan) {
-        nextBtnSpan.innerText = signupStep === 4 ? 'Complete Onboarding' : 'Next Step';
+      const nextBtn = document.getElementById('btn-signup-next');
+      if (nextBtn) {
+        const isComplete = (signupStep === 4);
+        nextBtn.innerHTML = `<span>${isComplete ? 'Complete Onboarding' : 'Next Step'}</span> <span class="material-symbols-outlined text-sm" id="btn-signup-next-icon">${isComplete ? 'check' : 'chevron_right'}</span>`;
       }
     }
 
@@ -4330,7 +4348,7 @@
         const data = await response.json();
         
         nextBtn.disabled = false;
-        nextBtn.innerHTML = `Complete Onboarding <span class="material-symbols-outlined text-sm">check</span>`;
+        nextBtn.innerHTML = `<span>Complete Onboarding</span> <span class="material-symbols-outlined text-sm" id="btn-signup-next-icon">check</span>`;
         
         signupCard.classList.add('scale-95', 'opacity-0');
         setTimeout(() => {
