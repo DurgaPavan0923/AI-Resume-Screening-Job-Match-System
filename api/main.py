@@ -69,6 +69,7 @@ CANDIDATE_STAGES: dict[str, int] = {}
 CANDIDATE_VERIFICATIONS: dict[str, dict[str, bool]] = {}
 CANDIDATE_NOTES: dict[str, list[dict]] = {}
 SCHEDULED_INTERVIEWS: list[dict] = []
+MATCH_CACHE: dict[str, Any] = {}
 AUDIT_LOGS: list[dict] = [
     {
         "id": 1,
@@ -657,11 +658,15 @@ def get_settings_internal() -> SettingsResponse:
 
 @app.get("/api/settings", response_model=SettingsResponse, tags=["Settings"])
 async def get_settings(current_user: dict = Depends(get_current_user)) -> SettingsResponse:
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden: System Admin access required.")
     return get_settings_internal()
 
 
 @app.post("/api/settings", response_model=SettingsResponse, tags=["Settings"])
 async def update_settings(req: SettingsUpdateRequest, current_user: dict = Depends(get_current_user)) -> SettingsResponse:
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden: System Admin access required.")
     AIConfig.active_provider = req.active_provider
     
     if req.openai_key is not None and not req.openai_key.startswith("sk-..."):
@@ -683,6 +688,8 @@ async def update_settings(req: SettingsUpdateRequest, current_user: dict = Depen
 
 @app.post("/api/settings/test", response_model=ConnectionTestResponse, tags=["Settings"])
 async def test_connection(req: ConnectionTestRequest, current_user: dict = Depends(get_current_user)) -> ConnectionTestResponse:
+    if current_user.get("role") != "admin":
+        raise HTTPException(status_code=403, detail="Forbidden: System Admin access required.")
     test_key = req.api_key
     provider = req.provider
     
@@ -842,6 +849,15 @@ def generate_evidence_map(raw_text: str, matched_skills: list[str], missing_skil
 
 
 def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: str) -> AnalyzeResponse | None:
+    import hashlib
+    raw_bytes = file_like.getvalue() if hasattr(file_like, "getvalue") else b""
+    cache_key = hashlib.sha256(raw_bytes + job_description.strip().encode("utf-8")).hexdigest()
+    if cache_key in MATCH_CACHE:
+        cached = MATCH_CACHE[cache_key]
+        cached.pipeline_stage = CANDIDATE_STAGES.get(filename, 1)
+        cached.verification = CANDIDATE_VERIFICATIONS.get(filename, {"screen": False, "eval": False, "hiring": False})
+        return cached
+
     job_clean = clean_text(job_description)
     jd_skills = extract_skills(job_clean, _skills_db) or {}
 
@@ -1107,7 +1123,7 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         {"step": "Formulate Tailored Questions", "agent": "Interview Generator Agent", "status": "completed", "details": "Created role-specific difficulty-adapted interview questions"}
     ]
 
-    return AnalyzeResponse(
+    response = AnalyzeResponse(
         name           = filename,
         score          = result.score,
         role           = result.role,
@@ -1133,6 +1149,8 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         verification   = CANDIDATE_VERIFICATIONS.get(filename, {"screen": False, "eval": False, "hiring": False}),
         candidate_id   = filename
     )
+    MATCH_CACHE[cache_key] = response
+    return response
 
 
 @app.post("/analyze", response_model=AnalyzeResponse | list[AnalyzeResponse], tags=["Resume"])

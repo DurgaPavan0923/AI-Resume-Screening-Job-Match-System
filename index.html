@@ -9188,6 +9188,7 @@ InsightAI Recruiting Dev`;
     function setPipelineStage(stage) {
       if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) return;
       const r = analysisResults[currentCandidateIndex];
+      const prevStage = r.pipelineStage !== undefined ? r.pipelineStage : 1;
       r.pipelineStage = stage;
       updatePipelineUI(stage);
       
@@ -9199,7 +9200,14 @@ InsightAI Recruiting Dev`;
         method: 'PATCH',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ stage_index: stage })
-      }).catch(err => console.warn("Stage update backend sync:", err));
+      }).then(res => {
+        if (!res.ok) throw new Error(`Server error ${res.status}`);
+      }).catch(err => {
+        console.warn("Stage update backend sync failed, rolling back:", err);
+        r.pipelineStage = prevStage;
+        updatePipelineUI(prevStage);
+        showToast("❌ Network error: Stage progression rolled back.");
+      });
     }
 
     function updatePipelineUI(stage) {
