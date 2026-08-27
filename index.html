@@ -1217,13 +1217,13 @@
           Stop guessing what ATS systems want. Our intelligence engine analyzes resumes against job descriptions in real-time, providing actionable insights and recruiter-grade bento analytics dashboards instantly.
         </p>
         <div class="flex flex-col sm:flex-row gap-4 pt-4">
-          <button class="premium-cta-primary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2 shadow-sm" onclick="switchView('workspace')">
-            <span class="material-symbols-outlined">upload_file</span>
-            Go to Workspace
+          <button class="premium-cta-primary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2 shadow-sm" onclick="startScreeningCTA()">
+            <span class="material-symbols-outlined">auto_awesome</span>
+            Start Screening
           </button>
-          <button class="premium-cta-secondary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2" onclick="alert('This demo will walk you through uploading resumes and exploring analytics. Click Get Started to try it yourself!')">
-            <span class="material-symbols-outlined">play_circle</span>
-            Watch Demo
+          <button class="premium-cta-secondary px-8 py-4 rounded-full font-body-md text-body-md font-semibold flex items-center justify-center gap-2" onclick="switchView('login')">
+            <span class="material-symbols-outlined">login</span>
+            Sign In
           </button>
         </div>
         <div class="flex items-center gap-4 pt-4">
@@ -1232,7 +1232,7 @@
             <div class="w-8 h-8 rounded-full bg-surface-container-high border-2 border-surface flex items-center justify-center text-xs text-on-surface-variant">B</div>
             <div class="w-8 h-8 rounded-full bg-surface-container-high border-2 border-surface flex items-center justify-center text-xs text-on-surface-variant">C</div>
           </div>
-          <span class="font-body-sm text-body-sm text-on-surface-variant">Joined by 10,000+ job seekers this month.</span>
+          <span class="font-body-sm text-body-sm text-on-surface-variant">Privacy-conscious candidate processing and evaluation.</span>
         </div>
       </div>
       
@@ -1369,19 +1369,19 @@
             <p class="text-xs text-on-surface-variant mt-2 font-medium">Intelligent Resume Screening Powered by AI</p>
           </div>
           
-          <!-- Mini Stats Row -->
+          <!-- Product Architecture Capabilities -->
           <div class="flex gap-6 border-t border-outline-variant/30 pt-4 w-fit">
             <div>
-              <div class="font-headline-md text-base font-bold text-primary leading-none">10K+</div>
-              <div class="text-[10px] text-on-surface-variant mt-1">Resumes Screened</div>
+              <div class="font-headline-md text-xs font-bold text-primary uppercase tracking-wider">AI Sourcing</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Explainable Matching</div>
             </div>
             <div class="border-l border-outline-variant/30 pl-6">
-              <div class="font-headline-md text-base font-bold text-secondary leading-none">95%</div>
-              <div class="text-[10px] text-on-surface-variant mt-1">Match Accuracy</div>
+              <div class="font-headline-md text-xs font-bold text-secondary uppercase tracking-wider">ATS Parsing</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Skill Gap Analysis</div>
             </div>
             <div class="border-l border-outline-variant/30 pl-6">
-              <div class="font-headline-md text-base font-bold text-tertiary leading-none">500+</div>
-              <div class="text-[10px] text-on-surface-variant mt-1">Recruiters</div>
+              <div class="font-headline-md text-xs font-bold text-tertiary uppercase tracking-wider">Decisions</div>
+              <div class="text-[10px] text-on-surface-variant mt-1">Structured Reports</div>
             </div>
           </div>
         </div>
@@ -1783,11 +1783,11 @@
     <div class="mt-8 border-t border-outline-variant/30 pt-8 max-w-xl mx-auto text-center space-y-4">
       <div class="flex flex-wrap justify-center gap-6 text-on-surface-variant text-[11px] font-semibold">
         <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">lock</span> SSL/TLS Encrypted</span>
-        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-secondary">verified_user</span> GDPR Compliant</span>
-        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-tertiary">psychology_alt</span> AI Bias-Free</span>
-        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">security</span> Encrypted Storage</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-secondary">verified_user</span> Privacy-Conscious Data Handling</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-tertiary">psychology_alt</span> Configurable Bias Mitigation</span>
+        <span class="flex items-center gap-1.5"><span class="material-symbols-outlined text-base text-primary">security</span> Designed with Secure API Handling</span>
       </div>
-      <p class="text-[10px] text-on-surface-variant/70">Your data is processed in-memory securely and permanently deleted after session closure.</p>
+      <p class="text-[10px] text-on-surface-variant/70">Candidate processing occurs securely in-memory. AI recommendations are decision-support tools. Recruiters remain responsible for final hiring decisions.</p>
     </div>
   </main>
 
@@ -2899,7 +2899,7 @@
             <div class="bg-surface-container-low border border-outline-variant/40 rounded-2xl p-4 flex flex-col gap-1.5">
               <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block">Success Rate</span>
               <span class="text-2xl font-bold text-primary" id="metrics-success-rate">100.0%</span>
-              <span class="text-[9px] text-on-surface-variant font-medium">Target availability: &gt;99.9%</span>
+              <span class="text-[9px] text-on-surface-variant font-medium">High Availability Architecture</span>
             </div>
             
             <!-- Est. Tokens -->
@@ -2971,7 +2971,7 @@
             <span class="material-symbols-outlined text-lg">shield</span>
             Enterprise Trust &amp; Compliance
           </h3>
-          <p class="text-xs text-on-surface-variant mb-4">Monitor API health, enable automatic model failover pipelines, and verify GDPR compliance status.</p>
+          <p class="text-xs text-on-surface-variant mb-4">Monitor API health, enable automatic model failover pipelines, and review candidate privacy controls.</p>
           
           <div class="space-y-3.5 text-xs">
             <!-- Failover switch -->
@@ -3004,24 +3004,24 @@
                 <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">Gemini API Status</span>
                 <div class="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Operational (99.9%)</span>
+                  <span>Operational (Connected)</span>
                 </div>
               </div>
               <div>
                 <span class="text-[9px] font-bold text-on-surface-variant uppercase tracking-wider block mb-1">OpenAI API Status</span>
                 <div class="flex items-center gap-1.5 text-[10px] font-semibold text-emerald-400">
                   <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                  <span>Operational (100.0%)</span>
+                  <span>Operational (Connected)</span>
                 </div>
               </div>
             </div>
 
-            <!-- GDPR / Security Compliance Card -->
+            <!-- Candidate Data Retention & Privacy Controls -->
             <div class="bg-surface/60 p-3 rounded-xl border border-outline-variant/30 flex items-start gap-3">
               <span class="material-symbols-outlined text-primary text-lg">gavel</span>
               <div class="space-y-1">
-                <span class="font-semibold text-on-surface block text-[11px]">GDPR Compliance Purge Act</span>
-                <p class="text-[10px] text-on-surface-variant leading-normal">Data residency matches EU local boundaries. Candidate profiles and PDFs are completely wiped from our endpoints upon manual deletion or browser logout cache clearance.</p>
+                <span class="font-semibold text-on-surface block text-[11px]">Candidate Data Retention &amp; Privacy</span>
+                <p class="text-[10px] text-on-surface-variant leading-normal">Candidate profiles and parsed documents are stored securely and permanently deleted upon manual deletion or browser logout cache clearance.</p>
               </div>
             </div>
           </div>
@@ -3553,14 +3553,39 @@
     // Production-Grade Auth Helper Functions
     // ---------------------------------------------------------------------------
     async function checkSessionStatus() {
-      // Show loading indicator or handle loading transition if needed
+      const localLoggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      const authToken = localStorage.getItem('authToken');
+      const savedRole = localStorage.getItem('userRole') || 'recruiter';
+      const savedName = localStorage.getItem('recruiterName') || 'Pavan Kumar';
+
+      // Always restore UI immediately from localStorage so there's zero flicker or premature logout
+      if (localLoggedIn) {
+        currentRole = savedRole;
+        if (!currentUser) {
+          currentUser = {
+            name: savedName,
+            email: localStorage.getItem('userEmail') || `${savedName.toLowerCase().replace(/\s+/g, '.')}@insightai.com`,
+            role: savedRole,
+            avatar: localStorage.getItem('userAvatar') || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=80&h=80'
+          };
+        }
+        setUserRoleUI(savedRole);
+        updateUserProfileUI(currentUser);
+      }
+
+      // Verify with backend if token/session exists
       try {
-        const response = await fetch('/api/auth/session');
+        const headers = {};
+        if (authToken) {
+          headers['Authorization'] = `Bearer ${authToken}`;
+        }
+        const response = await fetch('/api/auth/session', { headers });
         if (response.ok) {
           const data = await response.json();
           if (data.status === 'success' && data.user) {
             localStorage.setItem('isLoggedIn', 'true');
             localStorage.setItem('userRole', data.user.role);
+            localStorage.setItem('recruiterName', data.user.name);
             currentUser = data.user;
             currentRole = data.user.role;
             setUserRoleUI(data.user.role);
@@ -3569,20 +3594,21 @@
           }
         }
       } catch (err) {
-        console.error("Session verification failed:", err);
+        console.warn("Session backend verification notice:", err);
       }
-      
-      // Invalidate session
-      localStorage.removeItem('isLoggedIn');
-      localStorage.removeItem('userRole');
-      currentUser = null;
-      
-      // Reset UI elements
+
+      // If backend verification failed but user has localLoggedIn session, KEEP THEM LOGGED IN!
+      // Only the explicit "Sign Out" button (handleLogout) should destroy the session!
+      if (localLoggedIn) {
+        return true;
+      }
+
+      // Genuinely logged out:
       const navAvatarContainer = document.getElementById('navbar-profile-avatar-container');
       const navLaunch = document.getElementById('nav-btn-launch');
       if (navAvatarContainer) navAvatarContainer.classList.add('hidden');
       if (navLaunch) navLaunch.classList.remove('hidden');
-      
+
       return false;
     }
 
@@ -3804,6 +3830,20 @@
         if (rememberBox) rememberBox.checked = true;
       }
       
+      // Rehydrate analyzed candidates if persisted
+      try {
+        const savedResults = localStorage.getItem('insightai_analysisResults');
+        if (savedResults) {
+          const parsed = JSON.parse(savedResults);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            analysisResults = parsed;
+            renderCandidateSelector();
+          }
+        }
+      } catch(err) {
+        console.warn("Could not rehydrate saved analysis results:", err);
+      }
+
       // Check login state via backend session api
       checkSessionStatus().then(isLoggedIn => {
         const hashView = window.location.hash.replace('#/', '') || '';
@@ -3819,6 +3859,7 @@
         }
         
         if (protectedViews.includes(viewToLoad) && !isLoggedIn) {
+          sessionStorage.setItem('redirectAfterLogin', viewToLoad);
           switchView('login');
         } else {
           switchView(viewToLoad);
@@ -3831,13 +3872,13 @@
         const allowedViews = ['login', 'landing', 'recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'logout-success', 'profile', 'security', 'notifications'];
         const protectedViews = ['recruiter-dashboard', 'workspace', 'processing', 'dashboard', 'settings', 'admin-analytics', 'profile', 'security', 'notifications'];
         if (allowedViews.includes(hashView)) {
-          checkSessionStatus().then(isLoggedIn => {
-            if (protectedViews.includes(hashView) && !isLoggedIn) {
-              switchView('login');
-            } else {
-              switchView(hashView, false);
-            }
-          });
+          const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+          if (protectedViews.includes(hashView) && !loggedIn) {
+            sessionStorage.setItem('redirectAfterLogin', hashView);
+            switchView('login');
+          } else {
+            switchView(hashView, false);
+          }
         }
       });
 
@@ -3985,6 +4026,16 @@
       switchView(viewId, true, sectionId);
     }
 
+    function startScreeningCTA() {
+      const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
+      if (loggedIn) {
+        switchView('workspace');
+      } else {
+        sessionStorage.setItem('redirectAfterLogin', 'workspace');
+        switchView('login');
+      }
+    }
+
     function switchDashboardMobileView(view) {
       const sidebar = document.getElementById('dashboard-sidebar');
       const content = document.getElementById('dashboard-content-panel');
@@ -4037,6 +4088,7 @@
       const loggedIn = localStorage.getItem('isLoggedIn') === 'true';
       if (protectedViews.includes(viewId)) {
         if (!loggedIn) {
+          sessionStorage.setItem('redirectAfterLogin', viewId);
           showToast("🔒 Please sign in to access your workspace.");
           viewId = 'login';
         } else if (currentRole) {
@@ -4582,8 +4634,14 @@
         setUserRoleUI(data.user.role);
         updateUserProfileUI(data.user);
         
-        // Route each persona to its OWN dedicated dashboard
-        routeUserToRoleDashboard(data.user.role);
+        // Check if there is an intended protected route, otherwise route to Workspace
+        const intended = sessionStorage.getItem('redirectAfterLogin');
+        if (intended) {
+          sessionStorage.removeItem('redirectAfterLogin');
+          switchView(intended);
+        } else {
+          switchView('workspace');
+        }
         showToast(`🔑 Welcome back! Logged in as: ${data.user.role.toUpperCase()}`);
       } catch (err) {
         btn.disabled = false;
@@ -5437,6 +5495,14 @@ Requirements:
         // Sort by match score descending
         analysisResults.sort((a, b) => b.score - a.score);
         
+        // Persist analysisResults and jobDescription across refreshes
+        try {
+          localStorage.setItem('insightai_analysisResults', JSON.stringify(analysisResults));
+          localStorage.setItem('insightai_jobDescription', jd);
+        } catch(e) {
+          console.warn("Storage quota limit reached:", e);
+        }
+        
         // Render selector list in Dashboard sidebar
         renderCandidateSelector();
         
@@ -5845,11 +5911,16 @@ Requirements:
     function downloadCandidateReportPDF() {
       try {
         if (typeof currentCandidateIndex === 'undefined' || !analysisResults || !analysisResults[currentCandidateIndex]) {
-          showToast('No active candidate analyzed to export.', 'error');
+          showToast('Report is not ready yet.', 'error');
           return;
         }
         
         const r = analysisResults[currentCandidateIndex];
+        if (!r || r.score === undefined || r.score === null || isNaN(r.score)) {
+          showToast('Report is not ready yet.', 'error');
+          return;
+        }
+
         const displayName = isAnonymousMode ? `Candidate #${currentCandidateIndex + 1}` : r.name.replace('.pdf', '');
         const cleanName = displayName.trim().replace(/\s+/g, '_');
         
@@ -5858,7 +5929,7 @@ Requirements:
         
         // Temporarily override document title for download filename
         const originalTitle = document.title;
-        document.title = `${cleanName}_Screening_Report`;
+        document.title = `${cleanName}_InsightAI_Report`;
         
         // Trigger print dialog (export to PDF)
         window.print();
@@ -5869,7 +5940,7 @@ Requirements:
         }, 500);
       } catch (err) {
         console.error('Error during report download:', err);
-        showToast('Failed to compile PDF report.', 'error');
+        showToast('Report is not ready yet.', 'error');
       }
     }
 
@@ -8597,11 +8668,12 @@ InsightAI Recruiting Dev`;
         } else {
           if (currentCandidateIndex === null || !analysisResults[currentCandidateIndex]) {
             removeChatLoader(loaderId);
-            appendChatMessage('assistant', "⚠️ Please upload resumes or select a candidate first.");
+            appendChatMessage('assistant', "Please open a candidate report before asking candidate-specific questions.");
             return;
           }
           const r = analysisResults[currentCandidateIndex];
           const typeToSend = chatType || (currentAIMode + '-chat');
+          const notesText = (r.notes || []).map(n => typeof n === 'string' ? n : (n.text || '')).filter(Boolean).join('; ');
           payload = {
             message: message,
             chat_type: typeToSend,
@@ -8610,8 +8682,11 @@ InsightAI Recruiting Dev`;
             candidate_role: r.role || 'Unspecified',
             missing_skills: r.missing_skills || [],
             matched_skills: r.matched_skills || [],
+            experience: r.experience || 0,
+            summary: r.summary || r.gpt_analysis || '',
+            recruiter_notes: notesText,
             history: chatHistories[histKey],
-            job_description: document.getElementById('job-description')?.value || ''
+            job_description: (document.getElementById('jd-textarea')?.value || '').trim()
           };
         }
 
@@ -9209,6 +9284,9 @@ InsightAI Recruiting Dev`;
       const prevStage = r.pipelineStage !== undefined ? r.pipelineStage : 1;
       r.pipelineStage = stage;
       updatePipelineUI(stage);
+      try {
+        localStorage.setItem('insightai_analysisResults', JSON.stringify(analysisResults));
+      } catch(e) {}
       
       const stagesList = ["Applied", "Screened", "Shortlisted", "Technical Interview", "Final Review", "Hired"];
       const displayName = isAnonymousMode ? 'Candidate #' + (currentCandidateIndex + 1) : r.name.replace('.pdf', '');
@@ -9224,6 +9302,9 @@ InsightAI Recruiting Dev`;
         console.warn("Stage update backend sync failed, rolling back:", err);
         r.pipelineStage = prevStage;
         updatePipelineUI(prevStage);
+        try {
+          localStorage.setItem('insightai_analysisResults', JSON.stringify(analysisResults));
+        } catch(e) {}
         showToast("❌ Network error: Stage progression rolled back.");
       });
     }
@@ -9429,23 +9510,46 @@ InsightAI Recruiting Dev`;
       const text = input.value.trim();
       if (!text) return;
       
-      r.notes.push(text);
+      const noteObj = {
+        text: text,
+        user: localStorage.getItem('recruiterName') || 'Pavan Kumar',
+        timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) + ', ' + new Date().toLocaleDateString([], { month: 'short', day: 'numeric' })
+      };
+      r.notes.push(noteObj);
       input.value = '';
+      
+      try {
+        localStorage.setItem('insightai_analysisResults', JSON.stringify(analysisResults));
+      } catch(e) {}
+      
+      fetch(`/api/candidates/${encodeURIComponent(r.name)}/notes`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ note: text })
+      }).catch(err => console.warn("Notes sync notice:", err));
+      
       renderNotes(r.notes);
-      showToast("📝 Note added");
+      showToast("📝 Recruiter note saved");
     }
 
     function renderNotes(notes = []) {
       const container = document.getElementById('candidate-notes-list');
       if (!container) return;
       container.innerHTML = '';
-      if (notes.length === 0) {
-        container.innerHTML = `<div class="text-on-surface-variant italic">No comments yet. Be the first to comment!</div>`;
+      if (!notes || notes.length === 0) {
+        container.innerHTML = `<div class="text-on-surface-variant italic text-xs">No recruiter notes recorded yet.</div>`;
       } else {
-        notes.forEach(note => {
+        notes.forEach(n => {
+          const text = typeof n === 'string' ? n : (n.text || n.note || '');
+          const author = (typeof n === 'object' && n.user) ? n.user : (localStorage.getItem('recruiterName') || 'Recruiter');
+          const time = (typeof n === 'object' && n.timestamp) ? n.timestamp : new Date().toLocaleDateString();
           container.innerHTML += `
-            <div class="bg-surface-container-high p-2 rounded-lg border border-outline-variant/30 text-on-surface leading-tight">
-              ${note}
+            <div class="bg-surface-container-high p-2.5 rounded-xl border border-outline-variant/30 text-on-surface leading-snug space-y-1">
+              <div class="text-xs">${text}</div>
+              <div class="text-[9px] text-on-surface-variant font-medium flex justify-between">
+                <span>By ${author}</span>
+                <span>${time}</span>
+              </div>
             </div>
           `;
         });

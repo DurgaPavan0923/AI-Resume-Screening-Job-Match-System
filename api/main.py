@@ -458,6 +458,9 @@ class ChatRequest(BaseModel):
     chat_type: str | None = None
     history: list[HistoryItem] | None = None
     job_description: str | None = None
+    experience: int | float | None = None
+    summary: str | None = None
+    recruiter_notes: str | None = None
 
 
 class CandidateSummaryItem(BaseModel):
@@ -1566,9 +1569,15 @@ async def chat_assistant(req: ChatRequest, request: Request, current_user: dict 
             f"Match Score: {req.candidate_score}%\n"
             f"Predicted Role: {req.candidate_role}\n"
             f"Matched Skills: {', '.join(req.matched_skills)}\n"
-            f"Missing Skills: {', '.join(req.missing_skills)}\n\n"
-            f"Recruiter's Question: {req.message}"
+            f"Missing Skills: {', '.join(req.missing_skills)}\n"
         )
+        if req.experience is not None:
+            prompt += f"Years Experience: {req.experience}\n"
+        if req.summary:
+            prompt += f"Candidate Summary: {req.summary[:500]}\n"
+        if req.recruiter_notes:
+            prompt += f"Recruiter Notes: {req.recruiter_notes}\n"
+        prompt += f"\nRecruiter's Question: {req.message}"
         if req.job_description:
             prompt += f"\nTarget Job Description Context: {req.job_description[:1000]}"
         
