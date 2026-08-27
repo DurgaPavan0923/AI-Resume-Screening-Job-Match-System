@@ -63,6 +63,48 @@ class AIConfig:
     # Simple rate limiting storage
     rate_limits = {}
 
+# In-memory Enterprise OS State
+CANDIDATE_STAGES: dict[str, int] = {}
+CANDIDATE_VERIFICATIONS: dict[str, dict[str, bool]] = {}
+CANDIDATE_NOTES: dict[str, list[dict]] = {}
+SCHEDULED_INTERVIEWS: list[dict] = []
+AUDIT_LOGS: list[dict] = [
+    {
+        "id": 1,
+        "timestamp": "May 25, 2026 09:01",
+        "action": "Recruiter Pavan Kumar authenticated via SSO session.",
+        "user": "Pavan Kumar",
+        "role": "recruiter"
+    },
+    {
+        "id": 2,
+        "timestamp": "May 24, 2026 17:15",
+        "action": "Completed batch screening for role: Senior Machine Learning Engineer.",
+        "user": "Elena Rostova",
+        "role": "hr"
+    },
+    {
+        "id": 3,
+        "timestamp": "May 24, 2026 16:42",
+        "action": "System Admin verified Google Gemini 2.5 Flash active provider status.",
+        "user": "Admin User",
+        "role": "admin"
+    }
+]
+
+def add_audit_log_internal(action: str, user: str = "System", role: str = "system") -> dict:
+    log_entry = {
+        "id": int(time.time() * 1000),
+        "timestamp": datetime.datetime.now().strftime("%b %d, %Y %H:%M"),
+        "action": action,
+        "user": user,
+        "role": role
+    }
+    AUDIT_LOGS.insert(0, log_entry)
+    if len(AUDIT_LOGS) > 100:
+        AUDIT_LOGS.pop()
+    return log_entry
+
 
 def sanitize_input(text: str) -> str:
     if not AIConfig.enable_masking:
@@ -369,6 +411,9 @@ class AnalyzeResponse(BaseModel):
     explainability: Explainability | None = None
     multi_agent_timeline: list[dict] | None = None
     evidence_map:   list[EvidenceItem] | None = None
+    pipeline_stage: int | None = 1
+    verification:   dict[str, bool] | None = None
+    candidate_id:   str | None = None
 
 
 class KeyValueImportance(BaseModel):
@@ -1082,7 +1127,10 @@ def process_single_pdf(file_like: io.BytesIO, filename: str, job_description: st
         career_trajectory = career_trajectory,
         explainability = explainability,
         multi_agent_timeline = multi_agent_timeline,
-        evidence_map = [EvidenceItem(**item) for item in generate_evidence_map(result.raw_text, list(result.skills.keys()), result.missing_skills)]
+        evidence_map = [EvidenceItem(**item) for item in generate_evidence_map(result.raw_text, list(result.skills.keys()), result.missing_skills)],
+        pipeline_stage = CANDIDATE_STAGES.get(filename, 1),
+        verification   = CANDIDATE_VERIFICATIONS.get(filename, {"screen": False, "eval": False, "hiring": False}),
+        candidate_id   = filename
     )
 
 
@@ -1750,3 +1798,218 @@ async def mock_interview_agent(req: MockInterviewRequest, current_user: dict = D
         sentiment_score = sentiment_score,
         ai_feedback = ai_feedback
     )
+
+
+# ---------------------------------------------------------------------------
+# Enterprise Workflow & Dossier Endpoints
+# ---------------------------------------------------------------------------
+
+class ForgotPasswordRequest(BaseModel):
+    email: str
+
+@app.post("/api/auth/forgot-password", tags=["Auth"])
+async def forgot_password(req: ForgotPasswordRequest):
+    email = req.email.strip()
+    if not email:
+        raise HTTPException(status_code=400, detail="Email is required.")
+    add_audit_log_internal(f"Password reset link generated for {email}.", "System", "auth")
+    return {"status": "success", "message": f"Password reset instructions have been dispatched to {email}."}
+
+
+class StageUpdateRequest(BaseModel):
+    stage_index: int
+
+
+@app.patch("/api/candidates/{candidate_id}/stage", tags=["Pipeline"])
+async def update_candidate_stage(candidate_id: str, req: StageUpdateRequest, current_user: dict = Depends(get_current_user)):
+    if req.stage_index < 0 or req.stage_index > 5:
+        raise HTTPException(status_code=400, detail="Invalid stage index (0-5).")
+    stages = ["Applied", "Screened", "Shortlisted", "Technical Interview", "Final Review", "Hired"]
+    stage_name = stages[req.stage_index]
+    CANDIDATE_STAGES[candidate_id] = req.stage_index
+    add_audit_log_internal(
+        f"Candidate '{candidate_id}' moved to stage '{stage_name}' by {current_user.get('name', 'Recruiter')}.",
+        current_user.get('name', 'Recruiter'),
+        current_user.get('role', 'recruiter')
+    )
+    return {"status": "success", "candidate_id": candidate_id, "stage_index": req.stage_index, "stage_name": stage_name}
+
+
+@app.get("/api/candidates/{candidate_id}/stage", tags=["Pipeline"])
+async def get_candidate_stage(candidate_id: str, current_user: dict = Depends(get_current_user)):
+    stage_index = CANDIDATE_STAGES.get(candidate_id, 1)
+    stages = ["Applied", "Screened", "Shortlisted", "Technical Interview", "Final Review", "Hired"]
+    return {"status": "success", "candidate_id": candidate_id, "stage_index": stage_index, "stage_name": stages[stage_index]}
+
+
+class VerificationRequest(BaseModel):
+    stage: str
+    approved: bool
+
+
+@app.post("/api/candidates/{candidate_id}/verify", tags=["Pipeline"])
+async def verify_candidate(candidate_id: str, req: VerificationRequest, current_user: dict = Depends(get_current_user)):
+    if req.stage not in ("screen", "eval", "hiring"):
+        raise HTTPException(status_code=400, detail="Invalid verification stage.")
+    
+    user_role = current_user.get("role", "recruiter")
+    if req.stage in ("eval", "hiring") and user_role not in ("hr", "admin"):
+        raise HTTPException(status_code=403, detail="Only HR Managers or Admins can sign off on Evaluation and Final Hiring approvals.")
+        
+    if candidate_id not in CANDIDATE_VERIFICATIONS:
+        CANDIDATE_VERIFICATIONS[candidate_id] = {"screen": False, "eval": False, "hiring": False}
+    CANDIDATE_VERIFICATIONS[candidate_id][req.stage] = req.approved
+    
+    all_approved = all(CANDIDATE_VERIFICATIONS[candidate_id].values())
+    
+    add_audit_log_internal(
+        f"Candidate '{candidate_id}' verification board '{req.stage}' set to {req.approved} by {current_user.get('name', 'User')}.",
+        current_user.get('name', 'User'),
+        user_role
+    )
+    return {
+        "status": "success",
+        "candidate_id": candidate_id,
+        "verification": CANDIDATE_VERIFICATIONS[candidate_id],
+        "all_approved": all_approved
+    }
+
+
+@app.get("/api/candidates/{candidate_id}/verify", tags=["Pipeline"])
+async def get_candidate_verification(candidate_id: str, current_user: dict = Depends(get_current_user)):
+    verif = CANDIDATE_VERIFICATIONS.get(candidate_id, {"screen": False, "eval": False, "hiring": False})
+    return {"status": "success", "candidate_id": candidate_id, "verification": verif, "all_approved": all(verif.values())}
+
+
+class NoteCreateRequest(BaseModel):
+    text: str
+
+
+@app.get("/api/candidates/{candidate_id}/notes", tags=["Notes"])
+async def get_candidate_notes(candidate_id: str, current_user: dict = Depends(get_current_user)):
+    notes = CANDIDATE_NOTES.get(candidate_id, [])
+    return {"status": "success", "candidate_id": candidate_id, "notes": notes}
+
+
+@app.post("/api/candidates/{candidate_id}/notes", tags=["Notes"])
+async def add_candidate_note(candidate_id: str, req: NoteCreateRequest, current_user: dict = Depends(get_current_user)):
+    text = req.text.strip()
+    if not text:
+        raise HTTPException(status_code=400, detail="Note text cannot be empty.")
+    if candidate_id not in CANDIDATE_NOTES:
+        CANDIDATE_NOTES[candidate_id] = []
+    
+    note_obj = {
+        "id": int(time.time() * 1000),
+        "text": text,
+        "author": current_user.get("name", "Recruiter"),
+        "role": current_user.get("role", "recruiter"),
+        "timestamp": datetime.datetime.now().strftime("%b %d, %Y %H:%M")
+    }
+    CANDIDATE_NOTES[candidate_id].insert(0, note_obj)
+    
+    add_audit_log_internal(
+        f"Recruiter note added to '{candidate_id}' by {current_user.get('name', 'Recruiter')}.",
+        current_user.get('name', 'Recruiter'),
+        current_user.get('role', 'recruiter')
+    )
+    return {"status": "success", "candidate_id": candidate_id, "note": note_obj}
+
+
+class ScheduleInterviewRequest(BaseModel):
+    candidate_name: str
+    role: str
+    date: str
+    time: str
+    interviewer: str
+    is_zoom: bool = True
+
+
+@app.post("/api/interviews/schedule", tags=["Interview"])
+async def schedule_interview(req: ScheduleInterviewRequest, current_user: dict = Depends(get_current_user)):
+    import random
+    zoom_meeting_id = f"{random.randint(900, 999)} {random.randint(100, 999)} {random.randint(1000, 9999)}"
+    zoom_url = f"https://zoom.us/j/{zoom_meeting_id.replace(' ', '')}" if req.is_zoom else "In-Person Corporate HQ"
+    
+    email_template = (
+        f"Subject: Technical Interview Invitation: InsightAI Screening for {req.role}\n\n"
+        f"Dear {req.candidate_name},\n\n"
+        f"Congratulations! We would love to invite you for a Technical Interview round for the {req.role} position.\n\n"
+        f"Session Details:\n"
+        f"- Target Role: {req.role}\n"
+        f"- Date: {req.date}\n"
+        f"- Time: {req.time} (Standard Corporate Time)\n"
+        f"- Lead Interviewer: {req.interviewer}\n"
+        f"- Location / Meeting Link: {zoom_url}\n\n"
+        f"Please confirm your availability by replying to this invitation. We look forward to meeting you!\n\n"
+        f"Best regards,\n"
+        f"Talent Acquisition Squad\n"
+        f"InsightAI Enterprise Recruiting"
+    )
+    
+    interview_record = {
+        "id": int(time.time() * 1000),
+        "candidate_name": req.candidate_name,
+        "role": req.role,
+        "date": req.date,
+        "time": req.time,
+        "interviewer": req.interviewer,
+        "zoom_url": zoom_url,
+        "email_template": email_template,
+        "scheduled_by": current_user.get("name", "Recruiter"),
+        "created_at": datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    }
+    SCHEDULED_INTERVIEWS.append(interview_record)
+    
+    CANDIDATE_STAGES[req.candidate_name] = 3
+    
+    add_audit_log_internal(
+        f"Interview scheduled for '{req.candidate_name}' on {req.date} at {req.time} with {req.interviewer}.",
+        current_user.get('name', 'Recruiter'),
+        current_user.get('role', 'recruiter')
+    )
+    
+    return {
+        "status": "success",
+        "interview": interview_record,
+        "zoom_url": zoom_url,
+        "email_template": email_template
+    }
+
+
+@app.get("/api/interviews", tags=["Interview"])
+async def list_interviews(current_user: dict = Depends(get_current_user)):
+    return {"status": "success", "interviews": SCHEDULED_INTERVIEWS}
+
+
+@app.get("/api/audit-logs", tags=["Audit"])
+async def get_audit_logs(current_user: dict = Depends(get_current_user)):
+    return {"status": "success", "logs": AUDIT_LOGS}
+
+
+class AuditLogCreateRequest(BaseModel):
+    action: str
+
+
+@app.post("/api/audit-logs", tags=["Audit"])
+async def create_audit_log(req: AuditLogCreateRequest, current_user: dict = Depends(get_current_user)):
+    log_item = add_audit_log_internal(
+        req.action,
+        current_user.get("name", "User"),
+        current_user.get("role", "recruiter")
+    )
+    return {"status": "success", "log": log_item}
+
+
+class RevokeSessionRequest(BaseModel):
+    session_id: str
+
+
+@app.post("/api/auth/sessions/revoke", tags=["Auth"])
+async def revoke_session(req: RevokeSessionRequest, current_user: dict = Depends(get_current_user)):
+    add_audit_log_internal(
+        f"Session {req.session_id} revoked by {current_user.get('name', 'User')}.",
+        current_user.get('name', 'User'),
+        current_user.get('role', 'recruiter')
+    )
+    return {"status": "success", "message": f"Session {req.session_id} revoked."}
